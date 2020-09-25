@@ -10,7 +10,7 @@ const mapStateToProps = (state, { navigation }) => {
 
     const {
         global: { language },
-        settings: {
+        categories: {
             loading: {
                 expenseCategoryLoading,
                 initExpenseCategoryLoading,

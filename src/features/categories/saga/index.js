@@ -2,11 +2,13 @@ import { call, put, takeEvery } from 'redux-saga/effects';
 
 import {
     settingsTriggerSpinner,
+} from '../../settings/actions';
+import {
     setExpenseCategories,
     setCreateExpenseCategories,
     setEditExpenseCategories,
     setRemoveExpenseCategories,
-} from '../../actions';
+} from '../actions';
 
 import {
     GET_EXPENSE_CATEGORIES,
@@ -20,10 +22,10 @@ import {
     GET_EDIT_EXPENSE_CATEGORIES_URL,
     EDIT_EXPENSE_CATEGORIES_URL,
     REMOVE_EXPENSE_CATEGORIES_URL,
-} from '../../constants';
+} from '../constants';
 
-import Request from '../../../../api/request';
-import { ROUTES } from '../../../../navigation/routes';
+import Request from '../../../api/request';
+import { ROUTES } from '../../../navigation/routes';
 
 
 function* getExpenseCategories(payloadData) {

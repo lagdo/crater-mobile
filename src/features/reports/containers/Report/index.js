@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Report } from '../../components/Report';
 import { reduxForm, getFormValues } from 'redux-form';
 import { validate } from './validation';
-import * as MoreAction from '../../actions';
+import * as ReportAction from '../../actions';
 import { REPORT_FORM, DATE_RANGE } from '../../constants';
 
 const mapStateToProps = (state, { navigation }) => {
@@ -31,7 +31,7 @@ const mapStateToProps = (state, { navigation }) => {
 };
 
 const mapDispatchToProps = {
-    generateReport: MoreAction.generateReport,
+    generateReport: ReportAction.generateReport,
 };
 
 //  Redux Forms

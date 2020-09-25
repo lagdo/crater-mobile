@@ -2,11 +2,13 @@ import { call, put, takeEvery } from 'redux-saga/effects';
 
 import {
     settingsTriggerSpinner,
+} from '../../settings/actions';
+import {
     setTaxes,
     setTax,
     setEditTax,
     setRemoveTax,
-} from '../../actions';
+} from '../actions';
 
 import {
     GET_TAXES,
@@ -18,9 +20,9 @@ import {
     CREATE_SALES_TAX_URL,
     EDIT_SALES_TAX_URL,
     REMOVE_SALES_TAX_URL,
-} from '../../constants';
+} from '../constants';
 
-import Request from '../../../../api/request';
+import Request from '../../../api/request';
 
 
 function* getTaxTypes({ payload: { onResult } = {} }) {

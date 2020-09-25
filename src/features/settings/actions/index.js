@@ -13,23 +13,6 @@ import {
     CLEAR_PREFERENCES,
     GET_SETTING_ITEM,
     EDIT_SETTING_ITEM,
-    GET_EXPENSE_CATEGORIES,
-    GET_CREATE_EXPENSE_CATEGORY,
-    CREATE_EXPENSE_CATEGORY,
-    EDIT_EXPENSE_CATEGORY,
-    REMOVE_EXPENSE_CATEGORY,
-    SET_EXPENSE_CATEGORIES,
-    SET_CREATE_EXPENSE_CATEGORIES,
-    SET_EDI_EXPENSE_CATEGORIES,
-    SET_REMOVE_EXPENSE_CATEGORIES,
-    GET_TAXES,
-    SET_TAXES,
-    REMOVE_TAX,
-    SET_TAX,
-    TAX_ADD,
-    TAX_EDIT,
-    SET_EDIT_TAX,
-    SET_REMOVE_TAX,
     GET_CUSTOMIZE_SETTINGS,
     SET_CUSTOMIZE_SETTINGS,
     EDIT_CUSTOMIZE_SETTINGS,
@@ -129,95 +112,6 @@ export const editSettingItem = (payload) => ({
 
 export const setSettings = (payload) => ({
     type: SET_SETTINGS,
-    payload,
-});
-
-// Expense Categories
-// -------------------------------------------------
-export const getExpenseCategories = (payload) => ({
-    type: GET_EXPENSE_CATEGORIES,
-    payload,
-});
-
-export const setExpenseCategories = (payload) => ({
-    type: SET_EXPENSE_CATEGORIES,
-    payload,
-});
-
-export const setCreateExpenseCategories = (payload) => ({
-    type: SET_CREATE_EXPENSE_CATEGORIES,
-    payload,
-});
-
-export const setEditExpenseCategories = (payload) => ({
-    type: SET_EDI_EXPENSE_CATEGORIES,
-    payload,
-});
-
-export const setRemoveExpenseCategories = (payload) => ({
-    type: SET_REMOVE_EXPENSE_CATEGORIES,
-    payload,
-});
-
-export const createExpenseCategory = (payload = {}) => ({
-    type: CREATE_EXPENSE_CATEGORY,
-    payload,
-});
-
-export const getEditExpenseCategory = (payload = {}) => ({
-    type: GET_CREATE_EXPENSE_CATEGORY,
-    payload,
-});
-
-export const removeExpenseCategory = (payload = {}) => ({
-    type: REMOVE_EXPENSE_CATEGORY,
-    payload,
-});
-
-export const editExpenseCategory = (payload = {}) => ({
-    type: EDIT_EXPENSE_CATEGORY,
-    payload,
-});
-
-//  Taxes
-// -------------------------------------------------
-export const getTaxes = (payload) => ({
-    type: GET_TAXES,
-    payload,
-});
-
-export const setTaxes = (payload) => ({
-    type: SET_TAXES,
-    payload,
-});
-
-export const addTax = (payload) => ({
-    type: TAX_ADD,
-    payload,
-});
-
-export const editTax = (payload) => ({
-    type: TAX_EDIT,
-    payload,
-});
-
-export const removeTax = (payload) => ({
-    type: REMOVE_TAX,
-    payload,
-});
-
-export const setTax = (payload) => ({
-    type: SET_TAX,
-    payload,
-});
-
-export const setEditTax = (payload) => ({
-    type: SET_EDIT_TAX,
-    payload,
-});
-
-export const setRemoveTax = (payload) => ({
-    type: SET_REMOVE_TAX,
     payload,
 });
 
