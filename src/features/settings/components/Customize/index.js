@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Fragment } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { Field, change } from 'redux-form';
 import styles from './styles';
@@ -31,57 +31,56 @@ type IProps = {
     handleSubmit: Function,
 }
 
-export class Customize extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
+export const Customize = (props: IProps) =>  {
+    const {
+        navigation,
+        language,
+        type,
+        isLoading,
+        loading,
+        handleSubmit,
+        formValues,
+        editSettingItem,
+        getCustomizeSettings,
+        setCustomizeSettings,
+        editCustomizeSettings,
+        customizes,
+    } = props;
 
-        this.paymentChild = React.createRef();
-        this.itemChild = React.createRef();
+    const paymentChild = useRef(null);
+    const itemChild = useRef(null);
 
-        this.state = {
-            data: {},
-            isUpdateAutoGenerate: false,
-            activeTab: PAYMENT_TABS.MODE,
-        }
-    }
+    const [data, setData] = useState({});
+    const [isUpdateAutoGenerate, setUpdateAutoGenerate] = useState(false);
+    const [activeTab, setActiveTab] = useState(PAYMENT_TABS.MODE);
 
-    componentDidMount() {
-
-        const {
-            getCustomizeSettings,
-            customizes,
-            navigation,
-        } = this.props
-
-        let hasCustomizeApiCalled = customizes ? (typeof customizes === 'undefined' || customizes === null) : true
+    useEffect(() => {
+        let hasCustomizeApiCalled = customizes ?
+            (typeof customizes === 'undefined' || customizes === null) : true
 
         hasCustomizeApiCalled && getCustomizeSettings()
 
-        this.setState({ data: this.setParams() })
+        setData(setParams())
 
         goBack(MOUNT, navigation)
-    }
 
-    componentWillUpdate(nextProps, nextState) {
+        return () => {
+            isUpdateAutoGenerate &&
+                setCustomizeSettings({ customizes: null })
+            goBack(UNMOUNT)
+        }
+    }, []);
 
-        const { navigation } = nextProps
-        const toastMsg = navigation.getParam('toastMsg', null)
+    const toastMsg = navigation.getParam('toastMsg', null);
 
+    useEffect(() => {
         toastMsg &&
             setTimeout(() => {
                 navigation.setParams({ 'toastMsg': null })
             }, 2500);
-    }
+    }, [toastMsg]);
 
-    componentWillUnmount() {
-        this.state.isUpdateAutoGenerate &&
-            this.props.setCustomizeSettings({ customizes: null })
-        goBack(UNMOUNT)
-    }
-
-    setParams = (values = null) => {
-
-        const { type } = this.props
+    const setParams = (values = null) => {
         let params = {}
 
         switch (type) {
@@ -159,16 +158,12 @@ export class Customize extends React.Component<IProps> {
         return params
     }
 
-    setFormField = (field, value) => {
-        this.props.dispatch(change(CUSTOMIZE_FORM, field, value));
+    const setFormField = (field, value) => {
+        props.dispatch(change(CUSTOMIZE_FORM, field, value));
     };
 
-    changeAutoGenerateStatus = (field, status) => {
-
-        this.setFormField(field, status)
-
-        const { editSettingItem } = this.props
-        const { data: { autoGenerateName } } = this.state
+    const changeAutoGenerateStatus = (field, status) => {
+        setFormField(field, status)
 
         editSettingItem({
             params: {
@@ -177,30 +172,25 @@ export class Customize extends React.Component<IProps> {
             },
             hasCustomize: true,
             onResult: () => {
-                this.toggleToast()
-                this.setState({ isUpdateAutoGenerate: true })
+                toggleToast()
+                setUpdateAutoGenerate(true)
             }
         })
     }
 
-    onSave = (values) => {
-
-        const { editCustomizeSettings, navigation } = this.props
-        const params = this.setParams(values)
+    const onSave = (values) => {
+        const params = setParams(values)
 
         editCustomizeSettings({ params, navigation })
     }
 
-    toggleToast = () => {
-        this.props.navigation.setParams({
+    const toggleToast = () => {
+        navigation.setParams({
             "toastMsg": "settings.preferences.settingUpdate"
         })
     }
 
-    BOTTOM_ACTION = () => {
-        const { language, loading, handleSubmit, type } = this.props
-        const { activeTab } = this.state
-
+    const BOTTOM_ACTION = () => {
         let isPaymentMode = (type === CUSTOMIZE_TYPE.PAYMENTS && activeTab === PAYMENT_TABS.MODE)
         let isItemScreen = type === CUSTOMIZE_TYPE.ITEMS
 
@@ -211,10 +201,10 @@ export class Customize extends React.Component<IProps> {
                 <View style={{ flex: 1 }}>
                     <CtButton
                         onPress={() => isPaymentMode ?
-                            this.paymentChild.current.openModal() :
+                            paymentChild.current.openModal() :
                             isItemScreen ?
-                                this.itemChild.current.openModal()
-                                : handleSubmit(this.onSave)()
+                                itemChild.current.openModal()
+                                : handleSubmit(onSave)()
                         }
                         btnTitle={Lng.t(title, { locale: language })}
                         containerStyle={styles.handleBtn}
@@ -225,8 +215,7 @@ export class Customize extends React.Component<IProps> {
         )
     }
 
-    TOGGLE_FIELD_VIEW = (language, data) => {
-
+    const TOGGLE_FIELD_VIEW = () => {
         return (
             <ScrollView
                 bounces={false}
@@ -243,15 +232,14 @@ export class Customize extends React.Component<IProps> {
                     hint={Lng.t(data.autoGenerateTitle, { locale: language })}
                     description={Lng.t(data.autoGenerateDescription, { locale: language })}
                     onChangeCallback={(val) =>
-                        this.changeAutoGenerateStatus(data.autoGenerateName, val)
+                        changeAutoGenerateStatus(data.autoGenerateName, val)
                     }
                 />
             </ScrollView>
         )
     }
 
-    PREFIX_FIELD = (language, data) => {
-
+    const PREFIX_FIELD = () => {
         return (
             <Field
                 name={data.prefixName}
@@ -270,20 +258,13 @@ export class Customize extends React.Component<IProps> {
         )
     }
 
-    setActiveTab = (activeTab) => {
-        this.setState({ activeTab });
-    }
-
-    PAYMENT_CUSTOMIZE_TAB = () => {
-        const { language } = this.props
-        const { activeTab, data } = this.state
-
+    const PAYMENT_CUSTOMIZE_TAB = () => {
         return (
             <Tabs
                 activeTab={activeTab}
                 style={styles.tabs}
                 tabStyle={styles.tabView}
-                setActiveTab={this.setActiveTab}
+                setActiveTab={setActiveTab}
                 tabs={[
                     {
                         Title: PAYMENT_TABS.MODE,
@@ -291,9 +272,9 @@ export class Customize extends React.Component<IProps> {
                         render: (
                             <ScrollView keyboardShouldPersistTaps='handled'>
                                 <PaymentModes
-                                    ref={this.paymentChild}
-                                    props={this.props}
-                                    setFormField={(field, value) => this.setFormField(field, value)}
+                                    ref={paymentChild}
+                                    props={props}
+                                    setFormField={(field, value) => setFormField(field, value)}
                                 />
                             </ScrollView>
                         )
@@ -304,9 +285,9 @@ export class Customize extends React.Component<IProps> {
                         render: (
                             <View style={styles.bodyContainer}>
 
-                                {this.PREFIX_FIELD(language, data)}
+                                {PREFIX_FIELD(language, data)}
 
-                                {this.TOGGLE_FIELD_VIEW(language, data)}
+                                {TOGGLE_FIELD_VIEW(language, data)}
 
                             </View>
                         )
@@ -316,65 +297,53 @@ export class Customize extends React.Component<IProps> {
         )
     }
 
-    render() {
-        const {
-            navigation,
-            language,
-            type,
-            isLoading,
-            formValues,
-        } = this.props;
+    let toastMessage = navigation.getParam('toastMsg', '')
+    let isItemsScreen = (type === CUSTOMIZE_TYPE.ITEMS)
+    let isPaymentsScreen = (type === CUSTOMIZE_TYPE.PAYMENTS)
 
-        const { data } = this.state
+    let dataLoading = isItemsScreen ? !hasObjectLength(data) :
+        !hasObjectLength(data) || isLoading || !hasObjectLength(formValues)
 
-        let toastMessage = navigation.getParam('toastMsg', '')
-        let isItemsScreen = (type === CUSTOMIZE_TYPE.ITEMS)
-        let isPaymentsScreen = (type === CUSTOMIZE_TYPE.PAYMENTS)
+    return (
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: () => navigation.navigate(ROUTES.CUSTOMIZES),
+                title: Lng.t(data.headerTitle, { locale: language }),
+                titleStyle: headerTitle({ marginLeft: -26, marginRight: -50 }),
+                rightIconPress: null,
+                placement: "center",
+            }}
+            bottomAction={BOTTOM_ACTION()}
+            toastProps={{
+                message: Lng.t(toastMessage, { locale: language }),
+                visible: toastMessage
+            }}
+            loadingProps={{ is: dataLoading }}
+            hideScrollView
+        >
 
-        let loading = isItemsScreen ? !hasObjectLength(data) :
-            !hasObjectLength(data) || isLoading || !hasObjectLength(formValues)
+            {isPaymentsScreen && PAYMENT_CUSTOMIZE_TAB()}
 
-        return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: () => navigation.navigate(ROUTES.CUSTOMIZES),
-                    title: Lng.t(data.headerTitle, { locale: language }),
-                    titleStyle: headerTitle({ marginLeft: -26, marginRight: -50 }),
-                    rightIconPress: null,
-                    placement: "center",
-                }}
-                bottomAction={this.BOTTOM_ACTION()}
-                toastProps={{
-                    message: Lng.t(toastMessage, { locale: language }),
-                    visible: toastMessage
-                }}
-                loadingProps={{ is: loading }}
-                hideScrollView
-            >
+            {isItemsScreen && (
+                <ScrollView keyboardShouldPersistTaps='handled'>
+                    <Units
+                        ref={itemChild}
+                        props={props}
+                        setFormField={(field, value) => setFormField(field, value)}
+                    />
+                </ScrollView>
+            )}
 
-                {isPaymentsScreen && this.PAYMENT_CUSTOMIZE_TAB()}
+            {!isPaymentsScreen && !isItemsScreen && (
+                <View style={styles.bodyContainer}>
 
-                {isItemsScreen && (
-                    <ScrollView keyboardShouldPersistTaps='handled'>
-                        <Units
-                            ref={this.itemChild}
-                            props={this.props}
-                            setFormField={(field, value) => this.setFormField(field, value)}
-                        />
-                    </ScrollView>
-                )}
+                    {PREFIX_FIELD()}
 
-                {!isPaymentsScreen && !isItemsScreen && (
-                    <View style={styles.bodyContainer}>
+                    {TOGGLE_FIELD_VIEW()}
 
-                        {this.PREFIX_FIELD(language, data)}
+                </View>
+            )}
 
-                        {this.TOGGLE_FIELD_VIEW(language, data)}
-
-                    </View>
-                )}
-
-            </DefaultLayout>
-        );
-    }
+        </DefaultLayout>
+    );
 }
