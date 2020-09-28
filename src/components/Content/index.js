@@ -12,13 +12,15 @@ type IProps = {
     onRetry: Function,
 };
 
-export const Content = ({
-    children,
-    withLoading = false,
-    loading,
-    loadingProps,
-    emptyProps,
-}: IProps) => {
+export const Content = (props: IProps) => {
+    const {
+        children,
+        withLoading = false,
+        loading,
+        loadingProps,
+        emptyProps,
+    } = props;
+
     if (emptyProps && emptyProps.is) {
         return <Empty {...emptyProps} />;
     }

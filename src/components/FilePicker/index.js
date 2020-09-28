@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -34,18 +34,25 @@ type IProps = {
     defaultImage: String
 };
 
-export class FilePickerComponent extends Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            image: null,
-            loading: false
-        };
-    }
+export const FilePickerComponent = (props: IProps) => {
+    const {
+        label,
+        containerStyle,
+        imageUrl,
+        imageStyle,
+        imageContainerStyle,
+        hasAvatar = false,
+        loadingContainerStyle,
+        defaultImage,
+        fileLoading,
+    } = props;
 
-    getPermissionAsync = async () => {
+    const [loading, setLoading] = useState(false);
+    const [image, setImage] = useState(null);
+
+    const getPermissionAsync = async () => {
         alertMe({
-            desc: Lng.t("filePicker.permission", { locale: this.props.language }),
+            desc: Lng.t("filePicker.permission"),
             showCancel: true,
             okText: 'Allow',
             okPress: () => {
@@ -58,29 +65,24 @@ export class FilePickerComponent extends Component<IProps> {
         })
     }
 
-    onToggleLoading = () => {
-        const { fileLoading } = this.props
-        const { loading } = this.state
+    const onToggleLoading = () => {
+        setLoading(!loading);
 
-        this.setState((prevState) => {
-            return { loading: !prevState.loading }
-        });
-
-        fileLoading && fileLoading(!loading)
+        fileLoading && fileLoading(!loading);
     }
 
-    chooseFile = async () => {
+    const chooseFile = async () => {
 
         const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
         if (status !== 'granted') {
-            this.getPermissionAsync();
+            getPermissionAsync();
         }
         else {
             setTimeout(() => {
-                this.onToggleLoading()
+                onToggleLoading()
             }, 1000);
 
-            const { mediaType = 'Images' } = this.props
+            const { mediaType = 'Images' } = props;
 
             let result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions[mediaType],
@@ -91,121 +93,102 @@ export class FilePickerComponent extends Component<IProps> {
             });
 
             if (!result.cancelled) {
-                const { onChangeCallback, input: { onChange } } = this.props
-                this.setState({ image: result.uri });
+                const { onChangeCallback, input: { onChange } } = props;
+                setImage(result.uri);
 
                 FileSystem.readAsStringAsync(result.uri, {
                     encoding: FileSystem.EncodingType.Base64
                 }).then((base64) => {
-                    const res = { ...result, base64 }
-                    onChangeCallback(res)
-                    this.onToggleLoading()
+                    const res = { ...result, base64 };
+                    onChangeCallback(res);
+                    onToggleLoading();
                 })
-                    .catch(error => {
-                        console.error(error);
-                    });
+                .catch(error => {
+                    // console.error(error);
+                });
             }
             else {
-                this.onToggleLoading()
+                onToggleLoading();
             }
         }
     };
 
+    return (
+        <View style={[styles.mainContainer, containerStyle && containerStyle]}>
+            {label && <Text style={styles.label}>{label}</Text>}
 
-    render() {
-
-        let { image, loading } = this.state;
-        const {
-            label,
-            containerStyle,
-            imageUrl,
-            language,
-            imageStyle,
-            imageContainerStyle,
-            hasAvatar = false,
-            loadingContainerStyle,
-            defaultImage,
-        } = this.props;
-
-
-        return (
-            <View style={[styles.mainContainer, containerStyle && containerStyle]}>
-                {label && <Text style={styles.label}>{label}</Text>}
-
-                <TouchableWithoutFeedback onPress={() => this.chooseFile()}>
-                    <View>
-                        <View
-                            style={[
-                                styles.imageWithIconContainer,
-                                hasAvatar && imageContainerStyle
-                            ]}
+            <TouchableWithoutFeedback onPress={() => chooseFile()}>
+                <View>
+                    <View
+                        style={[
+                            styles.imageWithIconContainer,
+                            hasAvatar && imageContainerStyle
+                        ]}
+                    >
+                        <Content
+                            loadingProps={{
+                                is: loading,
+                                style: { ...styles.loadingContainer, ...loadingContainerStyle }
+                            }}
                         >
-                            <Content
-                                loadingProps={{
-                                    is: loading,
-                                    style: { ...styles.loadingContainer, ...loadingContainerStyle }
-                                }}
-                            >
-                                {image !== null || imageUrl ? (
-                                    <View
-                                        style={[
-                                            styles.imageContainer,
-                                            imageContainerStyle
+                            {image !== null || imageUrl ? (
+                                <View
+                                    style={[
+                                        styles.imageContainer,
+                                        imageContainerStyle
+                                    ]}
+                                >
+                                    <AssetImage
+                                        imageSource={image !== null ? image : imageUrl}
+                                        imageStyle={[
+                                            styles.images,
+                                            imageStyle && imageStyle,
                                         ]}
-                                    >
-                                        <AssetImage
-                                            imageSource={image !== null ? image : imageUrl}
-                                            imageStyle={[
-                                                styles.images,
-                                                imageStyle && imageStyle,
-                                            ]}
-                                            uri
-                                            loadingImageStyle={styles.loadImage}
-                                        />
-                                    </View>
-                                ) : (
-                                        !defaultImage ? (
-                                            <View style={styles.container}>
-                                                <Icon
-                                                    name={"cloud-upload-alt"}
-                                                    size={23}
-                                                    color={colors.gray}
-                                                />
-                                                <Text style={styles.title}>
-                                                    {Lng.t("filePicker.file", { locale: language })}
-                                                </Text>
-                                            </View>
+                                        uri
+                                        loadingImageStyle={styles.loadImage}
+                                    />
+                                </View>
+                            ) : (
+                                    !defaultImage ? (
+                                        <View style={styles.container}>
+                                            <Icon
+                                                name={"cloud-upload-alt"}
+                                                size={23}
+                                                color={colors.gray}
+                                            />
+                                            <Text style={styles.title}>
+                                                {Lng.t("filePicker.file")}
+                                            </Text>
+                                        </View>
+                                    )
+                                        : (
+                                            <AssetImage
+                                                imageSource={defaultImage}
+                                                imageStyle={[
+                                                    styles.images,
+                                                    imageStyle && imageStyle,
+                                                ]}
+                                                loadingImageStyle={styles.loadImage}
+                                            />
                                         )
-                                            : (
-                                                <AssetImage
-                                                    imageSource={defaultImage}
-                                                    imageStyle={[
-                                                        styles.images,
-                                                        imageStyle && imageStyle,
-                                                    ]}
-                                                    loadingImageStyle={styles.loadImage}
-                                                />
-                                            )
-                                    )}
-                            </Content>
-                        </View>
-                        {hasAvatar && (
-                            <View style={styles.iconContainer}>
-                                <Icon
-                                    name={"camera"}
-                                    size={20}
-                                    color={colors.white}
-                                    style={styles.iconStyle}
-                                />
-                            </View>
-                        )}
+                                )}
+                        </Content>
                     </View>
-                </TouchableWithoutFeedback>
-            </View>
-        );
-    }
+                    {hasAvatar && (
+                        <View style={styles.iconContainer}>
+                            <Icon
+                                name={"camera"}
+                                size={20}
+                                color={colors.white}
+                                style={styles.iconStyle}
+                            />
+                        </View>
+                    )}
+                </View>
+            </TouchableWithoutFeedback>
+        </View>
+    );
 }
-
 
 const mapStateToProps = ({ global }) => ({
     language: global.language,

@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
 } from 'react-native';
@@ -13,40 +13,56 @@ import { connect } from 'react-redux';
 import { IProps } from './type';
 import { headerTitle } from '../../api/helper';
 
-export class SelectFieldComponent extends Component<IProps> {
-    constructor(props) {
-        super(props);
+export const SelectFieldComponent = (props: IProps) => {
+    const {
+        language,
+        containerStyle,
+        items,
+        getItems,
+        loading,
+        label,
+        icon,
+        placeholder,
+        meta,
+        headerProps,
+        hasPagination,
+        fakeInputProps,
+        listViewProps,
+        valueCompareField,
+        compareField,
+        concurrentMultiSelect,
+        emptyContentProps,
+        apiSearch,
+        searchInputProps,
+        isRequired,
+        isInternalSearch,
+        onSelect,
+        isMultiSelect,
+        input: { name, value, onChange },
+        hasFirstItem = true,
+        displayName,
+        isEditable = true,
+        onlyPlaceholder,
+        isCompareField = true,
+        searchFields,
+        onSearch,
+        rightIconPress,
+        emptyContentProps: { contentType },
+        pagination: pg,
+    } = props;
 
-        this.state = {
-            page: 1,
-            refreshing: false,
-            pagination: {
-                page: 1,
-                limit: 10,
-                lastPage: 1
-            },
-            search: '',
-            visible: false,
-            values: '',
-            selectedItems: [],
-            oldItems: [],
-            defaultItem: [],
-            searchItems: [],
-            oldValue: '',
-        };
-    }
+    const [refreshing, setRefreshing] = useState(false);
+    const [pagination, setPagination] = useState(pg || { page: 1, limit: 10, lastPage: 1 });
+    const [search, setSearch] = useState('');
+    const [visible, setVisible] = useState(false);
+    const [values, setValues] = useState('');
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [oldItems, setOldItems] = useState([]);
+    const [defaultItems, setDefaultItems] = useState([]);
+    const [searchItems, setSearchItems] = useState([]);
+    const [oldValue, setOldValue] = useState();
 
-    componentDidMount() {
-        const {
-            input: { value },
-            pagination,
-            compareField,
-            items,
-            apiSearch,
-            displayName,
-            concurrentMultiSelect
-        } = this.props
-
+    useEffect(() => {
         if (typeof items !== 'undefined') {
             let newValue = ''
 
@@ -55,41 +71,26 @@ export class SelectFieldComponent extends Component<IProps> {
                     newValue = items[key]['fullItem'][displayName]
                 }
             }
-            concurrentMultiSelect && this.setState({
-                selectedItems: value,
-                oldItems: value,
-            })
+            if (concurrentMultiSelect) {
+                setSelectedItems(value);
+                setOldItems(value);
+            }
 
-            this.setState({
-                values: compareField ? newValue : value[displayName],
-                defaultItem: items || [],
-                searchItems: items || [],
-                oldValue: compareField ? value : value[displayName],
-            })
-
+            setValues(compareField ? newValue : value[displayName]);
+            setDefaultItems(items || []);
+            setSearchItems(items || []);
+            setOldValue(compareField ? value : value[displayName]);
         }
 
-        apiSearch && this.onGetItems({
+        apiSearch && onGetItems({
             fresh: true,
             onResult: () => {
-                const {
-                    items,
-                    onSelect,
-                    isMultiSelect,
-                    valueCompareField,
-                    compareField,
-                    input: { onChange, value },
-                    hasFirstItem = true
-                } = this.props
-
                 if (typeof items !== 'undefined' && items.length !== 0 && hasFirstItem) {
 
                     firstItem = items[0]['fullItem']
 
-                    this.setState({
-                        values: compareField && firstItem[displayName],
-                        oldValue: compareField ? firstItem[compareField] : firstItem[displayName]
-                    })
+                    setValues(compareField && firstItem[displayName]);
+                    setOldValue(compareField ? firstItem[compareField] : firstItem[displayName]);
 
                     /*  if (!value) {
                          if (!onSelect) {
@@ -104,27 +105,12 @@ export class SelectFieldComponent extends Component<IProps> {
                 }
             }
         })
+    }, []);
 
-        pagination && this.setState({
-            pagination
-        })
-    }
-
-    componentWillUpdate(nextProps, nextState) {
-        const {
-            concurrentMultiSelect,
-            input: { value },
-            items,
-            compareField,
-            displayName,
-        } = nextProps
-        const { search, oldItems, oldValue } = nextState
-
+    useEffect(() => {
         if (concurrentMultiSelect && !search && oldItems.length < value.length) {
-            this.setState({
-                selectedItems: value,
-                oldItems: value
-            })
+            setSelectedItems(value);
+            setOldItems(value);
         }
 
         if (typeof items !== 'undefined' && !search) {
@@ -138,29 +124,13 @@ export class SelectFieldComponent extends Component<IProps> {
             }
 
             if (value && (oldValue !== value)) {
-                this.setState({
-                    oldValue: compareField ? value : value[displayName],
-                    values: compareField ? newValue : value[displayName],
-                })
+                setOldValue(compareField ? value : value[displayName]);
+                setValues(compareField ? newValue : value[displayName]);
             }
-
         }
+    }, [search, value, oldValue]);
 
-    }
-
-    onGetItems = ({
-        fresh = false,
-        onResult,
-        q = '',
-    } = {}) => {
-
-        const { getItems } = this.props
-
-        const {
-            refreshing,
-            pagination
-        } = this.state;
-
+    const onGetItems = ({ fresh = false, onResult, q = '' } = {}) => {
         if (refreshing) {
             return;
         }
@@ -171,9 +141,7 @@ export class SelectFieldComponent extends Component<IProps> {
             return
         }
 
-        this.setState({
-            refreshing: true,
-        })
+        setRefreshing(true);
 
         getItems && getItems({
             fresh,
@@ -181,58 +149,36 @@ export class SelectFieldComponent extends Component<IProps> {
             params: { search: q },
             q,
             onMeta: ({ last_page, current_page }) => {
-                this.setState({
-                    pagination: {
-                        ...paginationParams,
+                setPagination({
+                    ...paginationParams,
 
-                        lastPage: last_page,
-                        page: current_page + 1
-                    }
-                })
+                    lastPage: last_page,
+                    page: current_page + 1
+                });
             },
             onResult: () => {
-                this.setState({
-                    refreshing: false,
-                })
+                setRefreshing(false);
                 onResult && onResult();
             },
         });
 
     }
 
-    onToggle = () => {
-        const { meta, isEditable = true } = this.props
-        const { visible, defaultItem } = this.state
-
-
+    const onToggle = () => {
         if (isEditable) {
-            if (visible)
-                this.setState({ searchItems: defaultItem })
+            visible && setSearchItems(defaultItems);
 
-            this.setState((prevState) => {
-                return { visible: !prevState.visible }
-            });
+            setVisible(!visible);
 
             meta.dispatch(change(meta.form, 'search', ''));
         }
     }
 
-    onItemSelect = (item) => {
-        const {
-            concurrentMultiSelect
-        } = this.props
-        concurrentMultiSelect ? this.toggleItem(item) : this.getAlert(item)
-
+    const onItemSelect = (item) => {
+        concurrentMultiSelect ? toggleItem(item) : getAlert(item)
     }
 
-    toggleItem = (item) => {
-        const {
-            compareField,
-            valueCompareField,
-        } = this.props
-
-        const { selectedItems } = this.state
-
+    const toggleItem = (item) => {
         const newItem = [{ ...item, [valueCompareField]: item[compareField] }]
 
         if (selectedItems) {
@@ -245,36 +191,23 @@ export class SelectFieldComponent extends Component<IProps> {
                     JSON.parse(val[valueCompareField]) !== JSON.parse(item[compareField])
                 )
 
-                this.setState({ selectedItems: removedItems })
+                setSelectedItems(removedItems);
             } else {
-                this.setState({
-                    selectedItems: [...selectedItems, ...newItem],
-                })
+                setSelectedItems([...selectedItems, ...newItem]);
             }
         } else {
-            this.setState({ selectedItems: newItem })
+            setSelectedItems(newItem);
         }
     }
 
-    getAlert = (item) => {
-        const {
-            displayName,
-            input: { onChange, value },
-            isMultiSelect,
-            onlyPlaceholder,
-            onSelect,
-            compareField,
-            valueCompareField,
-            isCompareField = true
-        } = this.props
-
+    const getAlert = (item) => {
         if (!isMultiSelect && value) {
             const hasCompare = compareField ? value === item[compareField] :
                 JSON.parse(value.id) === JSON.parse(item.id)
 
             if (hasCompare) {
                 // alert(`The ${item[displayName]} already added`)
-                this.onToggle()
+                onToggle()
                 return
             }
         }
@@ -284,14 +217,12 @@ export class SelectFieldComponent extends Component<IProps> {
 
             if (hasSameItem.length > 0) {
                 // alert(`The ${item[displayName]} already added`)
-                this.onToggle()
+                onToggle()
                 return
             }
         }
 
-        !onlyPlaceholder && this.setState({
-            values: item[displayName]
-        })
+        !onlyPlaceholder && setValues(item[displayName]);
 
         if (!onSelect) {
             isMultiSelect ?
@@ -303,27 +234,20 @@ export class SelectFieldComponent extends Component<IProps> {
             onSelect(item)
         }
 
-        !onlyPlaceholder && this.setState({
-            oldValue: item[compareField]
-        })
+        !onlyPlaceholder && setOldValue(item[compareField]);
 
-        this.onToggle()
+        onToggle()
     }
 
-    onSearch = (search) => {
-        this.setState({ search })
-        const { apiSearch, isInternalSearch } = this.props;
+    const onSearchItems = (search) => {
+        setSearch(search);
 
-        apiSearch && !isInternalSearch ? this.onGetItems({ fresh: true, q: search }) : this.internalSearch(search)
+        apiSearch && !isInternalSearch ? onGetItems({ fresh: true, q: search }) : internalSearch(search)
     }
 
-    internalSearch = (search) => {
-
-        const { items, searchFields, onSearch, isInternalSearch } = this.props;
+    const internalSearch = (search) => {
         let newData = [];
-        const { defaultItem } = this.state
-
-        let searchItems = isInternalSearch ? items : defaultItem
+        let searchItems = isInternalSearch ? items : defaultItems
 
         if (typeof searchItems !== 'undefined' && searchItems.length != 0) {
             newData = searchItems.filter((item) => {
@@ -350,37 +274,28 @@ export class SelectFieldComponent extends Component<IProps> {
             });
         }
 
-        this.setState({ searchItems: newData })
+        setSearchItems(newData);
     }
 
-    onSubmit = () => {
-        const { input: { onChange, value } } = this.props
-
-        const { selectedItems } = this.state
-
+    const onSubmit = () => {
         onChange(selectedItems)
 
-        this.setState({
-            oldItems: selectedItems
-        })
+        setOldItems(selectedItems);
 
-        this.onToggle()
+        onToggle()
     }
 
-    onRightIconPress = () => {
-        const { rightIconPress } = this.props
-        this.onToggle()
+    const onRightIconPress = () => {
+        onToggle()
         rightIconPress && rightIconPress()
     }
 
-    BOTTOM_ACTION = () => {
-        const { language } = this.props
-
+    const BOTTOM_ACTION = () => {
         return (
             <View style={styles.submitButton}>
                 <View style={{ flex: 1 }}>
                     <CtButton
-                        onPress={this.onSubmit}
+                        onPress={onSubmit}
                         btnTitle={Lng.t("button.done", { locale: language })}
                         containerStyle={styles.handleBtn}
                     />
@@ -389,10 +304,7 @@ export class SelectFieldComponent extends Component<IProps> {
         )
     }
 
-    getEmptyTitle = () => {
-        const { language, emptyContentProps: { contentType } } = this.props
-        const { search } = this.state
-
+    const getEmptyTitle = () => {
         let emptyTitle = ''
 
         if (contentType) {
@@ -404,138 +316,104 @@ export class SelectFieldComponent extends Component<IProps> {
         return search ? `${noSearchResult} "${search}"` : emptyTitle
     }
 
-    render() {
-        const {
-            containerStyle,
-            items,
-            loading,
-            label,
-            icon,
-            placeholder,
-            meta,
-            headerProps,
-            hasPagination,
-            fakeInputProps,
-            listViewProps,
-            valueCompareField,
+    const { lastPage, page } = pagination;
+    const canLoadMore = (lastPage >= page);
+
+    let paginationContent = {}
+    let multiSelectProps = {}
+    let bottomActionProps = {}
+
+    if (concurrentMultiSelect) {
+        multiSelectProps = {
+            hasCheckbox: true,
             compareField,
-            concurrentMultiSelect,
-            emptyContentProps,
-            apiSearch,
-            searchInputProps,
-            input: { value },
-            isRequired,
-            isInternalSearch
-        } = this.props;
-
-        const {
-            refreshing,
-            visible,
-            search,
-            pagination: { lastPage, page },
-            values,
-            selectedItems,
-            searchItems,
-        } = this.state
-
-        const canLoadMore = (lastPage >= page)
-
-        let paginationContent = {}
-        let multiSelectProps = {}
-        let bottomActionProps = {}
-
-        if (concurrentMultiSelect) {
-            multiSelectProps = {
-                hasCheckbox: true,
-                compareField,
-                valueCompareField,
-                checkedItems: selectedItems,
-            }
-            bottomActionProps = {
-                bottomAction: this.BOTTOM_ACTION()
-            }
+            valueCompareField,
+            checkedItems: selectedItems,
         }
-
-        if (hasPagination) {
-            paginationContent = {
-                canLoadMore,
-                getFreshItems: (onHide) => {
-                    this.onGetItems({
-                        fresh: true,
-                        onResult: onHide,
-                        q: search,
-                    })
-                },
-                getItems: () => {
-                    this.onGetItems({
-                        q: search,
-                    });
-                },
-            }
+        bottomActionProps = {
+            bottomAction: BOTTOM_ACTION()
         }
-
-        let internalSearchItem = (isInternalSearch && !search) ? items : searchItems
-
-        return (
-            <View style={styles.container}>
-
-                <FakeInput
-                    label={label}
-                    icon={icon}
-                    isRequired={isRequired}
-                    values={value && (values || placeholder)}
-                    // values={value && values}
-                    placeholder={placeholder}
-                    onChangeCallback={this.onToggle}
-                    containerStyle={containerStyle}
-                    meta={meta}
-                    rightIcon={'angle-right'}
-                    {...fakeInputProps}
-                />
-
-                <SlideModal
-                    visible={visible}
-                    onToggle={this.onToggle}
-                    headerProps={{
-                        leftIcon: "long-arrow-alt-left",
-                        leftIconPress: () => this.onToggle(),
-                        titleStyle: headerTitle({}),
-                        placement: "center",
-                        rightIcon: "plus",
-                        hasCircle: false,
-                        noBorder: false,
-                        transparent: false,
-                        rightIconPress: () => this.onRightIconPress(),
-                        ...headerProps
-                    }}
-                    searchInputProps={searchInputProps && searchInputProps}
-                    onSearch={this.onSearch}
-                    bottomDivider
-                    {...paginationContent}
-                    {...bottomActionProps}
-                    listViewProps={{
-                        items: apiSearch ? items : internalSearchItem,
-                        onPress: this.onItemSelect,
-                        refreshing: refreshing,
-                        loading: loading,
-                        isEmpty: typeof items == 'undefined' || (apiSearch ?
-                            items.length <= 0 : internalSearchItem.length <= 0),
-                        bottomDivider: true,
-                        emptyContentProps: {
-                            title: this.getEmptyTitle(),
-                            ...emptyContentProps
-                        },
-                        itemContainer: {
-                            paddingVertical: 16
-                        },
-                        ...listViewProps,
-                        ...multiSelectProps,
-                        ...paginationContent
-                    }}
-                />
-            </View>
-        );
     }
+
+    if (hasPagination) {
+        paginationContent = {
+            canLoadMore,
+            getFreshItems: (onHide) => {
+                onGetItems({
+                    fresh: true,
+                    onResult: onHide,
+                    q: search,
+                })
+            },
+            getItems: () => {
+                onGetItems({
+                    q: search,
+                });
+            },
+        }
+    }
+
+    let internalSearchItem = (isInternalSearch && !search) ? items : searchItems
+
+    return (
+        <View style={styles.container}>
+
+            <FakeInput
+                label={label}
+                icon={icon}
+                isRequired={isRequired}
+                values={value && (values || placeholder)}
+                // values={value && values}
+                placeholder={placeholder}
+                onChangeCallback={onToggle}
+                containerStyle={containerStyle}
+                meta={meta}
+                rightIcon={'angle-right'}
+                {...fakeInputProps}
+            />
+
+            <SlideModal
+                visible={visible}
+                onToggle={onToggle}
+                headerProps={{
+                    leftIcon: "long-arrow-alt-left",
+                    leftIconPress: onToggle,
+                    titleStyle: headerTitle({}),
+                    placement: "center",
+                    rightIcon: "plus",
+                    hasCircle: false,
+                    noBorder: false,
+                    transparent: false,
+                    rightIconPress: onRightIconPress,
+                    ...headerProps
+                }}
+                searchInputProps={searchInputProps && searchInputProps}
+                onSearch={onSearchItems}
+                bottomDivider
+                {...paginationContent}
+                {...bottomActionProps}
+                listViewProps={{
+                    items: apiSearch ? items : internalSearchItem,
+                    onPress: onItemSelect,
+                    refreshing: refreshing,
+                    loading: loading,
+                    isEmpty: typeof items == 'undefined' || (apiSearch ?
+                        items.length <= 0 : internalSearchItem.length <= 0),
+                    bottomDivider: true,
+                    emptyContentProps: {
+                        title: getEmptyTitle(),
+                        ...emptyContentProps
+                    },
+                    itemContainer: {
+                        paddingVertical: 16
+                    },
+                    ...listViewProps,
+                    ...multiSelectProps,
+                    ...paginationContent
+                }}
+            />
+        </View>
+    );
 }
 
 const mapStateToProps = ({ global }) => ({

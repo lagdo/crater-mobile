@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Text, Animated } from 'react-native';
 import { styles } from './styles';
 
@@ -8,71 +8,71 @@ type IProps = {
     containerStyle: Object
 };
 
+// let timerID = null;
 
-export class Toast extends Component<IProps> {
-    constructor() {
-        super();
-        this.animateOpacityValue = new Animated.Value(0);
-    }
+export const Toast = (props: IProps) => {
+    const {
+        visible = false,
+        message,
+        containerStyle
+    } = props;
 
-    componentWillUnmount() {
-        this.timerID && clearTimeout(this.timerID);
-    }
+    let timerID = null;
 
-    ShowToastFunction(duration = 1000) {
-        Animated.timing
-            (
-                this.animateOpacityValue,
+    useEffect(() => {
+        return () => {
+            timerID && clearTimeout(timerID);
+        };
+    });
+
+    const animateOpacityValue = new Animated.Value(0);
+
+    const showToastFunction = (duration = 1000) => {
+        Animated.timing(
+            animateOpacityValue,
+            {
+                toValue: 0.8,
+                duration: 200,
+            }
+        ).start(hideToastFunction(duration));
+    };
+
+    const hideToastFunction = (duration) => {
+        timerID = setTimeout(() => {
+            Animated.timing(
+                animateOpacityValue,
                 {
-                    toValue: 0.8,
-                    duration: 200
+                    toValue: 0,
+                    duration: 200,
                 }
-            ).start(this.HideToastFunction(duration))
-
-    }
-
-    HideToastFunction = (duration) => {
-        this.timerID = setTimeout(() => {
-            Animated.timing
-                (
-                    this.animateOpacityValue,
-                    {
-                        toValue: 0,
-                        duration: 200
-                    }
-                ).start(() => {
-                    clearTimeout(this.timerID);
-                })
+            ).start(() => clearTimeout(timerID));
         }, duration);
-    }
+    };
 
-    render() {
-        const { visible = false, message, containerStyle } = this.props
-        visible && this.ShowToastFunction()
+    visible && showToastFunction();
 
-        if (visible) {
-            return (
-                <Animated.View
-                    style={[
-                        styles.animatedToastView,
-                        { opacity: this.animateOpacityValue },
-                        containerStyle && containerStyle
-                    ]}
+    if (visible) {
+        return (
+            <Animated.View
+                style={[
+                    styles.animatedToastView,
+                    { opacity: animateOpacityValue },
+                    containerStyle && containerStyle
+                ]}
+            >
+
+                <Text
+                    numberOfLines={2}
+                    style={styles.title}
                 >
+                    {message}
+                </Text>
 
-                    <Text
-                        numberOfLines={2}
-                        style={styles.title}
-                    >
-                        {message}
-                    </Text>
-
-                </Animated.View>
-            );
-        }
-        else {
-            return null;
-        }
+            </Animated.View>
+        );
+    }
+    else {
+        return null;
     }
 }
 

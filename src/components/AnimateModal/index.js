@@ -12,37 +12,29 @@ type IProps = {
     modalProps: Object
 }
 
-export class AnimateModal extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-        }
-    }
+export const AnimateModal = (props: IProps) => {
+    const { onToggle, visible, children, modalProps } = props;
 
-    render() {
+    return (
+        <Modal
+            isVisible={visible}
+            animationIn={"fadeIn"}
+            animationOut={'fadeOut'}
+            onBackdropPress={() => onToggle()}
+            backdropTransitionInTiming={100}
+            backdropTransitionOutTiming={0}
+            onBackButtonPress={() => onToggle()}
+            style={styles.modalContainer}
+            {...modalProps}
+        >
 
-        const { onToggle, visible, children, modalProps } = this.props
-        return (
-            <Modal
-                isVisible={visible}
-                animationIn={"fadeIn"}
-                animationOut={'fadeOut'}
-                onBackdropPress={() => onToggle()}
-                backdropTransitionInTiming={100}
-                backdropTransitionOutTiming={0}
-                onBackButtonPress={() => onToggle()}
-                style={styles.modalContainer}
-                {...modalProps}
-            >
+            <StatusBar
+                backgroundColor={colors.secondary}
+                barStyle={"dark-content"}
+                translucent={true}
+            />
 
-                <StatusBar
-                    backgroundColor={colors.secondary}
-                    barStyle={"dark-content"}
-                    translucent={true}
-                />
-
-                {children}
-            </Modal>
-        );
-    }
+            {children}
+        </Modal>
+    );
 }

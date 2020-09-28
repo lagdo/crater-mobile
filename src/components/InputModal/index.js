@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { View, Text, KeyboardAvoidingView, ScrollView } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import { styles } from './styles'
 import { AnimateModal } from '../AnimateModal';
 import { Field } from 'redux-form';
@@ -7,7 +8,6 @@ import { InputField } from '../InputField';
 import { CtButton } from '../Button';
 import { BUTTON_COLOR } from '../../api/consts';
 import Lng from '../../api/lang/i18n';
-import { Icon } from 'react-native-elements';
 import { colors } from '../../styles/colors';
 
 type Iprops = {
@@ -23,124 +23,103 @@ type Iprops = {
     showRemoveButton: Boolean,
 }
 
-export class InputModal extends Component<Iprops>{
-    constructor(props) {
-        super(props);
-        this.state = {
-        };
-    }
+export const InputModal = (props: IProps) => {
+    const {
+        modalProps,
+        onToggle,
+        visible = false,
+        showRemoveButton = false,
+        onSubmitLoading = false,
+        onRemoveLoading = false,
+        onRemove,
+        onSubmit,
+        fieldName,
+        hint,
+        headerTitle,
+    } = props;
 
-    BUTTON_VIEW = () => {
-        const {
-            showRemoveButton = false,
-            onSubmitLoading = false,
-            onRemoveLoading = false,
-            onRemove,
-            onSubmit,
-            language,
-        } = this.props
-
-        return (
-            <View style={styles.rowViewContainer}>
-                {showRemoveButton && (
-                    <View style={styles.rowView}>
-                        <CtButton
-                            onPress={() => onRemove?.()}
-                            btnTitle={Lng.t("button.remove", { locale: language })}
-                            containerStyle={styles.handleBtn}
-                            buttonColor={BUTTON_COLOR.DANGER}
-                            loading={onRemoveLoading}
-                        />
-                    </View>
-                )}
-
+    const BUTTON_VIEW = (
+        <View style={styles.rowViewContainer}>
+            {showRemoveButton && (
                 <View style={styles.rowView}>
                     <CtButton
-                        onPress={() => onSubmit?.()}
-                        btnTitle={Lng.t("button.save", { locale: language })}
+                        onPress={() => onRemove?.()}
+                        btnTitle={Lng.t("button.remove")}
                         containerStyle={styles.handleBtn}
-                        loading={onSubmitLoading}
+                        buttonColor={BUTTON_COLOR.DANGER}
+                        loading={onRemoveLoading}
                     />
                 </View>
+            )}
+
+            <View style={styles.rowView}>
+                <CtButton
+                    onPress={() => onSubmit?.()}
+                    btnTitle={Lng.t("button.save")}
+                    containerStyle={styles.handleBtn}
+                    loading={onSubmitLoading}
+                />
             </View>
-        )
-    }
+        </View>
+    );
 
-    FIELD = () => {
-        const { fieldName, hint, onSubmit } = this.props
-
-        return (
-            <View style={styles.fieldView}>
-                <KeyboardAvoidingView
-                    keyboardVerticalOffset={0}
-                    behavior="position"
-                >
-                    <ScrollView
-                        bounces={false}
-                        showsVerticalScrollIndicator={false}
-                        keyboardShouldPersistTaps='handled'
-                    >
-                        <Field
-                            name={fieldName}
-                            component={InputField}
-                            hint={hint}
-                            inputProps={{
-                                returnKeyType: 'next',
-                                autoCorrect: true
-                            }}
-                            isRequired
-                        />
-                    </ScrollView>
-                </KeyboardAvoidingView>
-            </View>
-
-        )
-    }
-
-    HEADER_VIEW = () => {
-        const { headerTitle, onToggle } = this.props
-
-        return (
-            <View style={styles.rowViewContainer}>
-                <View style={styles.rowView}>
-                    <Text style={styles.heading}>{headerTitle}</Text>
-                </View>
-                <View>
-                    <Icon
-                        name="close"
-                        size={28}
-                        color={colors.dark}
-                        onPress={() => onToggle && onToggle()}
-                    />
-                </View>
-            </View>
-        )
-    }
-
-    render() {
-        const {
-            modalProps,
-            onToggle,
-            visible = false,
-        } = this.props
-
-        return (
-            <AnimateModal
-                visible={visible}
-                onToggle={() => onToggle && onToggle()}
-                modalProps={{ ...modalProps }}
+    const FIELD = (
+        <View style={styles.fieldView}>
+            <KeyboardAvoidingView
+                keyboardVerticalOffset={0}
+                behavior="position"
             >
-                <View style={styles.modalViewContainer}>
+                <ScrollView
+                    bounces={false}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps='handled'
+                >
+                    <Field
+                        name={fieldName}
+                        component={InputField}
+                        hint={hint}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCorrect: true
+                        }}
+                        isRequired
+                    />
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
+    );
 
-                    {this.HEADER_VIEW()}
+    const HEADER_VIEW = (
+        <View style={styles.rowViewContainer}>
+            <View style={styles.rowView}>
+                <Text style={styles.heading}>{headerTitle}</Text>
+            </View>
+            <View>
+                <Icon
+                    name="times"
+                    size={28}
+                    color={colors.dark}
+                    onPress={() => onToggle && onToggle()}
+                />
+            </View>
+        </View>
+    );
 
-                    {this.FIELD()}
+    return (
+        <AnimateModal
+            visible={visible}
+            onToggle={() => onToggle && onToggle()}
+            modalProps={{ ...modalProps }}
+        >
+            <View style={styles.modalViewContainer}>
 
-                    {this.BUTTON_VIEW()}
+                {HEADER_VIEW}
 
-                </View>
-            </AnimateModal>
-        );
-    }
+                {FIELD}
+
+                {BUTTON_VIEW}
+
+            </View>
+        </AnimateModal>
+    );
 }
-

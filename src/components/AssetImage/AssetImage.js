@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Image, View, ActivityIndicator } from 'react-native';
 
 type IProps = {
@@ -8,38 +8,29 @@ type IProps = {
     imageProps: Object,
     loadingImageStyle: Object
 };
-export class AssetImage extends Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            loading: false,
-        };
-    }
 
-    imageLoad() {
-        const { loading } = this.state;
-        this.setState({ loading: !loading });
-    }
+export const AssetImage = (props: IProps) => {
+    const { imageSource, imageStyle, loadingImageStyle, uri, imageProps } = props;
 
-    render() {
-        const { imageSource, imageStyle, loadingImageStyle, uri, imageProps } = this.props;
-        const { loading } = this.state;
-        return (
-            <View>
-                {loading && <ActivityIndicator
-                    style={[imageStyle, loadingImageStyle && loadingImageStyle, { position: 'absolute' }]}
-                />
-                }
-                <Image
-                    source={uri ? { uri: imageSource } : imageSource}
-                    style={imageStyle}
-                    onLoadStart={() => this.imageLoad()}
-                    onLoad={() => this.imageLoad()}
-                    {...imageProps}
-                />
-            </View>
-        );
-    }
+    const [loading, setLoading] = useState(false);
+
+    const imageLoad = () => setLoading(!loading);
+
+    return (
+        <View>
+            {loading && <ActivityIndicator
+                style={[imageStyle, loadingImageStyle && loadingImageStyle, { position: 'absolute' }]}
+            />
+            }
+            <Image
+                source={uri ? { uri: imageSource } : imageSource}
+                style={imageStyle}
+                onLoadStart={imageLoad}
+                onLoad={imageLoad}
+                {...imageProps}
+            />
+        </View>
+    );
 }
 
 export default AssetImage;

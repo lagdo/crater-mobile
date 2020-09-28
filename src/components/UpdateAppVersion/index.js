@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import { View, Platform, Linking } from 'react-native'
 import { connect } from 'react-redux';
 import styles from './styles';
@@ -10,78 +10,65 @@ import Lng from '../../api/lang/i18n';
 import { goBack, MOUNT, UNMOUNT } from '../../navigation/actions';
 import { ROUTES } from '../../navigation/routes';
 
-export class UpdateAppVersion extends Component {
+export const UpdateAppVersion = (props) => {
+    const [loading, setLoading] = useState(false);
+    const { language } = props;
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            loading: false
-        };
-    }
-
-    componentDidMount() {
+    useEffect(() => {
         const { navigation } = this.props
         goBack(MOUNT, navigation, { route: ROUTES.UPDATE_APP_VERSION })
-    }
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
+        return () => goBack(UNMOUNT);
+    }, []);
 
-    onUpdateApp = () => {
+    const onUpdateApp = () => {
 
-        this.setState({ loading: true })
+        setLoading(true);
 
         setTimeout(() => {
-            this.setState({ loading: false })
+            setLoading(false);
         }, 1000);
 
         Platform.OS === 'android' ?
             Linking.openURL('https://play.google.com/store/apps/details?id=com.craterapp.app') :
-            Linking.openURL('http://itunes.apple.com/app/id1489169767')
+            Linking.openURL('http://itunes.apple.com/app/id1489169767');
     }
 
-    render() {
+    return (
+        <View style={styles.container}>
 
-        const { language } = this.props;
-        const { loading } = this.state
+            <View style={styles.main}
+            >
+                <View style={styles.logoContainer}>
+                    <AssetImage
+                        imageSource={IMAGES.LOGO_DARK}
+                        imageStyle={styles.imgLogo}
+                    />
+                </View>
 
-        return (
-            <View style={styles.container}>
+                <View style={styles.bodyContainer}>
 
-                <View style={styles.main}
-                >
-                    <View style={styles.logoContainer}>
-                        <AssetImage
-                            imageSource={IMAGES.LOGO_DARK}
-                            imageStyle={styles.imgLogo}
-                        />
-                    </View>
+                    <Text h4 style={styles.title}>
+                        {Lng.t("updateApp.title", { locale: language })}
+                    </Text>
 
-                    <View style={styles.bodyContainer}>
-
-                        <Text h4 style={styles.title}>
-                            {Lng.t("updateApp.title", { locale: language })}
-                        </Text>
-
-                        <Text h6 style={styles.description}>
-                            {Lng.t("updateApp.description", { locale: language })}
-                        </Text>
-
-                    </View>
-
-                    <View style={{ marginTop: 25 }}>
-                        <CtGradientButton
-                            onPress={() => this.onUpdateApp()}
-                            btnTitle={Lng.t("button.updateCapital", { locale: language })}
-                            loading={loading}
-                        />
-                    </View>
+                    <Text h6 style={styles.description}>
+                        {Lng.t("updateApp.description", { locale: language })}
+                    </Text>
 
                 </View>
+
+                <View style={{ marginTop: 25 }}>
+                    <CtGradientButton
+                        onPress={onUpdateApp}
+                        btnTitle={Lng.t("button.updateCapital", { locale: language })}
+                        loading={loading}
+                    />
+                </View>
+
             </View>
-        )
-    }
+        </View>
+    );
 }
 
 const mapStateToProps = ({ global }) => ({
