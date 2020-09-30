@@ -36,7 +36,6 @@ type IProps = {
 export const Endpoint = (props: IProps) => {
     const {
         handleSubmit,
-        language,
         loading,
         navigation,
         skipEndpoint = false,
@@ -61,7 +60,7 @@ export const Endpoint = (props: IProps) => {
             endpointURL: !(URL.charAt(URL.length - 1) === '/') ? URL
                 : URL.slice(0, -1),
             onResult: (val) => {
-                !val ? alertMe({ title: Lng.t("endpoint.alertInvalidUrl", { locale: language }) }) :
+                !val ? alertMe({ title: Lng.t("endpoint.alertInvalidUrl") }) :
                     navigation.navigate(ROUTES.LOGIN)
 
             }
@@ -79,7 +78,7 @@ export const Endpoint = (props: IProps) => {
                 <CtHeader
                     leftIcon="angle-left"
                     leftIconPress={onBack}
-                    title={Lng.t("header.back", { locale: language })}
+                    title={Lng.t("header.back")}
                     titleOnPress={onBack}
                     titleStyle={{ marginLeft: -10, marginTop: Platform.OS === 'ios' ? -1 : 2 }}
                     placement="left"
@@ -118,10 +117,10 @@ export const Endpoint = (props: IProps) => {
                             <Field
                                 name="endpointURL"
                                 component={InputField}
-                                hint={Lng.t("endpoint.endpointURL", { locale: language })}
+                                hint={Lng.t("endpoint.endpointURL")}
                                 inputProps={{
                                     autoCapitalize: 'none',
-                                    placeholder: Lng.t("endpoint.urlPlaceHolder", { locale: language }),
+                                    placeholder: Lng.t("endpoint.urlPlaceHolder"),
                                     autoCorrect: true,
                                     keyboardType: "url",
                                     onSubmitEditing: toggleFocus
@@ -130,13 +129,13 @@ export const Endpoint = (props: IProps) => {
                                 inputContainerStyle={styles.inputField}
                             />
                             <Text style={styles.endpointTextTitle}>
-                                {Lng.t("endpoint.endpointDesc", { locale: language })}
+                                {Lng.t("endpoint.endpointDesc")}
                             </Text>
                         </View>
 
                         <CtGradientButton
                             onPress={handleSubmit(onSetEndpointApi)}
-                            btnTitle={Lng.t("button.save", { locale: language })}
+                            btnTitle={Lng.t("button.save")}
                             loading={isFocus ? false : loading}
                             style={styles.buttonStyle}
                             buttonContainerStyle={styles.buttonContainer}

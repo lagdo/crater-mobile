@@ -60,14 +60,12 @@ type IProps = {
     estimateData: Object,
     estimateItems: Object,
     items: Object,
-    language: String,
     type: String
 }
 
 export const Estimate = (props: IProps) => {
     const {
         navigation,
-        language,
         loading,
         type,
         handleSubmit,
@@ -150,18 +148,18 @@ export const Estimate = (props: IProps) => {
         }
 
         alertMe({
-            title: Lng.t("estimates.alert.draftTitle", { locale: language }),
+            title: Lng.t("estimates.alert.draftTitle"),
             showCancel: true,
-            cancelText: Lng.t("alert.action.discard", { locale: language }),
+            cancelText: Lng.t("alert.action.discard"),
             cancelPress: () => navigation.navigate(ROUTES.ESTIMATE_LIST),
-            okText: Lng.t("alert.action.saveAsDraft", { locale: language }),
+            okText: Lng.t("alert.action.saveAsDraft"),
             okPress: handleSubmit(onSubmitEstimate)
         })
     }
 
     const onSubmitEstimate = (values, status = 'draft') => {
         if (finalAmount() < 0) {
-            alert(Lng.t("estimates.alert.lessAmount", { locale: language }))
+            alert(Lng.t("estimates.alert.lessAmount"))
             return
         }
 
@@ -323,7 +321,7 @@ export const Estimate = (props: IProps) => {
                 <View style={styles.subContainer}>
                     <View>
                         <Text style={styles.amountHeading}>
-                            {Lng.t("estimates.subtotal", { locale: language })}
+                            {Lng.t("estimates.subtotal")}
                         </Text>
                     </View>
                     <View>
@@ -339,7 +337,7 @@ export const Estimate = (props: IProps) => {
                     <View style={[styles.subContainer, styles.discount]}>
                         <View>
                             <Text style={styles.amountHeading}>
-                                {Lng.t("estimates.discount", { locale: language })}
+                                {Lng.t("estimates.discount")}
                             </Text>
                         </View>
                         <View style={[styles.subAmount, styles.discountField]}>
@@ -436,7 +434,7 @@ export const Estimate = (props: IProps) => {
                         fakeInputProps={{
                             fakeInput: (
                                 <Text style={styles.taxFakeInput}>
-                                    {Lng.t("estimates.taxPlaceholder", { locale: language })}
+                                    {Lng.t("estimates.taxPlaceholder")}
                                 </Text>
                             )
                         }}
@@ -448,7 +446,7 @@ export const Estimate = (props: IProps) => {
                         compareField="id"
                         valueCompareField="tax_type_id"
                         headerProps={{
-                            title: Lng.t("taxes.title", { locale: language })
+                            title: Lng.t("taxes.title")
                         }}
                         rightIconPress={
                             () => navigation.navigate(ROUTES.TAX, {
@@ -474,7 +472,7 @@ export const Estimate = (props: IProps) => {
                 <View style={styles.subContainer}>
                     <View>
                         <Text style={styles.amountHeading}>
-                            {Lng.t("estimates.totalAmount", { locale: language })}:
+                            {Lng.t("estimates.totalAmount")}:
                         </Text>
                     </View>
                     <View>
@@ -494,7 +492,7 @@ export const Estimate = (props: IProps) => {
             <View style={styles.submitButton}>
                 <CtButton
                     onPress={() => onOptionSelect(ESTIMATE_ACTIONS.VIEW)}
-                    btnTitle={Lng.t("button.viewPdf", { locale: language })}
+                    btnTitle={Lng.t("button.viewPdf")}
                     type={BUTTON_TYPE.OUTLINE}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
@@ -503,7 +501,7 @@ export const Estimate = (props: IProps) => {
 
                 <CtButton
                     onPress={handleSubmit((val) => onSubmitEstimate(val, status = 'save'))}
-                    btnTitle={Lng.t("button.save", { locale: language })}
+                    btnTitle={Lng.t("button.save")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
                     loading={loading}
@@ -628,7 +626,7 @@ export const Estimate = (props: IProps) => {
 
             case ESTIMATE_ACTIONS.CONVERT_TO_INVOICE:
                 alertMe({
-                    desc: Lng.t("estimates.alert.convertToInvoiceDescription", { locale: language }),
+                    desc: Lng.t("estimates.alert.convertToInvoiceDescription"),
                     showCancel: true,
                     okPress: () => convertToInvoice({
                         id: navigation.getParam('id'),
@@ -642,8 +640,8 @@ export const Estimate = (props: IProps) => {
             case ESTIMATE_ACTIONS.DELETE:
 
                 alertMe({
-                    title: Lng.t("alert.title", { locale: language }),
-                    desc: Lng.t("estimates.alert.removeDescription", { locale: language }),
+                    title: Lng.t("alert.title"),
+                    desc: Lng.t("estimates.alert.removeDescription"),
                     showCancel: true,
                     okPress: () => removeEstimate({
                         id: navigation.getParam('id'),
@@ -668,10 +666,7 @@ export const Estimate = (props: IProps) => {
     let hasMark = (markAsStatus === MARK_AS_ACCEPT) || (markAsStatus === MARK_AS_REJECT) || (markAsStatus === MARK_AS_SENT)
 
     let drownDownProps = (isEditEstimate && !initLoading) ? {
-        options: EDIT_ESTIMATE_ACTIONS(
-            language,
-            markAsStatus
-        ),
+        options: EDIT_ESTIMATE_ACTIONS(markAsStatus),
         onSelect: onOptionSelect,
         cancelButtonIndex: hasMark ? 5 : 6,
         destructiveButtonIndex: hasMark ? 4 : 5
@@ -682,8 +677,8 @@ export const Estimate = (props: IProps) => {
             headerProps={{
                 leftIconPress: () => onDraft(),
                 title: isEditEstimate ?
-                    Lng.t("header.editEstimate", { locale: language }) :
-                    Lng.t("header.addEstimate", { locale: language }),
+                    Lng.t("header.editEstimate") :
+                    Lng.t("header.addEstimate"),
                 titleStyle: headerTitle({ marginLeft: -15, marginRight: -15 }),
                 rightIcon: !isEditEstimate ? 'save' : null,
                 rightIconPress: handleSubmit((val) => onSubmitEstimate(val, status = 'save')),
@@ -704,7 +699,7 @@ export const Estimate = (props: IProps) => {
                             name={'estimate_date'}
                             isRequired
                             component={DatePickerField}
-                            label={Lng.t("estimates.estimateDate", { locale: language })}
+                            label={Lng.t("estimates.estimateDate")}
                             icon={'calendar-alt'}
                             onChangeCallback={(val) =>
                                 setFormField('estimate_date', val)
@@ -716,7 +711,7 @@ export const Estimate = (props: IProps) => {
                             name="expiry_date"
                             isRequired
                             component={DatePickerField}
-                            label={Lng.t("estimates.expiryDate", { locale: language })}
+                            label={Lng.t("estimates.expiryDate")}
                             icon={'calendar-alt'}
                             onChangeCallback={(val) =>
                                 setFormField('expiry_date', val)
@@ -728,7 +723,7 @@ export const Estimate = (props: IProps) => {
                 <Field
                     name="estimate_number"
                     component={FakeInput}
-                    label={Lng.t("estimates.estimateNumber", { locale: language })}
+                    label={Lng.t("estimates.estimateNumber")}
                     isRequired
                     prefixProps={{
                         fieldName: "estimate_number",
@@ -747,10 +742,10 @@ export const Estimate = (props: IProps) => {
                     getItems={getCustomers}
                     displayName="name"
                     component={SelectField}
-                    label={Lng.t("estimates.customer", { locale: language })}
+                    label={Lng.t("estimates.customer")}
                     icon={'user'}
                     placeholder={customerName ? customerName :
-                        Lng.t("estimates.customerPlaceholder", { locale: language })
+                        Lng.t("estimates.customerPlaceholder")
                     }
                     navigation={navigation}
                     compareField="id"
@@ -769,7 +764,7 @@ export const Estimate = (props: IProps) => {
                         })
                     }
                     headerProps={{
-                        title: Lng.t("customers.title", { locale: language }),
+                        title: Lng.t("customers.title"),
                     }}
                     listViewProps={{
                         hasAvatar: true,
@@ -781,7 +776,7 @@ export const Estimate = (props: IProps) => {
                 />
 
                 <Text style={[styles.inputTextStyle, styles.label]}>
-                    {Lng.t("estimates.items", { locale: language })}
+                    {Lng.t("estimates.items")}
                     <Text style={styles.required}> *</Text>
                 </Text>
 
@@ -807,7 +802,7 @@ export const Estimate = (props: IProps) => {
                     compareField="id"
                     valueCompareField="item_id"
                     icon={'percent'}
-                    placeholder={Lng.t("estimates.addItem", { locale: language })}
+                    placeholder={Lng.t("estimates.addItem")}
                     navigation={navigation}
                     onlyPlaceholder
                     isMultiSelect
@@ -837,7 +832,7 @@ export const Estimate = (props: IProps) => {
                         })
                     }
                     headerProps={{
-                        title: Lng.t("items.title", { locale: language }),
+                        title: Lng.t("items.title"),
                     }}
                     emptyContentProps={{
                         contentType: "items",
@@ -853,7 +848,7 @@ export const Estimate = (props: IProps) => {
                 <Field
                     name="reference_number"
                     component={InputField}
-                    hint={Lng.t("invoices.referenceNumber", { locale: language })}
+                    hint={Lng.t("invoices.referenceNumber")}
                     leftIcon={'hashtag'}
                     inputProps={{
                         returnKeyType: 'next',
@@ -865,10 +860,10 @@ export const Estimate = (props: IProps) => {
                 <Field
                     name="notes"
                     component={InputField}
-                    hint={Lng.t("estimates.notes", { locale: language })}
+                    hint={Lng.t("estimates.notes")}
                     inputProps={{
                         returnKeyType: 'next',
-                        placeholder: Lng.t("estimates.notePlaceholder", { locale: language }),
+                        placeholder: Lng.t("estimates.notePlaceholder"),
                         autoCorrect: true,
                         multiline: true,
                         maxLength: MAX_LENGTH
@@ -882,9 +877,9 @@ export const Estimate = (props: IProps) => {
                     name="estimate_template_id"
                     templates={estimateTemplates}
                     component={TemplateField}
-                    label={Lng.t("estimates.template", { locale: language })}
+                    label={Lng.t("estimates.template")}
                     icon={'file-alt'}
-                    placeholder={Lng.t("estimates.templatePlaceholder", { locale: language })}
+                    placeholder={Lng.t("estimates.templatePlaceholder")}
                     navigation={navigation}
                     language={language}
                 />

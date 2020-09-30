@@ -8,7 +8,6 @@ import Lng from '../../../../api/lang/i18n';
 export const Units = (props) => {
     const {
         navigation,
-        language,
         units,
         setFormField,
         itemUnitLoading = false,
@@ -39,8 +38,8 @@ export const Units = (props) => {
 
     const onRemove = () => {
         alertMe({
-            title: Lng.t("alert.title", { locale: language }),
-            desc: Lng.t("items.alertUnit", { locale: language }),
+            title: Lng.t("alert.title"),
+            desc: Lng.t("items.alertUnit"),
             showCancel: true,
             okPress: () => {
                 onToggle()
@@ -57,10 +56,10 @@ export const Units = (props) => {
                 navigation={navigation}
                 language={language}
                 headerTitle={isCreateMethod ?
-                    Lng.t("items.addUnit", { locale: language }) :
-                    Lng.t("items.editUnit", { locale: language })
+                    Lng.t("items.addUnit") :
+                    Lng.t("items.editUnit")
                 }
-                hint={Lng.t("items.unitHint", { locale: language })}
+                hint={Lng.t("items.unitHint")}
                 fieldName="unitName"
                 onSubmit={onSave}
                 onRemove={onRemove}
@@ -97,7 +96,7 @@ export const Units = (props) => {
                     bottomDivider
                     contentContainerStyle={{ flex: 3 }}
                     emptyContentProps={{
-                        title: Lng.t("payments.empty.modeTitle", { locale: language }),
+                        title: Lng.t("payments.empty.modeTitle"),
                     }}
                     itemContainer={{
                         paddingVertical: 8

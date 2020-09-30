@@ -28,7 +28,6 @@ type IProps = {
 export const TemplateField = (props: IProps) => {
     const {
         navigation,
-        language,
         containerStyle,
         templates,
         label,
@@ -64,7 +63,7 @@ export const TemplateField = (props: IProps) => {
             <View style={styles.submitButton}>
                 <CtButton
                     onPress={onSubmit}
-                    btnTitle={Lng.t("button.chooseTemplate", { locale: language })}
+                    btnTitle={Lng.t("button.chooseTemplate")}
                 />
             </View>
         )
@@ -91,7 +90,7 @@ export const TemplateField = (props: IProps) => {
                 headerProps={{
                     leftIcon: "long-arrow-alt-left",
                     leftIconPress: onToggle,
-                    title: Lng.t("header.template", { locale: language }),
+                    title: Lng.t("header.template"),
                     titleStyle: headerTitle({ marginLeft: -19, marginRight: -19 }),
                     placement: "center",
                     hasCircle: false,

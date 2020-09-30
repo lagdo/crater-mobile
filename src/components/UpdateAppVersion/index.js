@@ -49,11 +49,11 @@ export const UpdateAppVersion = (props) => {
                 <View style={styles.bodyContainer}>
 
                     <Text h4 style={styles.title}>
-                        {Lng.t("updateApp.title", { locale: language })}
+                        {Lng.t("updateApp.title")}
                     </Text>
 
                     <Text h6 style={styles.description}>
-                        {Lng.t("updateApp.description", { locale: language })}
+                        {Lng.t("updateApp.description")}
                     </Text>
 
                 </View>
@@ -61,7 +61,7 @@ export const UpdateAppVersion = (props) => {
                 <View style={{ marginTop: 25 }}>
                     <CtGradientButton
                         onPress={onUpdateApp}
-                        btnTitle={Lng.t("button.updateCapital", { locale: language })}
+                        btnTitle={Lng.t("button.updateCapital")}
                         loading={loading}
                     />
                 </View>

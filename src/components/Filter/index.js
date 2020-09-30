@@ -33,7 +33,6 @@ export const Filter = (props: IProps) => {
         dropdownFields,
         selectFields,
         datePickerFields,
-        language,
         clearFilter: { handleSubmit },
         onSubmitFilter,
     } = props;
@@ -160,7 +159,7 @@ export const Filter = (props: IProps) => {
             <View style={styles.submitButton}>
                 <CtButton
                     onPress={onClear}
-                    btnTitle={Lng.t("button.clear", { locale: language })}
+                    btnTitle={Lng.t("button.clear")}
                     type={BUTTON_TYPE.OUTLINE}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
@@ -168,7 +167,7 @@ export const Filter = (props: IProps) => {
 
                 <CtButton
                     onPress={handleSubmit(onSubmit)}
-                    btnTitle={Lng.t("search.title", { locale: language })}
+                    btnTitle={Lng.t("search.title")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
                 />
@@ -218,7 +217,7 @@ export const Filter = (props: IProps) => {
                         headerProps={{
                             leftIcon: 'long-arrow-alt-left',
                             leftIconStyle: styles.backIcon,
-                            title: Lng.t("header.filter", { locale: language }),
+                            title: Lng.t("header.filter"),
                             placement: "center",
                             rightIcon: "search",
                             hasCircle: false,

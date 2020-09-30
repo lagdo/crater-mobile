@@ -32,7 +32,6 @@ export const Login = (props: IProps) => {
         loading,
         // socialLoading,
         navigation,
-        language,
         login,
         // socialLogin,
         handleSubmit,
@@ -108,7 +107,7 @@ export const Login = (props: IProps) => {
                                 inputProps={{
                                     returnKeyType: 'next',
                                     autoCapitalize: 'none',
-                                    placeholder: Lng.t("login.email", { locale: language }),
+                                    placeholder: Lng.t("login.email"),
                                     autoCorrect: true,
                                     keyboardType: 'email-address',
                                     onSubmitEditing: () => {
@@ -127,7 +126,7 @@ export const Login = (props: IProps) => {
                                 inputProps={{
                                     returnKeyType: 'go',
                                     autoCapitalize: 'none',
-                                    placeholder: Lng.t("login.password", { locale: language }),
+                                    placeholder: Lng.t("login.password"),
                                     autoCorrect: true,
                                     onSubmitEditing: handleSubmit(onLogin),
                                 }}
@@ -143,7 +142,7 @@ export const Login = (props: IProps) => {
                                     onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}
                                 >
                                     <Text style={styles.forgetPassword}>
-                                        {Lng.t("button.forget", { locale: language })}
+                                        {Lng.t("button.forget")}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -152,7 +151,7 @@ export const Login = (props: IProps) => {
                         <View style={{ marginTop: 25 }}>
                             <CtGradientButton
                                 onPress={handleSubmit(onLogin)}
-                                btnTitle={Lng.t("button.singIn", { locale: language })}
+                                btnTitle={Lng.t("button.singIn")}
                                 loading={loading}
                             />
                         </View>
@@ -170,7 +169,7 @@ export const Login = (props: IProps) => {
                                 imageSource={IMAGES.GOOGLE_ICON}
                                 imageIcon
                                 onPress={() => onSocialLogin()}
-                                btnTitle={Lng.t("button.singInGoogle", { locale: language })}
+                                btnTitle={Lng.t("button.singInGoogle")}
                                 loading={socialLoading}
                                 buttonType={BUTTON_COLOR.WHITE}
                                 color={colors.dark3}

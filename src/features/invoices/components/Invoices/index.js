@@ -32,7 +32,6 @@ let params = {
 }
 
 type IProps = {
-    language: String,
     navigation: Object,
     invoices: Object,
     customers: Object,
@@ -44,7 +43,6 @@ type IProps = {
 export const Invoices = (props: IProps) => {
     const {
         navigation,
-        language,
         loading,
         handleSubmit,
         invoices,
@@ -247,14 +245,14 @@ export const Invoices = (props: IProps) => {
             getItems: getCustomers,
             items: customers,
             displayName: "name",
-            label: Lng.t("invoices.customer", { locale: language }),
+            label: Lng.t("invoices.customer"),
             icon: 'user',
-            placeholder: Lng.t("customers.placeholder", { locale: language }),
+            placeholder: Lng.t("customers.placeholder"),
             navigation: navigation,
             compareField: "id",
             onSelect: (item) => setFormField('customer_id', item.id),
             headerProps: {
-                title: Lng.t("customers.title", { locale: language }),
+                title: Lng.t("customers.title"),
                 rightIconPress: null
             },
             listViewProps: {
@@ -270,7 +268,7 @@ export const Invoices = (props: IProps) => {
     let datePickerFields = [
         {
             name: "from_date",
-            label: Lng.t("invoices.fromDate", { locale: language }),
+            label: Lng.t("invoices.fromDate"),
             onChangeCallback: (formDate, displayDate) => {
                 setSelectedFromDate(displayDate);
                 setSelectedFromDateValue(formDate);
@@ -281,7 +279,7 @@ export const Invoices = (props: IProps) => {
         },
         {
             name: "to_date",
-            label: Lng.t("invoices.toDate", { locale: language }),
+            label: Lng.t("invoices.toDate"),
             onChangeCallback: (formDate, displayDate) => {
                 setSelectedToDate(displayDate);
                 setSelectedToDateValue(formDate);
@@ -293,7 +291,7 @@ export const Invoices = (props: IProps) => {
 
     let inputFields = [{
         name: 'invoice_number',
-        hint: Lng.t("invoices.invoiceNumber", { locale: language }),
+        hint: Lng.t("invoices.invoiceNumber"),
         leftIcon: 'hashtag',
         inputProps: {
             autoCapitalize: 'none',
@@ -307,28 +305,28 @@ export const Invoices = (props: IProps) => {
     let dropdownFields = [
         {
             name: "filterStatus",
-            label: Lng.t("invoices.status", { locale: language }),
+            label: Lng.t("invoices.status"),
             fieldIcon: 'align-center',
             items: FILTER_INVOICE_STATUS,
             onChangeCallback: (val) => {
                 setFormField('filterStatus', val)
             },
             defaultPickerOptions: {
-                label: Lng.t("invoices.statusPlaceholder", { locale: language }),
+                label: Lng.t("invoices.statusPlaceholder"),
                 value: '',
             },
             containerStyle: styles.selectPicker
         },
         {
             name: "paid_status",
-            label: Lng.t("invoices.paidStatus", { locale: language }),
+            label: Lng.t("invoices.paidStatus"),
             fieldIcon: 'align-center',
             items: FILTER_INVOICE_PAID_STATUS,
             onChangeCallback: (val) => {
                 setFormField('paid_status', val)
             },
             defaultPickerOptions: {
-                label: Lng.t("invoices.paidStatusPlaceholder", { locale: language }),
+                label: Lng.t("invoices.paidStatusPlaceholder"),
                 value: '',
             },
             onDonePress: () => filterRefs.invNumber.focus(),
@@ -344,7 +342,7 @@ export const Invoices = (props: IProps) => {
                     rightIconPress: () => {
                         onAddInvoice()
                     },
-                    title: Lng.t("header.invoices", { locale: language }),
+                    title: Lng.t("header.invoices"),
                 }}
                 onSearch={onSearch}
                 filterProps={{
@@ -354,7 +352,6 @@ export const Invoices = (props: IProps) => {
                     inputFields: inputFields,
                     dropdownFields: dropdownFields,
                     clearFilter: props,
-                    language: language,
                     onResetFilter: () => onResetFilter()
                 }}
             >
@@ -365,7 +362,7 @@ export const Invoices = (props: IProps) => {
                     tabs={[
                         {
                             Title: INVOICES_TABS.DUE,
-                            tabName: TAB_NAME(INVOICES_TABS.DUE, language, Lng),
+                            tabName: TAB_NAME(INVOICES_TABS.DUE),
                             render: (
                                 <Due
                                     invoices={invoices}
@@ -377,7 +374,6 @@ export const Invoices = (props: IProps) => {
                                     fresh={fresh}
                                     search={search}
                                     navigation={navigation}
-                                    language={language}
                                     loadMoreItems={loadMoreItems}
                                     onAddInvoice={onAddInvoice}
                                     filter={filter}
@@ -386,7 +382,7 @@ export const Invoices = (props: IProps) => {
                         },
                         {
                             Title: INVOICES_TABS.DRAFT,
-                            tabName: TAB_NAME(INVOICES_TABS.DRAFT, language, Lng),
+                            tabName: TAB_NAME(INVOICES_TABS.DRAFT),
                             render: (
                                 <Draft
                                     invoices={invoices}
@@ -397,7 +393,6 @@ export const Invoices = (props: IProps) => {
                                     refreshing={refreshing}
                                     search={search}
                                     navigation={navigation}
-                                    language={language}
                                     loadMoreItems={loadMoreItems}
                                     onAddInvoice={onAddInvoice}
                                     fresh={fresh}
@@ -407,7 +402,7 @@ export const Invoices = (props: IProps) => {
                         },
                         {
                             Title: INVOICES_TABS.ALL,
-                            tabName: TAB_NAME(INVOICES_TABS.ALL, language, Lng),
+                            tabName: TAB_NAME(INVOICES_TABS.ALL),
                             render: (
                                 <All
                                     invoices={invoices}
@@ -419,7 +414,6 @@ export const Invoices = (props: IProps) => {
                                     fresh={fresh}
                                     search={search}
                                     navigation={navigation}
-                                    language={language}
                                     loadMoreItems={loadMoreItems}
                                     onAddInvoice={onAddInvoice}
                                     filter={filter}

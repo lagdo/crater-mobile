@@ -8,7 +8,6 @@ import Lng from '../../../../api/lang/i18n';
 export const PaymentModes = (props) => {
     const {
         navigation,
-        language,
         formValues: { methodName = "", methodId = null },
         createPaymentMode,
         editPaymentMode,
@@ -39,8 +38,8 @@ export const PaymentModes = (props) => {
 
     const onRemoveMethod = () => {
         alertMe({
-            title: Lng.t("alert.title", { locale: language }),
-            desc: Lng.t("payments.alertMode", { locale: language }),
+            title: Lng.t("alert.title"),
+            desc: Lng.t("payments.alertMode"),
             showCancel: true,
             okPress: () => {
                 onToggle()
@@ -55,12 +54,11 @@ export const PaymentModes = (props) => {
                 visible={visible}
                 onToggle={onToggle}
                 navigation={navigation}
-                language={language}
                 headerTitle={isCreateMethod ?
-                    Lng.t("payments.addMode", { locale: language }) :
-                    Lng.t("payments.editMode", { locale: language })
+                    Lng.t("payments.addMode") :
+                    Lng.t("payments.editMode")
                 }
-                hint={Lng.t("payments.modeHint", { locale: language })}
+                hint={Lng.t("payments.modeHint")}
                 fieldName="methodName"
                 onSubmit={onSaveMethod}
                 onRemove={onRemoveMethod}
@@ -97,7 +95,7 @@ export const PaymentModes = (props) => {
                     bottomDivider
                     contentContainerStyle={{ flex: 3 }}
                     emptyContentProps={{
-                        title: Lng.t("payments.empty.modeTitle", { locale: language }),
+                        title: Lng.t("payments.empty.modeTitle"),
                     }}
                 />
             </View>

@@ -33,12 +33,12 @@ export const ACTIONS_VALUE = {
 export const PAYMENT_ACTIONS = (Lng, language) => {
     return [
         {
-            label: Lng.t("payments.sendReceipt", { locale: language })
+            label: Lng.t("payments.sendReceipt")
             ,
             value: ACTIONS_VALUE.SEND
         },
         {
-            label: Lng.t("payments.removePayment", { locale: language })
+            label: Lng.t("payments.removePayment")
             ,
             value: ACTIONS_VALUE.REMOVE
         }

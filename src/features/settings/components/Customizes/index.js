@@ -13,7 +13,6 @@ import { MOUNT, goBack, UNMOUNT } from '../../../../navigation/actions';
 export const Customizes = (props) =>  {
     const {
         navigation,
-        language,
         getCustomizeSettings,
         getPaymentModes,
         getItemUnits,
@@ -44,7 +43,7 @@ export const Customizes = (props) =>  {
             <DefaultLayout
                 headerProps={{
                     leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
-                    title: Lng.t("header.customize", { locale: language }),
+                    title: Lng.t("header.customize"),
                     leftIconStyle: { color: colors.dark2 }
                 }}
                 hasSearchField={false}
@@ -52,7 +51,7 @@ export const Customizes = (props) =>  {
             >
                 <View style={styles.listViewContainer}>
                     <ListView
-                        items={CUSTOMIZES_MENU(language, Lng)}
+                        items={CUSTOMIZES_MENU()}
                         onPress={onSelectMenu}
                         leftTitleStyle={styles.listViewTitle}
                         listItemProps={{

@@ -17,14 +17,12 @@ type IProps = {
     getPayments: Function,
     payments: Object,
     loading: Boolean,
-    language: String,
 }
 
 export const Categories = (props: IProps) => {
     const {
         navigation,
         loading,
-        language,
         categories,
         getExpenseCategories,
     } = props;
@@ -107,8 +105,8 @@ export const Categories = (props: IProps) => {
     let categoriesList = itemList(categories)
 
     let empty = (!search) ? {
-        description: Lng.t("categories.empty.description", { locale: language }),
-        buttonTitle: Lng.t("categories.empty.buttonTitle", { locale: language }),
+        description: Lng.t("categories.empty.description"),
+        buttonTitle: Lng.t("categories.empty.buttonTitle"),
         buttonPress: () => navigation.navigate(ROUTES.CATEGORY, { type: CATEGORY_ADD }),
     } : {}
 
@@ -118,7 +116,7 @@ export const Categories = (props: IProps) => {
                 headerProps={{
                     leftIcon: "long-arrow-alt-left",
                     leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
-                    title: Lng.t("header.expenseCategory", { locale: language }),
+                    title: Lng.t("header.expenseCategory"),
                     titleStyle: styles.titleStyle,
                     placement: "center",
                     rightIcon: "plus",
@@ -144,8 +142,8 @@ export const Categories = (props: IProps) => {
                         bottomDivider
                         emptyContentProps={{
                             title: found ?
-                                Lng.t("categories.empty.title", { locale: language }) :
-                                Lng.t("search.noResult", { locale: language, search }),
+                                Lng.t("categories.empty.title") :
+                                Lng.t("search.noResult", { search }),
                             ...empty
                         }}
                     />

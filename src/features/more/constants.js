@@ -1,5 +1,6 @@
 import queryString from 'query-string';
 import { ROUTES } from "../../navigation/routes";
+import Lng from '../../api/lang/i18n';
 
 // Forms
 // -----------------------------------------
@@ -13,10 +14,10 @@ export const LOGOUT = 'more/LOGOUT';
 
 // Menus
 // -----------------------------------------
-export const MORE_MENU = (language, Lng) => {
+export const MORE_MENU = () => {
     return [
         {
-            title: Lng.t("more.estimate", { locale: language }),
+            title: Lng.t("more.estimate"),
             leftIcon: 'file-alt',
             iconSize: 28,
             fullItem: {
@@ -24,7 +25,7 @@ export const MORE_MENU = (language, Lng) => {
             }
         },
         {
-            title: Lng.t("more.items", { locale: language }),
+            title: Lng.t("more.items"),
             leftIcon: 'product-hunt',
             iconSize: 27,
             fullItem: {
@@ -32,21 +33,21 @@ export const MORE_MENU = (language, Lng) => {
             }
         },
         {
-            title: Lng.t("more.reports", { locale: language }),
+            title: Lng.t("more.reports"),
             leftIcon: 'signal',
             fullItem: {
                 route: ROUTES.REPORTS
             }
         },
         {
-            title: Lng.t("more.settings", { locale: language }),
+            title: Lng.t("more.settings"),
             leftIcon: 'cogs',
             fullItem: {
                 route: ROUTES.SETTING_LIST
             }
         },
         {
-            title: Lng.t("more.logout", { locale: language }),
+            title: Lng.t("more.logout"),
             leftIcon: 'sign-out-alt',
             iconSize: 26,
             fullItem: {

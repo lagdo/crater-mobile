@@ -13,7 +13,6 @@ import { MOUNT, goBack, UNMOUNT } from '../../../../navigation/actions';
 export const Settings = (props) => {
     const {
         navigation,
-        language,
     } = props;
 
     // const [endpointVisible, setEndpointVisible] = useState(false);
@@ -37,14 +36,14 @@ export const Settings = (props) => {
             <DefaultLayout
                 headerProps={{
                     leftIconPress: () => navigation.navigate(ROUTES.MAIN_MORE),
-                    title: Lng.t("header.settings", { locale: language }),
+                    title: Lng.t("header.settings"),
                     leftIconStyle: { color: colors.dark2 }
                 }}
                 hasSearchField={false}
             >
                 <View style={styles.listViewContainer}>
                     <ListView
-                        items={SETTINGS_MENU(language, Lng)}
+                        items={SETTINGS_MENU()}
                         onPress={onSelectMenu}
                         leftTitleStyle={styles.listViewTitle}
                         leftIconStyle={styles.listViewIcon}

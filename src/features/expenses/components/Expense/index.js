@@ -26,7 +26,6 @@ const IMAGE_TYPE = 'image'
 export const Expense = (props) => {
     const {
         navigation,
-        language,
         loading,
         type,
         getCreateExpense,
@@ -76,7 +75,7 @@ export const Expense = (props) => {
 
                     if (typeof categories === 'undefined' || categories.length === 0) {
                         alertMe({
-                            title: Lng.t("expenses.noCategories", { locale: language }),
+                            title: Lng.t("expenses.noCategories"),
                             okText: 'Add',
                             okPress: () => navigation.navigate(ROUTES.CATEGORY, {
                                 type: CATEGORY_ADD,
@@ -131,8 +130,8 @@ export const Expense = (props) => {
 
     const onRemoveExpense = () => {
         alertMe({
-            title: Lng.t("alert.title", { locale: language }),
-            desc: Lng.t("expenses.alertDescription", { locale: language }),
+            title: Lng.t("alert.title"),
+            desc: Lng.t("expenses.alertDescription"),
             showCancel: true,
             okPress: () => removeExpense({
                 id: navigation.getParam('id', null),
@@ -167,7 +166,7 @@ export const Expense = (props) => {
             <View style={styles.submitButton}>
                 <CtButton
                     onPress={handleSubmit(onSubmitExpense)}
-                    btnTitle={Lng.t("button.save", { locale: language })}
+                    btnTitle={Lng.t("button.save")}
                     loading={loading || fileLoading}
                 />
             </View>
@@ -193,7 +192,7 @@ export const Expense = (props) => {
     let gLoading = !newCategoryLoading ? (initLoading || isLoading) : false
 
     let drownDownProps = (type === EXPENSE_EDIT && !gLoading) ? {
-        options: EXPENSE_ACTIONS(Lng, language, imageUrl),
+        options: EXPENSE_ACTIONS(imageUrl),
         onSelect: onOptionSelect,
         cancelButtonIndex: imageUrl ? 2 : 1,
         destructiveButtonIndex: imageUrl ? 1 : 2
@@ -207,8 +206,8 @@ export const Expense = (props) => {
                     clearExpense()
                 },
                 title: isCreateExpense ?
-                    Lng.t("header.addExpense", { locale: language }) :
-                    Lng.t("header.editExpense", { locale: language }),
+                    Lng.t("header.addExpense") :
+                    Lng.t("header.editExpense"),
                 placement: "center",
                 rightIcon: isCreateExpense ? 'save' : null,
                 rightIconPress: handleSubmit(onSubmitExpense),
@@ -229,7 +228,7 @@ export const Expense = (props) => {
                     name="attachment_receipt"
                     component={FilePicker}
                     mediaType={'All'}
-                    label={Lng.t("expenses.receipt", { locale: language })}
+                    label={Lng.t("expenses.receipt")}
                     navigation={navigation}
                     onChangeCallback={(val) => setAttachmentReceipt(val)}
                     imageUrl={fileType.indexOf(IMAGE_TYPE) === 0 ? imageUrl : null}
@@ -241,7 +240,7 @@ export const Expense = (props) => {
                     name="expense_date"
                     component={DatePickerField}
                     isRequired
-                    label={Lng.t("expenses.date", { locale: language })}
+                    label={Lng.t("expenses.date")}
                     icon={'calendar-alt'}
                 />)}
 
@@ -250,7 +249,7 @@ export const Expense = (props) => {
                     name="amount"
                     component={InputField}
                     isRequired
-                    hint={Lng.t("expenses.amount", { locale: language })}
+                    hint={Lng.t("expenses.amount")}
                     leftIcon={'dollar-sign'}
                     inputProps={{
                         returnKeyType: 'go',
@@ -265,14 +264,14 @@ export const Expense = (props) => {
                     name="expense_category_id"
                     component={SelectPickerField}
                     isRequired
-                    label={Lng.t("expenses.category", { locale: language })}
+                    label={Lng.t("expenses.category")}
                     fieldIcon='align-center'
                     items={CategoriesName}
                     onChangeCallback={(val) => {
                         setFormField('expense_category_id', val)
                     }}
                     defaultPickerOptions={{
-                        label: Lng.t("expenses.categoryPlaceholder", { locale: language }),
+                        label: Lng.t("expenses.categoryPlaceholder"),
                         value: '',
                     }}
                     containerStyle={styles.selectPicker}
@@ -285,10 +284,10 @@ export const Expense = (props) => {
                 <Field
                     name={'notes'}
                     component={InputField}
-                    hint={Lng.t("expenses.notes", { locale: language })}
+                    hint={Lng.t("expenses.notes")}
                     inputProps={{
                         returnKeyType: 'next',
-                        placeholder: Lng.t("expenses.notesPlaceholder", { locale: language }),
+                        placeholder: Lng.t("expenses.notesPlaceholder"),
                         autoCorrect: true,
                         multiline: true,
                         maxLength: MAX_LENGTH

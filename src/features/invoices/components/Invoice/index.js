@@ -57,14 +57,12 @@ type IProps = {
     invoiceData: Object,
     invoiceItems: Object,
     items: Object,
-    language: String,
     type: String
 }
 
 export const Invoice = (props: IProps) => {
     const {
         navigation,
-        language,
         loading,
         type,
         getCreateInvoice,
@@ -156,18 +154,18 @@ export const Invoice = (props: IProps) => {
         }
 
         alertMe({
-            title: Lng.t("invoices.alert.draftTitle", { locale: language }),
+            title: Lng.t("invoices.alert.draftTitle"),
             showCancel: true,
-            cancelText: Lng.t("alert.action.discard", { locale: language }),
+            cancelText: Lng.t("alert.action.discard"),
             cancelPress: () => navigation.navigate(ROUTES.MAIN_INVOICES),
-            okText: Lng.t("alert.action.saveAsDraft", { locale: language }),
+            okText: Lng.t("alert.action.saveAsDraft"),
             okPress: handleSubmit(onSubmitInvoice)
         })
     }
 
     const onSubmitInvoice = (values, status = 'draft') => {
         if (finalAmount() < 0) {
-            alert(Lng.t("invoices.alert.lessAmount", { locale: language }))
+            alert(Lng.t("invoices.alert.lessAmount"))
             return
         }
 
@@ -329,7 +327,7 @@ export const Invoice = (props: IProps) => {
                 <View style={styles.subContainer}>
                     <View>
                         <Text style={styles.amountHeading}>
-                            {Lng.t("invoices.subtotal", { locale: language })}
+                            {Lng.t("invoices.subtotal")}
                         </Text>
                     </View>
                     <View>
@@ -345,7 +343,7 @@ export const Invoice = (props: IProps) => {
                     <View style={[styles.subContainer, styles.discount]}>
                         <View>
                             <Text style={styles.amountHeading}>
-                                {Lng.t("invoices.discount", { locale: language })}
+                                {Lng.t("invoices.discount")}
                             </Text>
                         </View>
                         <View style={[styles.subAmount, styles.discountField]}>
@@ -441,19 +439,18 @@ export const Invoice = (props: IProps) => {
                         fakeInputProps={{
                             fakeInput: (
                                 <Text style={styles.taxFakeInput}>
-                                    {Lng.t("invoices.taxPlaceholder", { locale: language })}
+                                    {Lng.t("invoices.taxPlaceholder")}
                                 </Text>
                             )
                         }}
                         navigation={navigation}
                         isMultiSelect
                         isInternalSearch
-                        language={language}
                         concurrentMultiSelect
                         compareField="id"
                         valueCompareField="tax_type_id"
                         headerProps={{
-                            title: Lng.t("taxes.title", { locale: language })
+                            title: Lng.t("taxes.title")
                         }}
                         rightIconPress={
                             () => navigation.navigate(ROUTES.TAX, {
@@ -479,7 +476,7 @@ export const Invoice = (props: IProps) => {
                 <View style={styles.subContainer}>
                     <View>
                         <Text style={styles.amountHeading}>
-                            {Lng.t("invoices.totalAmount", { locale: language })}:
+                            {Lng.t("invoices.totalAmount")}:
                         </Text>
                     </View>
                     <View>
@@ -499,7 +496,7 @@ export const Invoice = (props: IProps) => {
             <View style={styles.submitButton}>
                 <CtButton
                     onPress={handleSubmit((val) => onSubmitInvoice(val, status = INVOICE_ACTIONS.VIEW))}
-                    btnTitle={Lng.t("button.viewPdf", { locale: language })}
+                    btnTitle={Lng.t("button.viewPdf")}
                     type={BUTTON_TYPE.OUTLINE}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
@@ -508,7 +505,7 @@ export const Invoice = (props: IProps) => {
 
                 <CtButton
                     onPress={handleSubmit((val) => onSubmitInvoice(val, status = 'save'))}
-                    btnTitle={Lng.t("button.save", { locale: language })}
+                    btnTitle={Lng.t("button.save")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
                     loading={loading}
@@ -608,8 +605,8 @@ export const Invoice = (props: IProps) => {
         switch (action) {
             case INVOICE_ACTIONS.SEND:
                 alertMe({
-                    title: Lng.t("alert.title", { locale: language }),
-                    desc: Lng.t("invoices.alert.sendEmail", { locale: language }),
+                    title: Lng.t("alert.title"),
+                    desc: Lng.t("invoices.alert.sendEmail"),
                     showCancel: true,
                     okPress: () => changeInvoiceStatus({
                         id: navigation.getParam('id'),
@@ -645,8 +642,8 @@ export const Invoice = (props: IProps) => {
 
             case INVOICE_ACTIONS.CLONE:
                 alertMe({
-                    title: Lng.t("alert.title", { locale: language }),
-                    desc: Lng.t("invoices.alert.clone", { locale: language }),
+                    title: Lng.t("alert.title"),
+                    desc: Lng.t("invoices.alert.clone"),
                     showCancel: true,
                     okPress: () => changeInvoiceStatus({
                         id: navigation.getParam('id'),
@@ -659,8 +656,8 @@ export const Invoice = (props: IProps) => {
 
             case INVOICE_ACTIONS.DELETE:
                 alertMe({
-                    title: Lng.t("alert.title", { locale: language }),
-                    desc: Lng.t("invoices.alert.removeDescription", { locale: language }),
+                    title: Lng.t("alert.title"),
+                    desc: Lng.t("invoices.alert.removeDescription"),
                     showCancel: true,
                     okPress: () => removeInvoice({
                         id: navigation.getParam('id'),
@@ -670,8 +667,8 @@ export const Invoice = (props: IProps) => {
 
                             res.error && (res.error === 'payment_attached') &&
                                 alertMe({
-                                    title: Lng.t("invoices.alert.paymentAttachedTitle", { locale: language }),
-                                    desc: Lng.t("invoices.alert.paymentAttachedDescription", { locale: language }),
+                                    title: Lng.t("invoices.alert.paymentAttachedTitle"),
+                                    desc: Lng.t("invoices.alert.paymentAttachedDescription"),
                                 })
                         }
                     })
@@ -691,11 +688,7 @@ export const Invoice = (props: IProps) => {
     let hasCompleteStatus = (markAsStatus === 'COMPLETED')
 
     let drownDownProps = (isEditInvoice && !initLoading) ? {
-        options: EDIT_INVOICE_ACTIONS(
-            language,
-            hasSentStatus,
-            hasCompleteStatus
-        ),
+        options: EDIT_INVOICE_ACTIONS(hasSentStatus, hasCompleteStatus),
         onSelect: onOptionSelect,
         cancelButtonIndex:
             hasSentStatus ? 3 :
@@ -711,8 +704,8 @@ export const Invoice = (props: IProps) => {
             headerProps={{
                 leftIconPress: () => onDraft(handleSubmit),
                 title: isEditInvoice ?
-                    Lng.t("header.editInvoice", { locale: language }) :
-                    Lng.t("header.addInvoice", { locale: language }),
+                    Lng.t("header.editInvoice") :
+                    Lng.t("header.addInvoice"),
                 rightIcon: !isEditInvoice ? 'save' : null,
                 rightIconPress: handleSubmit((val) => onSubmitInvoice(val, status = 'save')),
                 rightIconProps: {
@@ -732,7 +725,7 @@ export const Invoice = (props: IProps) => {
                             name={'invoice_date'}
                             isRequired
                             component={DatePickerField}
-                            label={Lng.t("invoices.invoiceDate", { locale: language })}
+                            label={Lng.t("invoices.invoiceDate")}
                             icon={'calendar-alt'}
                             onChangeCallback={(val) =>
                                 setFormField('invoice_date', val)
@@ -744,7 +737,7 @@ export const Invoice = (props: IProps) => {
                             name="due_date"
                             isRequired
                             component={DatePickerField}
-                            label={Lng.t("invoices.dueDate", { locale: language })}
+                            label={Lng.t("invoices.dueDate")}
                             icon={'calendar-alt'}
                             onChangeCallback={(val) =>
                                 setFormField('due_date', val)
@@ -756,7 +749,7 @@ export const Invoice = (props: IProps) => {
                 <Field
                     name="invoice_number"
                     component={FakeInput}
-                    label={Lng.t("invoices.invoiceNumber", { locale: language })}
+                    label={Lng.t("invoices.invoiceNumber")}
                     isRequired
                     prefixProps={{
                         fieldName: "invoice_number",
@@ -775,10 +768,10 @@ export const Invoice = (props: IProps) => {
                     getItems={getCustomers}
                     displayName="name"
                     component={SelectField}
-                    label={Lng.t("invoices.customer", { locale: language })}
+                    label={Lng.t("invoices.customer")}
                     icon={'user'}
                     placeholder={customerName ? customerName :
-                        Lng.t("invoices.customerPlaceholder", { locale: language })
+                        Lng.t("invoices.customerPlaceholder")
                     }
                     navigation={navigation}
                     compareField="id"
@@ -797,7 +790,7 @@ export const Invoice = (props: IProps) => {
                         })
                     }
                     headerProps={{
-                        title: Lng.t("customers.title", { locale: language }),
+                        title: Lng.t("customers.title"),
                     }}
                     listViewProps={{
                         hasAvatar: true,
@@ -810,7 +803,7 @@ export const Invoice = (props: IProps) => {
                 />
 
                 <Text style={[styles.inputTextStyle, styles.label]}>
-                    {Lng.t("invoices.items", { locale: language })}
+                    {Lng.t("invoices.items")}
                     <Text style={styles.required}> *</Text>
                 </Text>
 
@@ -836,7 +829,7 @@ export const Invoice = (props: IProps) => {
                     compareField="id"
                     valueCompareField="item_id"
                     icon={'percent'}
-                    placeholder={Lng.t("invoices.addItem", { locale: language })}
+                    placeholder={Lng.t("invoices.addItem")}
                     navigation={navigation}
                     onlyPlaceholder
                     isMultiSelect
@@ -866,7 +859,7 @@ export const Invoice = (props: IProps) => {
                         })
                     }
                     headerProps={{
-                        title: Lng.t("items.title", { locale: language }),
+                        title: Lng.t("items.title"),
                     }}
                     emptyContentProps={{
                         contentType: "items",
@@ -882,7 +875,7 @@ export const Invoice = (props: IProps) => {
                 <Field
                     name="reference_number"
                     component={InputField}
-                    hint={Lng.t("invoices.referenceNumber", { locale: language })}
+                    hint={Lng.t("invoices.referenceNumber")}
                     leftIcon={'hashtag'}
                     inputProps={{
                         returnKeyType: 'next',
@@ -894,10 +887,10 @@ export const Invoice = (props: IProps) => {
                 <Field
                     name="notes"
                     component={InputField}
-                    hint={Lng.t("invoices.notes", { locale: language })}
+                    hint={Lng.t("invoices.notes")}
                     inputProps={{
                         returnKeyType: 'next',
-                        placeholder: Lng.t("invoices.notePlaceholder", { locale: language }),
+                        placeholder: Lng.t("invoices.notePlaceholder"),
                         autoCorrect: true,
                         multiline: true,
                         maxLength: MAX_LENGTH
@@ -911,11 +904,10 @@ export const Invoice = (props: IProps) => {
                     name="invoice_template_id"
                     templates={invoiceTemplates}
                     component={TemplateField}
-                    label={Lng.t("invoices.template", { locale: language })}
+                    label={Lng.t("invoices.template")}
                     icon={'file-alt'}
-                    placeholder={Lng.t("invoices.templatePlaceholder", { locale: language })}
+                    placeholder={Lng.t("invoices.templatePlaceholder")}
                     navigation={navigation}
-                    language={language}
                 />
 
             </View>

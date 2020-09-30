@@ -64,7 +64,7 @@ const MainLayoutComponent = ({
                             inputProps={{
                                 returnKeyType: 'next',
                                 autoCapitalize: 'none',
-                                placeholder: Lng.t("search.title", { locale: language }),
+                                placeholder: Lng.t("search.title"),
                                 autoCorrect: true,
                                 ...inputProps
                             }}

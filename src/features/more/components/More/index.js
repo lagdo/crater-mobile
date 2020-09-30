@@ -14,7 +14,6 @@ import { alertMe } from '../../../../api/global';
 export const More = (props) => {
     const {
         navigation,
-        language,
         logout,
     } = props;
 
@@ -26,9 +25,9 @@ export const More = (props) => {
 
     const onLogout = () => {
         alertMe({
-            title: Lng.t("logout.confirmation", { locale: language }),
+            title: Lng.t("logout.confirmation"),
             showCancel: true,
-            okText: Lng.t("logout.title", { locale: language }),
+            okText: Lng.t("logout.title"),
             okPress: () => logout({ navigation })
         })
     }
@@ -46,7 +45,7 @@ export const More = (props) => {
             <MainLayout
                 headerProps={{
                     hasCircle: false,
-                    title: Lng.t("header.more", { locale: language })
+                    title: Lng.t("header.more")
                 }}
                 bottomDivider
                 dividerStyle={styles.dividerStyle}
@@ -54,7 +53,7 @@ export const More = (props) => {
             >
                 <View style={styles.listViewContainer}>
                     <ListView
-                        items={MORE_MENU(language, Lng)}
+                        items={MORE_MENU()}
                         onPress={onSelectMenu}
                         hasAvatar
                         refreshing={false}

@@ -54,7 +54,6 @@ let addressField = [
 export const Address = (props: IProps) => {
     const {
         navigation,
-        language,
         type,
         handleSubmit,
         containerStyle,
@@ -139,7 +138,7 @@ export const Address = (props: IProps) => {
                 <View style={{ flex: 1 }}>
                     <CtButton
                         onPress={handleSubmit(saveAddress)}
-                        btnTitle={Lng.t("button.done", { locale: language })}
+                        btnTitle={Lng.t("button.done")}
                         containerStyle={styles.handleBtn}
                     />
                 </View>
@@ -158,7 +157,7 @@ export const Address = (props: IProps) => {
                         icon={'copy'}
                         color={colors.primaryLight}
                         leftIconSolid={false}
-                        values={Lng.t("customers.address.sameAs", { locale: language })}
+                        values={Lng.t("customers.address.sameAs")}
                         valueStyle={styles.sameAsToggle}
                         onChangeCallback={
                             () => fillShippingAddress(!status)
@@ -169,7 +168,7 @@ export const Address = (props: IProps) => {
                 <Field
                     name={"name"}
                     component={InputField}
-                    hint={Lng.t("customers.address.name", { locale: language })}
+                    hint={Lng.t("customers.address.name")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -183,7 +182,7 @@ export const Address = (props: IProps) => {
                     items={formatCountries(countries)}
                     displayName="name"
                     component={SelectField}
-                    label={Lng.t("customers.address.country", { locale: language })}
+                    label={Lng.t("customers.address.country")}
                     placeholder={" "}
                     rightIcon='angle-right'
                     navigation={navigation}
@@ -193,7 +192,7 @@ export const Address = (props: IProps) => {
                         setFormField(country, id)
                     }}
                     headerProps={{
-                        title: Lng.t("header.country", { locale: language }),
+                        title: Lng.t("header.country"),
                         rightIconPress: null
                     }}
                     listViewProps={{
@@ -207,7 +206,7 @@ export const Address = (props: IProps) => {
                 <Field
                     name={state}
                     component={InputField}
-                    hint={Lng.t("customers.address.state", { locale: language })}
+                    hint={Lng.t("customers.address.state")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -221,7 +220,7 @@ export const Address = (props: IProps) => {
                 <Field
                     name={city}
                     component={InputField}
-                    hint={Lng.t("customers.address.city", { locale: language })}
+                    hint={Lng.t("customers.address.city")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -238,11 +237,11 @@ export const Address = (props: IProps) => {
                 <Field
                     name={"address_street_1"}
                     component={InputField}
-                    hint={Lng.t("customers.address.address", { locale: language })}
+                    hint={Lng.t("customers.address.address")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
-                        placeholder: Lng.t("customers.address.street1", { locale: language }),
+                        placeholder: Lng.t("customers.address.street1"),
                         autoCorrect: true,
                         multiline: true,
                         maxLength: MAX_LENGTH
@@ -260,7 +259,7 @@ export const Address = (props: IProps) => {
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
-                        placeholder: Lng.t("customers.address.street2", { locale: language }),
+                        placeholder: Lng.t("customers.address.street2"),
                         autoCorrect: true,
                         multiline: true,
                         maxLength: MAX_LENGTH
@@ -273,7 +272,7 @@ export const Address = (props: IProps) => {
                 <Field
                     name={"phone"}
                     component={InputField}
-                    hint={Lng.t("customers.address.phone", { locale: language })}
+                    hint={Lng.t("customers.address.phone")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -288,7 +287,7 @@ export const Address = (props: IProps) => {
                 <Field
                     name={"zip"}
                     component={InputField}
-                    hint={Lng.t("customers.address.zipcode", { locale: language })}
+                    hint={Lng.t("customers.address.zipcode")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -322,8 +321,8 @@ export const Address = (props: IProps) => {
                     leftIcon: "long-arrow-alt-left",
                     leftIconPress: onToggle,
                     title: hasBillingAddress ?
-                        Lng.t("header.billingAddress", { locale: language }) :
-                        Lng.t("header.shippingAddress", { locale: language }),
+                        Lng.t("header.billingAddress") :
+                        Lng.t("header.shippingAddress"),
                     placement: "center",
                     hasCircle: false,
                     noBorder: false,

@@ -1,5 +1,6 @@
 import React from 'react';
 import queryString from 'query-string';
+import Lng from '../../api/lang/i18n';
 
 // Forms
 // -----------------------------------------
@@ -39,10 +40,10 @@ export const ACTIONS_VALUE = {
 
 }
 
-export const CUSTOMER_ACTIONS = (Lng, language) => {
+export const CUSTOMER_ACTIONS = () => {
     return [
         {
-            label: Lng.t("customers.removeCustomer", { locale: language })
+            label: Lng.t("customers.removeCustomer")
             ,
             value: ACTIONS_VALUE.REMOVE
         }

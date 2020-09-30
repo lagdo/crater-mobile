@@ -21,7 +21,6 @@ type IProps = {
     getAccount: Function,
     editAccount: Function,
     navigation: Object,
-    language: String,
     handleSubmit: Function,
     isLoading: Boolean,
     editAccountLoading: Boolean
@@ -29,7 +28,6 @@ type IProps = {
 export const Account = (props: IProps) =>  {
     const {
         navigation,
-        language,
         isLoading,
         handleSubmit,
         getAccount,
@@ -72,7 +70,7 @@ export const Account = (props: IProps) =>  {
             <View style={styles.submitButton}>
                 <CtButton
                     onPress={handleSubmit(onProfileUpdate)}
-                    btnTitle={Lng.t("button.save", { locale: language })}
+                    btnTitle={Lng.t("button.save")}
                     loading={editAccountLoading || fileLoading}
                 />
             </View>
@@ -85,7 +83,7 @@ export const Account = (props: IProps) =>  {
         <DefaultLayout
             headerProps={{
                 leftIconPress: () => navigation.goBack(null),
-                title: Lng.t("header.setting.account", { locale: language }),
+                title: Lng.t("header.setting.account"),
                 titleStyle: headerTitle({ marginLeft: -20, marginRight: -25 }),
                 placement: "center",
                 rightIcon: "save",
@@ -121,7 +119,7 @@ export const Account = (props: IProps) =>  {
                     name={name}
                     component={InputField}
                     isRequired
-                    hint={Lng.t("settings.account.name", { locale: language })}
+                    hint={Lng.t("settings.account.name")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCorrect: true,
@@ -135,7 +133,7 @@ export const Account = (props: IProps) =>  {
                     name={Email}
                     component={InputField}
                     isRequired
-                    hint={Lng.t("settings.account.email", { locale: language })}
+                    hint={Lng.t("settings.account.email")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -153,7 +151,7 @@ export const Account = (props: IProps) =>  {
                 <Field
                     name={password}
                     component={InputField}
-                    hint={Lng.t("settings.account.password", { locale: language })}
+                    hint={Lng.t("settings.account.password")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -172,7 +170,7 @@ export const Account = (props: IProps) =>  {
                 <Field
                     name={cpassword}
                     component={InputField}
-                    hint={Lng.t("settings.account.confirmPassword", { locale: language })}
+                    hint={Lng.t("settings.account.confirmPassword")}
                     inputProps={{
                         returnKeyType: 'go',
                         autoCapitalize: 'none',
@@ -192,7 +190,7 @@ export const Account = (props: IProps) =>  {
 
                 <View style={styles.versionContainer}>
                     <Text style={styles.versionTitle}>
-                        {Lng.t("settings.account.version", { locale: language })}
+                        {Lng.t("settings.account.version")}
                         {'  '}
                         <Text style={styles.version}>
                             {env.APP_VERSION}

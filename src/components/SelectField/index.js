@@ -15,7 +15,6 @@ import { headerTitle } from '../../api/helper';
 
 export const SelectFieldComponent = (props: IProps) => {
     const {
-        language,
         containerStyle,
         items,
         getItems,
@@ -296,7 +295,7 @@ export const SelectFieldComponent = (props: IProps) => {
                 <View style={{ flex: 1 }}>
                     <CtButton
                         onPress={onSubmit}
-                        btnTitle={Lng.t("button.done", { locale: language })}
+                        btnTitle={Lng.t("button.done")}
                         containerStyle={styles.handleBtn}
                     />
                 </View>
@@ -308,10 +307,10 @@ export const SelectFieldComponent = (props: IProps) => {
         let emptyTitle = ''
 
         if (contentType) {
-            emptyTitle = Lng.t(`${contentType}.empty.title`, { locale: language })
+            emptyTitle = Lng.t(`${contentType}.empty.title`)
         }
 
-        let noSearchResult = Lng.t("search.noSearchResult", { locale: language })
+        let noSearchResult = Lng.t("search.noSearchResult")
 
         return search ? `${noSearchResult} "${search}"` : emptyTitle
     }

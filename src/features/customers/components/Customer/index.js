@@ -39,14 +39,12 @@ type IProps = {
     handleSubmit: Function,
     customerLoading: Boolean,
     getEditCustomerLoading: Boolean,
-    language: String,
     formValues: Object,
 }
 
 export const Customer = (props: IProps) =>  {
     const {
         navigation,
-        language,
         getEditCustomer,
         createCustomer,
         editCustomer,
@@ -153,8 +151,8 @@ export const Customer = (props: IProps) =>  {
 
     const onRemoveCustomer = () => {
         alertMe({
-            title: Lng.t("alert.title", { locale: language }),
-            desc: Lng.t("customers.alertDescription", { locale: language }),
+            title: Lng.t("alert.title"),
+            desc: Lng.t("customers.alertDescription"),
             showCancel: true,
             okPress: () => removeCustomer({
                 id: navigation.getParam('customerId', null),
@@ -164,7 +162,7 @@ export const Customer = (props: IProps) =>  {
     }
 
     const BOTTOM_ACTION = () => {
-        const buttonTitle = Lng.t("button.save", { locale: language })
+        const buttonTitle = Lng.t("button.save")
 
         return (
             <View style={styles.submitButton}>
@@ -202,7 +200,7 @@ export const Customer = (props: IProps) =>  {
     }
 
     let drownDownProps = type === CUSTOMER_EDIT ? {
-        options: CUSTOMER_ACTIONS(Lng, language),
+        options: CUSTOMER_ACTIONS(),
         onSelect: onOptionSelect,
         cancelButtonIndex: 1,
         destructiveButtonIndex: 2,
@@ -217,8 +215,8 @@ export const Customer = (props: IProps) =>  {
                 leftIconStyle: styles.leftIcon,
                 leftIconPress: () => navigation.goBack(null),
                 title: type === CUSTOMER_EDIT ?
-                    Lng.t("header.editCustomer", { locale: language }) :
-                    Lng.t("header.addCustomer", { locale: language }),
+                    Lng.t("header.editCustomer") :
+                    Lng.t("header.addCustomer"),
                 titleStyle: styles.headerTitle,
                 placement: "center",
                 rightIcon: type !== CUSTOMER_EDIT ? "save" : null,
@@ -239,7 +237,7 @@ export const Customer = (props: IProps) =>  {
                     name="name"
                     component={InputField}
                     isRequired
-                    hint={Lng.t("customers.displayName", { locale: language })}
+                    hint={Lng.t("customers.displayName")}
                     inputFieldStyle={styles.inputFieldStyle}
                     inputProps={{
                         returnKeyType: 'next',
@@ -256,7 +254,7 @@ export const Customer = (props: IProps) =>  {
                 <Field
                     name="contact_name"
                     component={InputField}
-                    hint={Lng.t("customers.contactName", { locale: language })}
+                    hint={Lng.t("customers.contactName")}
                     inputFieldStyle={styles.inputFieldStyle}
                     inputProps={{
                         returnKeyType: 'next',
@@ -275,7 +273,7 @@ export const Customer = (props: IProps) =>  {
                 <Field
                     name="email"
                     component={InputField}
-                    hint={Lng.t("customers.email", { locale: language })}
+                    hint={Lng.t("customers.email")}
                     inputFieldStyle={styles.inputFieldStyle}
                     inputProps={{
                         returnKeyType: 'next',
@@ -295,7 +293,7 @@ export const Customer = (props: IProps) =>  {
                 <Field
                     name="phone"
                     component={InputField}
-                    hint={Lng.t("customers.phone", { locale: language })}
+                    hint={Lng.t("customers.phone")}
                     inputFieldStyle={styles.inputFieldStyle}
                     inputProps={{
                         returnKeyType: 'next',
@@ -315,7 +313,7 @@ export const Customer = (props: IProps) =>  {
                 <Field
                     name="website"
                     component={InputField}
-                    hint={Lng.t("customers.website", { locale: language })}
+                    hint={Lng.t("customers.website")}
                     inputFieldStyle={styles.inputFieldStyle}
                     inputProps={{
                         returnKeyType: 'next',
@@ -339,7 +337,7 @@ export const Customer = (props: IProps) =>  {
                         component={SelectField}
                         icon='dollar-sign'
                         rightIcon='angle-right'
-                        placeholder={selectedCurrency ? selectedCurrency : Lng.t("customers.currency", { locale: language })}
+                        placeholder={selectedCurrency ? selectedCurrency : Lng.t("customers.currency")}
                         navigation={navigation}
                         searchFields={['name']}
                         compareField="id"
@@ -347,7 +345,7 @@ export const Customer = (props: IProps) =>  {
                             setFormField('currency_id', val.id)
                         }}
                         headerProps={{
-                            title: Lng.t("currencies.title", { locale: language }),
+                            title: Lng.t("currencies.title"),
                             titleStyle: headerTitle({ marginLeft: -30, marginRight: -65 }),
                             rightIconPress: null
                         }}
@@ -367,7 +365,7 @@ export const Customer = (props: IProps) =>  {
                         addressValue={billingAddress}
                         icon='map-marker-alt'
                         rightIcon='angle-right'
-                        placeholder={Lng.t("customers.billingAddress", { locale: language })}
+                        placeholder={Lng.t("customers.billingAddress")}
                         navigation={navigation}
                         onChangeCallback={(val) =>
                             setFormField('billingAddress', val)
@@ -386,7 +384,7 @@ export const Customer = (props: IProps) =>  {
                         autoFillValue={billingAddress}
                         icon='map-marker-alt'
                         rightIcon='angle-right'
-                        placeholder={Lng.t("customers.shippingAddress", { locale: language })}
+                        placeholder={Lng.t("customers.shippingAddress")}
                         navigation={navigation}
                         onChangeCallback={(val) =>
                             setFormField('shippingAddress', val)
@@ -407,7 +405,7 @@ export const Customer = (props: IProps) =>  {
                     name="enable_portal"
                     component={ToggleSwitch}
                     status={enable_portal === 1 ? true : false}
-                    hint={Lng.t("customers.enablePortal", { locale: language })}
+                    hint={Lng.t("customers.enablePortal")}
                     onChangeCallback={(val) =>
                         onTogglePortal(val)
                     }
@@ -417,7 +415,7 @@ export const Customer = (props: IProps) =>  {
                     <Field
                         name={'password'}
                         component={InputField}
-                        hint={Lng.t("customers.password", { locale: language })}
+                        hint={Lng.t("customers.password")}
                         inputProps={{
                             returnKeyType: 'go',
                             autoCapitalize: 'none',

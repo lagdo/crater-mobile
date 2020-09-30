@@ -20,14 +20,12 @@ import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 type IProps = {
     navigation: Object,
     handleSubmit: Function,
-    language: String,
     getAccountLoading: Boolean,
 }
 export const Notification = (props: IProps) => {
     const {
         navigation,
         handleSubmit,
-        language,
         getSettingItemLoading,
         getSettingItem,
         editSettingItem,
@@ -118,7 +116,7 @@ export const Notification = (props: IProps) => {
         <DefaultLayout
             headerProps={{
                 leftIconPress: () => navigation.goBack(null),
-                title: Lng.t("header.notifications", { locale: language }),
+                title: Lng.t("header.notifications"),
                 placement: "center",
                 rightIcon: "save",
                 rightIconProps: {
@@ -131,7 +129,7 @@ export const Notification = (props: IProps) => {
                 is: getSettingItemLoading || invoiceStatus === null || estimateStatus === null
             }}
             toastProps={{
-                message: Lng.t(toastMessage, { locale: language }),
+                message: Lng.t(toastMessage),
                 visible: toastMessage,
                 containerStyle: styles.toastContainer
             }}
@@ -141,7 +139,7 @@ export const Notification = (props: IProps) => {
                 <Field
                     name={"notification_email"}
                     component={InputField}
-                    hint={Lng.t("settings.notifications.send", { locale: language })}
+                    hint={Lng.t("settings.notifications.send")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -160,8 +158,8 @@ export const Notification = (props: IProps) => {
                     name="notify_invoice_viewed"
                     component={ToggleSwitch}
                     status={invoiceStatus === 'YES' ? true : false}
-                    hint={Lng.t("settings.notifications.invoiceViewed", { locale: language })}
-                    description={Lng.t("settings.notifications.invoiceViewedDescription", { locale: language })}
+                    hint={Lng.t("settings.notifications.invoiceViewed")}
+                    description={Lng.t("settings.notifications.invoiceViewedDescription")}
                     onChangeCallback={onInvoiceStatusChange}
                 />
 
@@ -169,8 +167,8 @@ export const Notification = (props: IProps) => {
                     name="notify_estimate_viewed"
                     component={ToggleSwitch}
                     status={estimateStatus === 'YES' ? true : false}
-                    hint={Lng.t("settings.notifications.estimateViewed", { locale: language })}
-                    description={Lng.t("settings.notifications.estimateViewedDescription", { locale: language })}
+                    hint={Lng.t("settings.notifications.estimateViewed")}
+                    description={Lng.t("settings.notifications.estimateViewedDescription")}
                     onChangeCallback={onEstimateStatusChange}
                     mainContainerStyle={{ marginTop: 12 }}
                 />

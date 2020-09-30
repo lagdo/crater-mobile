@@ -13,7 +13,6 @@ import { MOUNT, goBack, UNMOUNT } from '../../../../navigation/actions';
 export const Reports = (props) => {
     const {
         navigation,
-        language,
     } = props;
 
     useEffect(() => {
@@ -33,14 +32,14 @@ export const Reports = (props) => {
             <DefaultLayout
                 headerProps={{
                     leftIconPress: () => navigation.navigate(ROUTES.MAIN_MORE),
-                    title: Lng.t("header.reports", { locale: language }),
+                    title: Lng.t("header.reports"),
                     leftIconStyle: { color: colors.dark2 }
                 }}
                 hasSearchField={false}
             >
                 <View style={styles.listViewContainer}>
                     <ListView
-                        items={REPORTS_MENU(language, Lng)}
+                        items={REPORTS_MENU()}
                         onPress={onSelectMenu}
                         leftTitleStyle={styles.listViewTitle}
                         listItemProps={{

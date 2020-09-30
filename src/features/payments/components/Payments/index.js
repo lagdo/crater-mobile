@@ -27,7 +27,6 @@ type IProps = {
     getPayments: Function,
     payments: Object,
     loading: Boolean,
-    language: String,
     getCustomers: Function,
 }
 
@@ -35,7 +34,6 @@ export const Payments = (props: IProps) => {
     const {
         navigation,
         loading,
-        language,
         handleSubmit,
         payments,
         filterPayments,
@@ -214,14 +212,14 @@ export const Payments = (props: IProps) => {
             getItems: getCustomers,
             items: customers,
             displayName: "name",
-            label: Lng.t("payments.customer", { locale: language }),
+            label: Lng.t("payments.customer"),
             icon: 'user',
-            placeholder: Lng.t("customers.placeholder", { locale: language }),
+            placeholder: Lng.t("customers.placeholder"),
             navigation: navigation,
             compareField: "id",
             onSelect: (item) => setFormField('customer_id', item.id),
             headerProps: {
-                title: Lng.t("customers.title", { locale: language }),
+                title: Lng.t("customers.title"),
                 rightIconPress: null
             },
             listViewProps: {
@@ -236,7 +234,7 @@ export const Payments = (props: IProps) => {
 
     let inputFields = [{
         name: 'payment_number',
-        hint: Lng.t("payments.number", { locale: language }),
+        hint: Lng.t("payments.number"),
         leftIcon: 'hashtag',
         inputProps: {
             autoCapitalize: 'none',
@@ -249,14 +247,14 @@ export const Payments = (props: IProps) => {
 
     let dropdownFields = [{
         name: "payment_method_id",
-        label: Lng.t("payments.mode", { locale: language }),
+        label: Lng.t("payments.mode"),
         fieldIcon: 'align-center',
         items: formatSelectPickerName(paymentMethods),
         onChangeCallback: (val) => {
             setFormField('payment_method_id', val)
         },
         defaultPickerOptions: {
-            label: Lng.t("payments.modePlaceholder", { locale: language }),
+            label: Lng.t("payments.modePlaceholder"),
             value: '',
         },
         selectedItem: selectedPaymentMode,
@@ -265,17 +263,17 @@ export const Payments = (props: IProps) => {
     }]
 
     let empty = (!filter && !search) ? {
-        description: Lng.t("payments.empty.description", { locale: language }),
-        buttonTitle: Lng.t("payments.empty.buttonTitle", { locale: language }),
+        description: Lng.t("payments.empty.description"),
+        buttonTitle: Lng.t("payments.empty.buttonTitle"),
         buttonPress: () => {
             navigation.navigate(ROUTES.PAYMENT, { type: PAYMENT_ADD })
             onResetFilter()
         }
     } : {}
 
-    let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
-        : (!filter) ? Lng.t("payments.empty.title", { locale: language }) :
-            Lng.t("filter.empty.filterTitle", { locale: language })
+    let emptyTitle = search ? Lng.t("search.noResult", { search })
+        : (!filter) ? Lng.t("payments.empty.title") :
+            Lng.t("filter.empty.filterTitle")
 
     return (
         <View style={styles.container}>
@@ -286,7 +284,7 @@ export const Payments = (props: IProps) => {
                         navigation.navigate(ROUTES.PAYMENT, { type: PAYMENT_ADD })
                         onResetFilter()
                     },
-                    title: Lng.t("header.payments", { locale: language })
+                    title: Lng.t("header.payments")
                 }}
                 onSearch={onSearch}
                 bottomDivider
@@ -296,7 +294,6 @@ export const Payments = (props: IProps) => {
                     inputFields: inputFields,
                     dropdownFields: dropdownFields,
                     clearFilter: props,
-                    language: language,
                     onResetFilter: () => onResetFilter()
                 }}
                 loadingProps={{ is: paymentModesLoading || (loading && fresh) }}
