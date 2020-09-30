@@ -9,7 +9,7 @@ import { REPORT_FORM, DATE_RANGE } from '../../constants';
 const mapStateToProps = (state, { navigation }) => {
     const {
         more: { loading },
-        global: { language, company, fiscalYear = '2-1' },
+        global: { language, company, fiscalYear = '2-1', endpointURL },
     } = state;
 
     const type = navigation.getParam('type');
@@ -23,6 +23,7 @@ const mapStateToProps = (state, { navigation }) => {
         type,
         company,
         fiscalYear,
+        endpointURL,
         initialValues: !isLoading && {
             date_range: DATE_RANGE.THIS_MONTH,
             report_type: 'byCustomer'

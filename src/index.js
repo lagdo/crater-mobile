@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -14,16 +14,10 @@ import { env } from './config';
 
 console.disableYellowBox = true;
 
-export default class Root extends Component {
-    constructor(props) {
-        super(props);
+const Root = (props) => {
+    const [fontLoaded, setFontLoaded] = useState(false);
 
-        this.state = {
-            fontLoaded: false,
-        };
-    }
-
-    componentWillMount() {
+    useEffect(() => {
         loadFonts({
             afterLoad: () => {
                 const reduxStore = store.getState();
@@ -49,25 +43,23 @@ export default class Root extends Component {
                             }
                         }))
                 }
-                this.setState({ fontLoaded: true });
+                setFontLoaded(true);
             },
         });
-    }
+    }, []);
 
-    render() {
-        const { fontLoaded } = this.state;
-
-        return (
-            <Provider store={store}>
-                <PersistGate persistor={persistor} >
-                    {fontLoaded && (
-                        <View style={{ flex: 1, position: 'relative' }}>
-                            <ApplicationNavigator />
-                            <AppLoader />
-                        </View>
-                    )}
-                </PersistGate>
-            </Provider>
-        );
-    }
+    return (
+        <Provider store={store}>
+            <PersistGate persistor={persistor} >
+                {fontLoaded && (
+                    <View style={{ flex: 1, position: 'relative' }}>
+                        <ApplicationNavigator />
+                        <AppLoader />
+                    </View>
+                )}
+            </PersistGate>
+        </Provider>
+    );
 }
+
+export default Root;

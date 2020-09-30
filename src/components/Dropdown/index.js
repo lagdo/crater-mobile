@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { TouchableOpacity, View, StatusBar } from 'react-native';
 import ActionSheet from 'react-native-actionsheet'
 import { styles } from './styles';
@@ -12,39 +12,32 @@ type IProps = {
     destructiveButtonIndex: Number,
 };
 
-export default class Dropdown extends Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            labelOptions: [],
-            visible: false,
-        };
-    }
+export default Dropdown = (props: IProps) => {
+    const {
+        options,
+        onPress,
+        onSelect,
+        cancelButtonIndex = 2,
+        destructiveButtonIndex = 1,
+    } = props;
 
-    componentWillMount() {
-        const { options } = this.props;
-        const labelOptions = [...options, { label: 'Cancel', value: null }].map(
-            ({ label }) => label,
-        );
+    const labelOptions = [...options, { label: 'Cancel', value: null }].map(
+        ({ label }) => label,
+    );
+    let actionSheet = null;
 
-        this.setState({ labelOptions })
-    }
+    // const [labelOptions, setLabelOptions] = useState([]);
+    const [visible, setVisible] = useState(false);
 
-    onToggleStatus = () => {
-        this.setState((prevState) => {
-            return { visible: !prevState.visible }
-        });
-    }
+    const onToggleStatus = () => setVisible(!visible);
 
-    showActionSheet = () => {
-        this.onToggleStatus()
-        this.ActionSheet.show()
-    }
+    const showActionSheet = () => {
+        onToggleStatus();
+        actionSheet && actionSheet.show();
+    };
 
-    onSelect = (index) => {
-        this.onToggleStatus()
-
-        const { options, onSelect } = this.props;
+    const onItemSelected = (index) => {
+        onToggleStatus()
 
         const valueOptions = [...options, { label: 'Cancel', value: null }].map(
             ({ value }) => value,
@@ -53,51 +46,44 @@ export default class Dropdown extends Component<IProps> {
         onSelect && onSelect(valueOptions[index]);
     }
 
+    return (
+        <View>
 
+            {visible && (
+                <StatusBar
+                    backgroundColor={colors.secondary}
+                    barStyle={"dark-content"}
+                    translucent={true}
+                />
+            )}
 
-    render() {
-        const { options, onPress, cancelButtonIndex = 2, destructiveButtonIndex = 1 } = this.props;
-        const { labelOptions, visible } = this.state;
+            <TouchableOpacity
+                onPress={showActionSheet}
+                style={styles.button}
+                hitSlop={{
+                    top: 13,
+                    left: 13,
+                    bottom: 13,
+                    right: 13
+                }}
+            >
+                <Icon
+                    name={'ellipsis-h'}
+                    size={18}
+                    style={styles.iconStyle}
+                />
+            </TouchableOpacity>
 
-        return (
-            <View>
-
-                {visible && (
-                    <StatusBar
-                        backgroundColor={colors.secondary}
-                        barStyle={"dark-content"}
-                        translucent={true}
-                    />
-                )}
-
-                <TouchableOpacity
-                    onPress={this.showActionSheet}
-                    style={styles.button}
-                    hitSlop={{
-                        top: 13,
-                        left: 13,
-                        bottom: 13,
-                        right: 13
-                    }}
-                >
-                    <Icon
-                        name={'ellipsis-h'}
-                        size={18}
-                        style={styles.iconStyle}
-                    />
-                </TouchableOpacity>
-
-                {labelOptions && (
-                    <ActionSheet
-                        ref={o => this.ActionSheet = o}
-                        tintColor={colors.primary}
-                        options={labelOptions}
-                        cancelButtonIndex={cancelButtonIndex}
-                        destructiveButtonIndex={destructiveButtonIndex}
-                        onPress={this.onSelect}
-                    />
-                )}
-            </View>
-        );
-    }
+            {labelOptions && (
+                <ActionSheet
+                    ref={sheet => actionSheet = sheet}
+                    tintColor={colors.primary}
+                    options={labelOptions}
+                    cancelButtonIndex={cancelButtonIndex}
+                    destructiveButtonIndex={destructiveButtonIndex}
+                    onPress={onItemSelected}
+                />
+            )}
+        </View>
+    );
 }

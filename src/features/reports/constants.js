@@ -13,6 +13,11 @@ export const REPORT_FORM = 'moreForm/REPORT_FORM';
 // -----------------------------------------
 export const GENERATE_REPORT = 'report/GENERATE_REPORT';
 
+export const SALES = 'reportType/SALES';
+export const PROFIT_AND_LOSS = 'reportType/PROFIT_AND_LOSS';
+export const EXPENSES = 'reportType/EXPENSES';
+export const TAXES = 'reportType/TAXES';
+
 export const REPORTS_MENU = (language, Lng) => {
     return [
         {

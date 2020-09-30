@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     KeyboardAvoidingView,
@@ -33,33 +33,28 @@ type IProps = {
     checkEndpointApi: Function
 };
 
-export class Endpoint extends Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            isFocus: false
-        };
-    }
+export const Endpoint = (props: IProps) => {
+    const {
+        handleSubmit,
+        language,
+        loading,
+        navigation,
+        skipEndpoint = false,
+        checkEndpointApi,
+    } = props;
 
+    const [isFocus, setFocus] = useState(false);
 
-    componentDidMount() {
-
-        const { navigation, skipEndpoint } = this.props
-
+    useEffect(() => {
         skipEndpoint && goBack(MOUNT, navigation, { route: ROUTES.SETTING_LIST })
-    }
 
-    componentWillUnmount() {
-        const { skipEndpoint } = this.props
-        skipEndpoint && goBack(UNMOUNT)
-    }
+        return () => skipEndpoint && goBack(UNMOUNT);
+    }, []);
 
+    const onSetEndpointApi = ({ endpointURL }) => {
 
-    onSetEndpointApi = ({ endpointURL }) => {
+        setFocus(false)
 
-        this.setState({ isFocus: false })
-
-        const { checkEndpointApi, navigation, language } = this.props
         let URL = endpointURL
 
         checkEndpointApi({
@@ -73,101 +68,83 @@ export class Endpoint extends Component<IProps> {
         })
     }
 
-    onBack = () => {
-        this.props.navigation.navigate(ROUTES.SETTING_LIST)
-    }
+    const onBack = () => navigation.navigate(ROUTES.SETTING_LIST);
 
-    toggleFocus = () => {
-        this.setState((prevState) => {
-            return { isFocus: !prevState.isFocus }
-        });
-    }
+    const toggleFocus = () => setFocus(!isFocus);
 
-    render() {
-        const {
-            handleSubmit,
-            language,
-            navigation,
-            skipEndpoint = false,
-            loading
-        } = this.props;
+    return (
+        <View style={styles.container}>
 
-
-        return (
-            <View style={styles.container}>
-
-                {skipEndpoint ? (
-                    <CtHeader
-                        leftIcon="angle-left"
-                        leftIconPress={() => this.onBack()}
-                        title={Lng.t("header.back", { locale: language })}
-                        titleOnPress={() => this.onBack()}
-                        titleStyle={{ marginLeft: -10, marginTop: Platform.OS === 'ios' ? -1 : 2 }}
-                        placement="left"
-                        noBorder
-                        transparent
+            {skipEndpoint ? (
+                <CtHeader
+                    leftIcon="angle-left"
+                    leftIconPress={onBack}
+                    title={Lng.t("header.back", { locale: language })}
+                    titleOnPress={onBack}
+                    titleStyle={{ marginLeft: -10, marginTop: Platform.OS === 'ios' ? -1 : 2 }}
+                    placement="left"
+                    noBorder
+                    transparent
+                />
+            ) : (
+                    <StatusBar
+                        barStyle="dark-content"
+                        hidden={false}
+                        translucent={true}
                     />
-                ) : (
-                        <StatusBar
-                            barStyle="dark-content"
-                            hidden={false}
-                            translucent={true}
-                        />
-                    )}
+                )}
 
-                <ScrollView
-                    style={{ paddingTop: skipEndpoint ? '18%' : '32%' }}
-                    bounces={false}
-                    showsVerticalScrollIndicator={false}
-                    keyboardShouldPersistTaps='handled'
+            <ScrollView
+                style={{ paddingTop: skipEndpoint ? '18%' : '32%' }}
+                bounces={false}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps='handled'
+            >
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={{ flex: 1 }}
+                    keyboardVerticalOffset={0}
+                    behavior="height"
                 >
-                    <KeyboardAvoidingView
-                        style={{ flex: 1 }}
-                        contentContainerStyle={{ flex: 1 }}
-                        keyboardVerticalOffset={0}
-                        behavior="height"
-                    >
-                        <View style={styles.main}>
+                    <View style={styles.main}>
 
-                            <View style={styles.logoContainer}>
-                                <AssetImage
-                                    imageSource={IMAGES.LOGO_DARK}
-                                    imageStyle={styles.imgLogo}
-                                />
-                            </View>
-                            <View>
-                                <Field
-                                    name="endpointURL"
-                                    component={InputField}
-                                    hint={Lng.t("endpoint.endpointURL", { locale: language })}
-                                    inputProps={{
-                                        autoCapitalize: 'none',
-                                        placeholder: Lng.t("endpoint.urlPlaceHolder", { locale: language }),
-                                        autoCorrect: true,
-                                        keyboardType: "url",
-                                        onSubmitEditing: () => this.toggleFocus()
-                                    }}
-                                    onFocus={() => this.toggleFocus()}
-                                    inputContainerStyle={styles.inputField}
-                                />
-                                <Text style={styles.endpointTextTitle}>
-                                    {Lng.t("endpoint.endpointDesc", { locale: language })}
-                                </Text>
-                            </View>
-
-                            <CtGradientButton
-                                onPress={handleSubmit(this.onSetEndpointApi)}
-                                btnTitle={Lng.t("button.save", { locale: language })}
-                                loading={this.state.isFocus ? false : loading}
-                                style={styles.buttonStyle}
-                                buttonContainerStyle={styles.buttonContainer}
+                        <View style={styles.logoContainer}>
+                            <AssetImage
+                                imageSource={IMAGES.LOGO_DARK}
+                                imageStyle={styles.imgLogo}
                             />
-
                         </View>
-                    </KeyboardAvoidingView>
-                </ScrollView>
-            </View>
-        );
-    }
-}
+                        <View>
+                            <Field
+                                name="endpointURL"
+                                component={InputField}
+                                hint={Lng.t("endpoint.endpointURL", { locale: language })}
+                                inputProps={{
+                                    autoCapitalize: 'none',
+                                    placeholder: Lng.t("endpoint.urlPlaceHolder", { locale: language }),
+                                    autoCorrect: true,
+                                    keyboardType: "url",
+                                    onSubmitEditing: toggleFocus
+                                }}
+                                onFocus={toggleFocus}
+                                inputContainerStyle={styles.inputField}
+                            />
+                            <Text style={styles.endpointTextTitle}>
+                                {Lng.t("endpoint.endpointDesc", { locale: language })}
+                            </Text>
+                        </View>
 
+                        <CtGradientButton
+                            onPress={handleSubmit(onSetEndpointApi)}
+                            btnTitle={Lng.t("button.save", { locale: language })}
+                            loading={isFocus ? false : loading}
+                            style={styles.buttonStyle}
+                            buttonContainerStyle={styles.buttonContainer}
+                        />
+
+                    </View>
+                </KeyboardAvoidingView>
+            </ScrollView>
+        </View>
+    );
+}

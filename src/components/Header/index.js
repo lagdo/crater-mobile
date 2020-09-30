@@ -27,60 +27,47 @@ type IProps = {
     titleOnPress: Object
 };
 
-export const CtHeader = ({
-    leftIcon,
-    leftIconPress,
-    title,
-    rightIcon,
-    rightIconPress,
-    placement,
-    transparent,
-    rightIconHint,
-    titleStyle,
-    leftIconStyle,
-    hasCircle,
-    noBorder,
-    rightIconProps,
-    rightComponent,
-    rightIconHintStyle,
-    filterProps,
-    titleOnPress,
-}: IProps) => {
-    const hederTitle = {
+export const CtHeader = (props: IProps) => {
+    const {
+        leftIcon,
+        leftIconPress,
+        title,
+        rightIcon,
+        rightIconPress,
+        placement,
+        transparent,
+        rightIconHint,
+        titleStyle,
+        leftIconStyle,
+        hasCircle,
+        noBorder,
+        rightIconProps,
+        rightComponent,
+        rightIconHintStyle,
+        filterProps,
+        titleOnPress,
+    } = props;
+
+    const headerTitleStyle = [
+        {
+            color: transparent ? colors.dark2 : colors.white,
+        },
+        styles.title,
+        titleStyle && titleStyle,
+    ];
+
+    const headerTitle = {
         text: title,
-        style: [
-            {
-                color: transparent ? colors.dark2 : colors.white,
-            },
-            styles.title,
-            titleStyle && titleStyle,
-        ],
-    }
+        style: headerTitleStyle,
+    };
 
-    const displayTitle = () => {
-
-        if (titleOnPress) {
-            return (
-                <TouchableOpacity
-                    onPress={() => titleOnPress()}
-                >
-                    <Text
-                        style={[
-                            {
-                                color: transparent ? colors.dark2 : colors.white,
-                            },
-                            styles.title,
-                            titleStyle && titleStyle,
-                        ]}
-                    >
-                        {title}
-                    </Text>
-                </TouchableOpacity>
-            )
-        }
-
-        return leftIcon && hederTitle
-    }
+    const displayTitle = titleOnPress ? (
+        <TouchableOpacity onPress={titleOnPress}>
+            <Text style={headerTitleStyle}>
+                {title}
+            </Text>
+        </TouchableOpacity>
+    ) : leftIcon && headerTitle;
 
     return (
         <Header
@@ -110,9 +97,9 @@ export const CtHeader = ({
                             ]}
                         />
                     </TouchableOpacity>
-                ) : hederTitle
+                ) : headerTitle
             }
-            centerComponent={displayTitle()}
+            centerComponent={displayTitle}
             rightComponent={!rightComponent ? (
                 <View style={styles.rightContainer}>
                     {filterProps && (

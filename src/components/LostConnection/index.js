@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { View } from 'react-native'
 import { connect } from 'react-redux';
 import styles from './styles';
@@ -11,80 +11,60 @@ import { goBack, MOUNT, UNMOUNT } from '../../navigation/actions';
 import { checkConnection } from '../../api/helper';
 import { ROUTES } from '../../navigation/routes';
 
-export class LostConnection extends Component {
+export const LostConnection = (props) => {
+    const {
+        navigation,
+        language,
+    } = props;
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            loading: false
-        };
-    }
+    const [loading, setLoading] = useState(false);
 
-    componentDidMount() {
-        const { navigation } = this.props
-        goBack(MOUNT, navigation, { route: ROUTES.LOST_CONNECTION } )
-    }
+    const onRetry = async () => {
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
-
-
-    onRetry = async () => {
-
-        this.setState({ loading: true })
+        setLoading(true);
 
         setTimeout(() => {
-            this.setState({ loading: false })
+            setLoading(false);
         }, 1000);
 
-        const { navigation } = this.props
+        let isConnected = await checkConnection();
+        !isConnected ? navigation.navigate(ROUTES.LOST_CONNECTION) : navigation.pop();
+    };
 
-        let isConnected = await checkConnection()
-        !isConnected ? navigation.navigate(ROUTES.LOST_CONNECTION) :
-            navigation.pop();
-    }
+    return (
+        <View style={styles.container}>
 
-    render() {
+            <View style={styles.main}>
 
-        const { language } = this.props;
-        const { loading } = this.state
+                <View style={styles.bodyContainer}>
+                    <Text style={styles.title}>
+                        {Lng.t("lostInternet.title", { locale: language })}
+                    </Text>
 
-        return (
-            <View style={styles.container}>
-
-                <View style={styles.main}>
-
-                    <View style={styles.bodyContainer}>
-                        <Text style={styles.title}>
-                            {Lng.t("lostInternet.title", { locale: language })}
-                        </Text>
-
-                        <View style={styles.logoContainer}>
-                            <AssetImage
-                                imageSource={IMAGES.LOST_CONNECTION}
-                                imageStyle={styles.imgLogo}
-                            />
-                        </View>
-
-                        <Text h6 style={styles.description}>
-                            {Lng.t("lostInternet.description", { locale: language })}
-                        </Text>
-                    </View>
-
-                    <View style={{ marginTop: 25 }}>
-                        <CtGradientButton
-                            onPress={() => this.onRetry()}
-                            btnTitle={Lng.t("button.retry", { locale: language })}
-                            loading={loading}
+                    <View style={styles.logoContainer}>
+                        <AssetImage
+                            imageSource={IMAGES.LOST_CONNECTION}
+                            imageStyle={styles.imgLogo}
                         />
                     </View>
 
+                    <Text h6 style={styles.description}>
+                        {Lng.t("lostInternet.description", { locale: language })}
+                    </Text>
+                </View>
+
+                <View style={{ marginTop: 25 }}>
+                    <CtGradientButton
+                        onPress={onRetry}
+                        btnTitle={Lng.t("button.retry", { locale: language })}
+                        loading={loading}
+                    />
                 </View>
 
             </View>
-        )
-    }
+
+        </View>
+    );
 }
 
 const mapStateToProps = ({ global }) => ({

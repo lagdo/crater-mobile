@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     TouchableWithoutFeedback,
     View
@@ -25,145 +25,112 @@ type IProps = {
     templates: Array,
 };
 
-export class TemplateField extends Component<IProps> {
-    constructor(props) {
-        super(props);
+export const TemplateField = (props: IProps) => {
+    const {
+        navigation,
+        language,
+        containerStyle,
+        templates,
+        label,
+        icon,
+        placeholder,
+        meta,
+        onChangeCallback,
+        input: { value, onChange },
+    } = props;
 
-        this.state = {
-            page: 1,
-            visible: false,
-            selectedTemplate: '',
-        };
-    }
+    // const [page, setPage] = useState(1);
+    const [visible, setVisible] = useState(false);
+    const [selectedTemplate, setSelectedTemplate] = useState('');
 
-    componentDidMount() {
-        const { input: { value }, templates, navigation } = this.props
-
+    useEffect(() => {
         const template = templates.filter(val => val.id === value)[0]
 
-        this.setState({
-            selectedTemplate: template,
-        })
-    }
+        setSelectedTemplate(template);
+    }, []);
 
-    onToggle = () => {
-        this.setState((prevState) => {
-            return { visible: !prevState.visible }
-        });
-    }
+    const onToggle = () => setVisible(!visible);
 
-    onTemplateSelect = (template) => {
-        this.setState({
-            selectedTemplate: template
-        })
-    }
-
-    onSearch = (search) => {
-        this.setState({ search })
-        this.getItems({ fresh: true, q: search })
-    }
-
-    onSubmit = () => {
-        const { onChangeCallback, input: { onChange } } = this.props
-
-        const { selectedTemplate } = this.state
-
+    const onSubmit = () => {
         onChange(selectedTemplate.id)
 
         onChangeCallback && onChangeCallback(selectedTemplate)
 
-        this.onToggle()
+        onToggle()
     }
 
-    BOTTOM_ACTION = () => {
-        const { language } = this.props
-
+    const BOTTOM_ACTION = () => {
         return (
             <View style={styles.submitButton}>
                 <CtButton
-                    onPress={this.onSubmit}
+                    onPress={onSubmit}
                     btnTitle={Lng.t("button.chooseTemplate", { locale: language })}
                 />
             </View>
         )
     }
 
-    render() {
-        const {
-            containerStyle,
-            templates,
-            label,
-            icon,
-            placeholder,
-            meta,
-            language,
-        } = this.props;
+    const { name, id } = selectedTemplate;
 
-        const {
-            visible,
-            selectedTemplate: { name, id } = {},
-        } = this.state
+    return (
+        <View style={styles.container}>
 
-        return (
-            <View style={styles.container}>
+            <FakeInput
+                label={label}
+                icon={icon}
+                values={name}
+                placeholder={placeholder}
+                onChangeCallback={onToggle}
+                containerStyle={containerStyle}
+                meta={meta}
+            />
 
-                <FakeInput
-                    label={label}
-                    icon={icon}
-                    values={name}
-                    placeholder={placeholder}
-                    onChangeCallback={this.onToggle}
-                    containerStyle={containerStyle}
-                    meta={meta}
-                />
-
-                <SlideModal
-                    visible={visible}
-                    onToggle={this.onToggle}
-                    headerProps={{
-                        leftIcon: "long-arrow-alt-left",
-                        leftIconPress: () => this.onToggle(),
-                        title: Lng.t("header.template", { locale: language }),
-                        titleStyle: headerTitle({ marginLeft: -19, marginRight: -19 }),
-                        placement: "center",
-                        hasCircle: false,
-                        noBorder: false,
-                        transparent: false,
-                    }}
-                    bottomDivider
-                    defaultLayout
-                    bottomAction={this.BOTTOM_ACTION()}
-                >
-                    <View style={styles.imageList}>
-                        {templates.map((val, index) => (
-                            <TouchableWithoutFeedback
-                                onPress={() => this.onTemplateSelect(val)}
-                                key={index}
-                            >
-                                <View style={styles.imageContainer}>
-                                    <AssetImage
-                                        uri
-                                        imageSource={val.path}
-                                        imageStyle={[
-                                            styles.image,
-                                            id === val.id && styles.active
-                                        ]}
+            <SlideModal
+                visible={visible}
+                onToggle={onToggle}
+                headerProps={{
+                    leftIcon: "long-arrow-alt-left",
+                    leftIconPress: onToggle,
+                    title: Lng.t("header.template", { locale: language }),
+                    titleStyle: headerTitle({ marginLeft: -19, marginRight: -19 }),
+                    placement: "center",
+                    hasCircle: false,
+                    noBorder: false,
+                    transparent: false,
+                }}
+                bottomDivider
+                defaultLayout
+                bottomAction={BOTTOM_ACTION()}
+            >
+                <View style={styles.imageList}>
+                    {templates.map((val, index) => (
+                        <TouchableWithoutFeedback
+                            onPress={() => setSelectedTemplate(val)}
+                            key={index}
+                        >
+                            <View style={styles.imageContainer}>
+                                <AssetImage
+                                    uri
+                                    imageSource={val.path}
+                                    imageStyle={[
+                                        styles.image,
+                                        id === val.id && styles.active
+                                    ]}
+                                />
+                                {id === val.id &&
+                                    <Icon
+                                        name="check"
+                                        size={18}
+                                        iconStyle={styles.iconStyle}
+                                        color={colors.white}
+                                        containerStyle={styles.iconContainer}
                                     />
-                                    {id === val.id &&
-                                        <Icon
-                                            name="check"
-                                            size={18}
-                                            iconStyle={styles.iconStyle}
-                                            color={colors.white}
-                                            containerStyle={styles.iconContainer}
-                                        />
-                                    }
-                                </View>
-                            </TouchableWithoutFeedback>
-                        ))}
-                    </View>
-                </SlideModal>
-            </View>
-        );
-    }
+                                }
+                            </View>
+                        </TouchableWithoutFeedback>
+                    ))}
+                </View>
+            </SlideModal>
+        </View>
+    );
 }

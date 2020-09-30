@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import styles from './styles';
 import {
@@ -23,69 +23,61 @@ type IProps = {
     language: String,
     getAccountLoading: Boolean,
 }
-export class Notification extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
+export const Notification = (props: IProps) => {
+    const {
+        navigation,
+        handleSubmit,
+        language,
+        getSettingItemLoading,
+        getSettingItem,
+        editSettingItem,
+    } = props;
 
-        this.state = {
-            invoiceStatus: null,
-            estimateStatus: null,
-            email: '',
-        }
-    }
+    const [invoiceStatus, setInvoiceStatus] = useState(null);
+    const [estimateStatus, setEstimateStatus] = useState(null);
+    // const [email, setEmail] = useState(null);
 
-    componentWillMount() {
-        const { getSettingItem } = this.props
-
+    useEffect(() => {
         getSettingItem({
             key: 'notify_invoice_viewed',
             onResult: (val) => {
-                this.setState({ invoiceStatus: val !== null ? val : 'NO' })
+                setInvoiceStatus(val !== null ? val : 'NO')
             }
         })
 
         getSettingItem({
             key: 'notify_estimate_viewed',
             onResult: (val) => {
-                this.setState({ estimateStatus: val !== null ? val : 'NO' })
+                setEstimateStatus(val !== null ? val : 'NO')
             }
         })
 
         getSettingItem({
             key: 'notification_email',
             onResult: (val) => {
-                this.setFormField('notification_email', val)
+                setFormField('notification_email', val)
             }
         })
-    }
 
-    componentDidMount() {
-        const { navigation } = this.props
         goBack(MOUNT, navigation)
-    }
 
-    componentWillUpdate(nextProps, nextState) {
+        return () => goBack(UNMOUNT);
+    }, []);
 
-        const { navigation } = nextProps
-        const toastMsg = navigation.getParam('toastMsg', null)
+    const toastMsg = navigation.getParam('toastMsg', null)
 
+    useEffect(() => {
         toastMsg &&
             setTimeout(() => {
                 navigation.setParams({ 'toastMsg': null })
             }, 2500);
-    }
+    }, [toastMsg]);
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
-
-    setFormField = (field, value) => {
-        this.props.dispatch(change(NOTIFICATION, field, value));
+    const setFormField = (field, value) => {
+        props.dispatch(change(NOTIFICATION, field, value));
     };
 
-    onNotificationSubmit = ({ notification_email }) => {
-        const { editSettingItem, navigation } = this.props
-
+    const onNotificationSubmit = ({ notification_email }) => {
         editSettingItem({
             params: {
                 key: 'notification_email',
@@ -96,115 +88,94 @@ export class Notification extends React.Component<IProps> {
 
     }
 
-    invoiceStatus = (status) => {
-        const { editSettingItem } = this.props
-
+    const onInvoiceStatusChange = (status) => {
         editSettingItem({
             params: {
                 key: 'notify_invoice_viewed',
                 value: status === true ? 'YES' : 'NO'
             },
-            onResult: () => { this.toggleToast('settings.notifications.invoiceViewedUpdated') }
+            onResult: () => { toggleToast('settings.notifications.invoiceViewedUpdated') }
         })
     }
 
-    estimateStatus = (status) => {
-        const { editSettingItem } = this.props
-
+    const onEstimateStatusChange = (status) => {
         editSettingItem({
             params: {
                 key: 'notify_estimate_viewed',
                 value: status === true ? 'YES' : 'NO'
             },
-            onResult: () => { this.toggleToast('settings.notifications.estimateViewedUpdated') }
+            onResult: () => { toggleToast('settings.notifications.estimateViewedUpdated') }
         })
     }
 
-    toggleToast = (msg) => {
-        this.props.navigation.setParams({
-            "toastMsg": msg
-        })
+    const toggleToast = (msg) => {
+        navigation.setParams({ "toastMsg": msg })
     }
 
-    render() {
-        const {
-            navigation,
-            handleSubmit,
-            language,
-            getSettingItemLoading,
-        } = this.props;
+    let toastMessage = navigation.getParam('toastMsg', '')
 
-        const { invoiceStatus, estimateStatus } = this.state
-        let toastMessage = navigation.getParam('toastMsg', '')
+    return (
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: () => navigation.goBack(null),
+                title: Lng.t("header.notifications", { locale: language }),
+                placement: "center",
+                rightIcon: "save",
+                rightIconProps: {
+                    solid: true,
+                },
+                leftIconStyle: { color: colors.dark2 },
+                rightIconPress: handleSubmit(onNotificationSubmit),
+            }}
+            loadingProps={{
+                is: getSettingItemLoading || invoiceStatus === null || estimateStatus === null
+            }}
+            toastProps={{
+                message: Lng.t(toastMessage, { locale: language }),
+                visible: toastMessage,
+                containerStyle: styles.toastContainer
+            }}
+        >
+            <View style={styles.mainContainer}>
 
-        return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: () => navigation.goBack(null),
-                    title: Lng.t("header.notifications", { locale: language }),
-                    placement: "center",
-                    rightIcon: "save",
-                    rightIconProps: {
-                        solid: true,
-                    },
-                    leftIconStyle: { color: colors.dark2 },
-                    rightIconPress: handleSubmit(this.onNotificationSubmit),
-                }}
-                loadingProps={{
-                    is: getSettingItemLoading || invoiceStatus === null ||
-                        estimateStatus === null
-                }}
-                toastProps={{
-                    message: Lng.t(toastMessage, { locale: language }),
-                    visible: toastMessage,
-                    containerStyle: styles.toastContainer
-                }}
-            >
-                <View style={styles.mainContainer}>
+                <Field
+                    name={"notification_email"}
+                    component={InputField}
+                    hint={Lng.t("settings.notifications.send", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        keyboardType: 'email-address',
+                    }}
+                    leftIcon={'envelope'}
+                    leftIconSolid={true}
+                />
 
-                    <Field
-                        name={"notification_email"}
-                        component={InputField}
-                        hint={Lng.t("settings.notifications.send", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            keyboardType: 'email-address',
-                        }}
-                        leftIcon={'envelope'}
-                        leftIconSolid={true}
-                    />
+                <CtDivider
+                    dividerStyle={styles.dividerLine}
+                />
 
-                    <CtDivider
-                        dividerStyle={styles.dividerLine}
-                    />
+                <Field
+                    name="notify_invoice_viewed"
+                    component={ToggleSwitch}
+                    status={invoiceStatus === 'YES' ? true : false}
+                    hint={Lng.t("settings.notifications.invoiceViewed", { locale: language })}
+                    description={Lng.t("settings.notifications.invoiceViewedDescription", { locale: language })}
+                    onChangeCallback={onInvoiceStatusChange}
+                />
 
-                    <Field
-                        name="notify_invoice_viewed"
-                        component={ToggleSwitch}
-                        status={invoiceStatus === 'YES' ? true : false}
-                        hint={Lng.t("settings.notifications.invoiceViewed", { locale: language })}
-                        description={Lng.t("settings.notifications.invoiceViewedDescription", { locale: language })}
-                        onChangeCallback={(val) =>
-                            this.invoiceStatus(val)
-                        }
-                    />
+                <Field
+                    name="notify_estimate_viewed"
+                    component={ToggleSwitch}
+                    status={estimateStatus === 'YES' ? true : false}
+                    hint={Lng.t("settings.notifications.estimateViewed", { locale: language })}
+                    description={Lng.t("settings.notifications.estimateViewedDescription", { locale: language })}
+                    onChangeCallback={onEstimateStatusChange}
+                    mainContainerStyle={{ marginTop: 12 }}
+                />
 
-                    <Field
-                        name="notify_estimate_viewed"
-                        component={ToggleSwitch}
-                        status={estimateStatus === 'YES' ? true : false}
-                        hint={Lng.t("settings.notifications.estimateViewed", { locale: language })}
-                        description={Lng.t("settings.notifications.estimateViewedDescription", { locale: language })}
-                        onChangeCallback={(val) =>
-                            this.estimateStatus(val)
-                        }
-                        mainContainerStyle={{ marginTop: 12 }}
-                    />
-
-                </View>
-            </DefaultLayout>
-        );
-    }
+            </View>
+        </DefaultLayout>
+    );
 }

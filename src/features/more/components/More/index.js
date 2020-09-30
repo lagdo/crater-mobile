@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { MainLayout, ListView } from '../../../../components';
@@ -11,37 +11,20 @@ import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { ROUTES } from '../../../../navigation/routes';
 import { alertMe } from '../../../../api/global';
 
-export class More extends React.Component {
-    constructor(props) {
-        super(props);
+export const More = (props) => {
+    const {
+        navigation,
+        language,
+        logout,
+    } = props;
 
-        this.state = {
-            endpointVisible: false
-        }
-    }
+    useEffect(() => {
+        goBack(MOUNT, navigation, { route: ROUTES.MAIN_INVOICES });
 
-    componentDidMount() {
-        const { navigation } = this.props
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_INVOICES })
-    }
+        return () => goBack(UNMOUNT);
+    }, []);
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
-
-    onSelectMenu = (item) => {
-        const { navigation } = this.props
-
-        if (item.route) {
-            navigation.navigate(item.route)
-        } else {
-            this[item.action]()
-        }
-    }
-
-    onLogout = () => {
-        const { navigation, logout, language } = this.props
-
+    const onLogout = () => {
         alertMe({
             title: Lng.t("logout.confirmation", { locale: language }),
             showCancel: true,
@@ -50,48 +33,46 @@ export class More extends React.Component {
         })
     }
 
-    toggleEndpointModal = () => {
-        this.setState((state) => ({
-            endpointVisible: !state.endpointVisible
-        }))
+    const onSelectMenu = (item) => {
+        if (item.route) {
+            navigation.navigate(item.route)
+        } else if (item.action === 'onLogout') {
+            onLogout();
+        }
     }
 
-    render() {
-        const { language } = this.props;
+    return (
+        <View style={styles.container}>
+            <MainLayout
+                headerProps={{
+                    hasCircle: false,
+                    title: Lng.t("header.more", { locale: language })
+                }}
+                bottomDivider
+                dividerStyle={styles.dividerStyle}
+                hasSearchField={false}
+            >
+                <View style={styles.listViewContainer}>
+                    <ListView
+                        items={MORE_MENU(language, Lng)}
+                        onPress={onSelectMenu}
+                        hasAvatar
+                        refreshing={false}
+                        leftTitleStyle={styles.listViewTitle}
+                        leftIconStyle={styles.listViewIcon}
+                        itemContainer={styles.itemContainer}
+                        listViewContainerStyle={styles.listViewScrollContainerStyle}
+                        listItemProps={{
+                            chevron: {
+                                size: 19,
+                                color: colors.darkGray,
+                                containerStyle: { marginTop: 5 },
+                            },
+                        }}
+                    />
+                </View>
 
-        return (
-            <View style={styles.container}>
-                <MainLayout
-                    headerProps={{
-                        hasCircle: false,
-                        title: Lng.t("header.more", { locale: language })
-                    }}
-                    bottomDivider
-                    dividerStyle={styles.dividerStyle}
-                    hasSearchField={false}
-                >
-                    <View style={styles.listViewContainer}>
-                        <ListView
-                            items={MORE_MENU(language, Lng)}
-                            onPress={this.onSelectMenu}
-                            hasAvatar
-                            refreshing={false}
-                            leftTitleStyle={styles.listViewTitle}
-                            leftIconStyle={styles.listViewIcon}
-                            itemContainer={styles.itemContainer}
-                            listViewContainerStyle={styles.listViewScrollContainerStyle}
-                            listItemProps={{
-                                chevron: {
-                                    size: 19,
-                                    color: colors.darkGray,
-                                    containerStyle: { marginTop: 5 },
-                                },
-                            }}
-                        />
-                    </View>
-
-                </MainLayout>
-            </View>
-        );
-    }
+            </MainLayout>
+        </View>
+    );
 }

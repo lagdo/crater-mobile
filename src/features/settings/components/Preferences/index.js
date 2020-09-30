@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import styles from './styles';
 import {
@@ -28,85 +28,77 @@ type IProps = {
     currencies: Object,
 }
 
-export class Preferences extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
+export const Preferences = (props: IProps) => {
+    const {
+        navigation,
+        language,
+        isLoading,
+        getPreferences,
+        getSettingItem,
+        editPreferences,
+        clearPreferences,
+        currencies,
+        editPreferencesLoading,
+        editSettingItemLoading,
+        editSettingItem,
+        handleSubmit,
+        formValues: {
+            time_zone,
+        },
+        dateFormats,
+    } = props
 
-        this.state = {
-            timezoneList: [],
-            dateFormatList: [],
-            fiscalYearLst: [],
-            discountPerItem: null,
-            taxPerItem: null,
-            visibleToast: false
-        }
-    }
+    const [timezoneList, setTimezoneList] = useState([]);
+    const [dateFormatList, setDateFormatList] = useState([]);
+    const [fiscalYearList, setFiscalYearList] = useState([]);
+    const [discountPerItem, setDiscountPerItem] = useState(null);
+    const [taxPerItem, setTaxPerItem] = useState(null);
+    const [visibleToast, setVisibleToast] = useState(false);
 
-    componentWillMount() {
-        const {
-            getPreferences,
-            getSettingItem
-        } = this.props
-
+    useEffect(() => {
         getPreferences({
             onResult: (val) => {
                 const { time_zones, date_formats, fiscal_years } = val
-                const dateFormatList = this.getDateFormatList(date_formats)
-                const timezoneList = this.getTimeZoneList(time_zones)
-                const fiscalYearLst = this.getFiscalYearList(fiscal_years)
-                this.setState({ timezoneList, dateFormatList, fiscalYearLst })
+                setTimezoneList(getTimeZoneList(time_zones))
+                setDateFormatList(getDateFormatList(date_formats))
+                setFiscalYearList(getFiscalYearList(fiscal_years))
             }
         })
         getSettingItem({
             key: 'discount_per_item',
             onResult: (val) => {
-                this.setState({ discountPerItem: val !== null ? val : 'NO' })
+                setDiscountPerItem(val !== null ? val : 'NO')
             }
         })
 
         getSettingItem({
             key: 'tax_per_item',
             onResult: (val) => {
-                this.setState({ taxPerItem: val !== null ? val : 'NO' })
+                setTaxPerItem(val !== null ? val : 'NO')
             }
         })
-    }
 
-    componentDidMount() {
-        const { navigation } = this.props
-        goBack(MOUNT, navigation)
-    }
+        goBack(MOUNT, navigation);
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
+        return () => goBack(UNMOUNT);
+    }, []);
 
-    setFormField = (field, value) => {
-        this.props.dispatch(change(EDIT_PREFERENCES, field, value));
+    const setFormField = (field, value) => {
+        props.dispatch(change(EDIT_PREFERENCES, field, value));
     };
 
-    onSubmitPreferences = (values) => {
-        const {
-            navigation,
-            editPreferences,
-            clearPreferences,
-            currencies,
-            editPreferencesLoading, editSettingItemLoading
-        } = this.props
-
+    const onSubmitPreferences = (values) => {
         if (!(editPreferencesLoading || editSettingItemLoading)) {
             clearPreferences()
             editPreferences({ params: values, navigation, currencies })
         }
-
     }
 
-    BOTTOM_ACTION = (handleSubmit) => {
-        const { editPreferencesLoading, language } = this.props
+    const BOTTOM_ACTION = (handleSubmit) => {
         return (
             <View style={styles.submitButton}>
                 <CtButton
-                    onPress={handleSubmit(this.onSubmitPreferences)}
+                    onPress={handleSubmit(onSubmitPreferences)}
                     btnTitle={Lng.t("button.save", { locale: language })}
                     loading={editPreferencesLoading}
                 />
@@ -114,8 +106,7 @@ export class Preferences extends React.Component<IProps> {
         )
     }
 
-    getTimeZoneList = (timezones) => {
-
+    const getTimeZoneList = (timezones) => {
         let timeZoneList = []
         if (typeof timezones !== 'undefined') {
 
@@ -129,11 +120,9 @@ export class Preferences extends React.Component<IProps> {
         }
 
         return timeZoneList
-
     }
 
-    getFiscalYearList = (fiscalYears) => {
-
+    const getFiscalYearList = (fiscalYears) => {
         let years = []
         if (typeof fiscalYears !== 'undefined') {
             years = fiscalYears.map((year) => {
@@ -148,8 +137,7 @@ export class Preferences extends React.Component<IProps> {
         return years
     }
 
-    getDateFormatList = (dateFormats) => {
-
+    const getDateFormatList = (dateFormats) => {
         let dateFormatList = []
         if (typeof dateFormats !== 'undefined') {
             dateFormatList = dateFormats.map((dateformat) => {
@@ -164,201 +152,174 @@ export class Preferences extends React.Component<IProps> {
         return dateFormatList
     }
 
-    setDiscountPerItem = (val) => {
-        const { editSettingItem } = this.props
-
+    const saveDiscountPerItem = (val) => {
         editSettingItem({
             params: {
                 key: 'discount_per_item',
                 value: val === true ? 'YES' : 'NO'
             },
-            onResult: () => { this.toggleToast() }
+            onResult: toggleToast
         })
     }
 
-    setTaxPerItem = (val) => {
-        const { editSettingItem } = this.props
-
+    const saveTaxPerItem = (val) => {
         editSettingItem({
             params: {
                 key: 'tax_per_item',
                 value: val === true ? 'YES' : 'NO'
             },
-            onResult: () => { this.toggleToast() }
+            onResult: toggleToast
         })
     }
 
-    toggleToast = () => {
-        this.setState({ visibleToast: true })
-    }
+    const toggleToast = () => setVisibleToast(true)
 
-    render() {
+    return (
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: () => navigation.goBack(null),
+                title: Lng.t("header.setting.preferences", { locale: language }),
+                placement: "center",
+                rightIcon: "save",
+                rightIconProps: {
+                    solid: true,
+                },
+                rightIconPress: handleSubmit(onSubmitPreferences),
+            }}
+            bottomAction={BOTTOM_ACTION(handleSubmit)}
+            loadingProps={{
+                is: isLoading ||
+                    timezoneList.length === 0 || dateFormatList.length === 0 ||
+                    discountPerItem === null || taxPerItem === null
+            }}
+            toastProps={{
+                message: Lng.t("settings.preferences.settingUpdate", { locale: language }),
+                visible: visibleToast
+            }}
+        >
 
-        const {
-            navigation,
-            handleSubmit,
-            language,
-            formValues: {
-                time_zone,
-            },
-            dateFormats,
-            isLoading,
-        } = this.props;
+            <View style={styles.mainContainer}>
 
-        const {
-            timezoneList,
-            dateFormatList,
-            fiscalYearLst,
-            discountPerItem,
-            taxPerItem,
-            visibleToast
-        } = this.state
+                <Field
+                    name="time_zone"
+                    items={timezoneList}
+                    displayName="key"
+                    component={SelectField}
+                    label={Lng.t("settings.preferences.timeZone", { locale: language })}
+                    icon='clock'
+                    rightIcon='angle-right'
+                    placeholder={time_zone ?
+                        time_zone :
+                        Lng.t("settings.preferences.timeZonePlaceholder", { locale: language })
+                    }
+                    fakeInputProps={{
+                        valueStyle: styles.selectedField,
+                        placeholderStyle: styles.selectedField,
+                    }}
+                    navigation={navigation}
+                    searchFields={['key']}
+                    compareField="value"
+                    onSelect={(val) => {
+                        setFormField('time_zone', val.value)
+                    }}
+                    headerProps={{
+                        title: Lng.t("timeZones.title", { locale: language }),
+                        titleStyle: headerTitle({ marginLeft: -23, marginRight: -40 }),
+                        rightIconPress: null
+                    }}
+                    emptyContentProps={{
+                        contentType: "timeZones",
+                    }}
+                    isRequired
+                />
 
-        return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: () => navigation.goBack(null),
-                    title: Lng.t("header.setting.preferences", { locale: language }),
-                    placement: "center",
-                    rightIcon: "save",
-                    rightIconProps: {
-                        solid: true,
-                    },
-                    rightIconPress: handleSubmit(this.onSubmitPreferences),
-                }}
-                bottomAction={this.BOTTOM_ACTION(handleSubmit)}
-                loadingProps={{
-                    is: isLoading || timezoneList.length === 0 || dateFormatList.length === 0 || discountPerItem === null || taxPerItem === null
-                }}
-                toastProps={{
-                    message: Lng.t("settings.preferences.settingUpdate", { locale: language }),
-                    visible: visibleToast
-                }}
-            >
+                <Field
+                    name="date_format"
+                    items={dateFormatList}
+                    displayName="display_date"
+                    component={SelectField}
+                    label={Lng.t("settings.preferences.dateFormat", { locale: language })}
+                    icon='calendar-alt'
+                    rightIcon='angle-right'
+                    placeholder={Lng.t("settings.preferences.dateFormatPlaceholder", { locale: language })}
+                    fakeInputProps={{
+                        valueStyle: styles.selectedField,
+                        placeholderStyle: styles.selectedField,
+                    }}
+                    navigation={navigation}
+                    searchFields={['display_date']}
+                    compareField="carbon_format_value"
+                    onSelect={(val) => {
+                        setFormField('carbon_date_format', val.carbon_format_value)
+                        setFormField('moment_date_format', val.moment_format_value)
+                        setFormField('date_format', val.carbon_format_value)
+                    }}
+                    headerProps={{
+                        title: Lng.t("dateFormats.title", { locale: language }),
+                        titleStyle: headerTitle({ marginLeft: -20, marginRight: -55 }),
+                        rightIconPress: null
+                    }}
+                    emptyContentProps={{
+                        contentType: "dateFormats",
+                    }}
+                    isRequired
+                />
 
-                <View style={styles.mainContainer}>
+                <Field
+                    name="fiscal_year"
+                    items={fiscalYearList}
+                    displayName="key"
+                    component={SelectField}
+                    label={Lng.t("settings.preferences.fiscalYear", { locale: language })}
+                    icon='calendar-alt'
+                    rightIcon='angle-right'
+                    placeholder={Lng.t("settings.preferences.fiscalYearPlaceholder", { locale: language })}
+                    fakeInputProps={{
+                        valueStyle: styles.selectedField,
+                        placeholderStyle: styles.selectedField,
+                    }}
+                    navigation={navigation}
+                    searchFields={['key']}
+                    compareField="value"
+                    onSelect={(val) => {
+                        setFormField('fiscal_year', val.value)
+                    }}
+                    headerProps={{
+                        title: Lng.t("fiscalYears.title", { locale: language }),
+                        titleStyle: headerTitle({ marginLeft: -15, marginRight: -35 }),
+                        rightIconPress: null
+                    }}
+                    emptyContentProps={{
+                        contentType: "fiscalYears",
+                    }}
+                    isRequired
+                />
+                <CtDivider
+                    dividerStyle={styles.dividerLine}
+                />
 
-                    <Field
-                        name="time_zone"
-                        items={timezoneList}
-                        displayName="key"
-                        component={SelectField}
-                        label={Lng.t("settings.preferences.timeZone", { locale: language })}
-                        icon='clock'
-                        rightIcon='angle-right'
-                        placeholder={time_zone ?
-                            time_zone :
-                            Lng.t("settings.preferences.timeZonePlaceholder", { locale: language })
-                        }
-                        fakeInputProps={{
-                            valueStyle: styles.selectedField,
-                            placeholderStyle: styles.selectedField,
-                        }}
-                        navigation={navigation}
-                        searchFields={['key']}
-                        compareField="value"
-                        onSelect={(val) => {
-                            this.setFormField('time_zone', val.value)
-                        }}
-                        headerProps={{
-                            title: Lng.t("timeZones.title", { locale: language }),
-                            titleStyle: headerTitle({ marginLeft: -23, marginRight: -40 }),
-                            rightIconPress: null
-                        }}
-                        emptyContentProps={{
-                            contentType: "timeZones",
-                        }}
-                        isRequired
-                    />
+                <Field
+                    name="discount_per_item"
+                    component={ToggleSwitch}
+                    status={discountPerItem === 'YES' ? true : false}
+                    hint={Lng.t("settings.preferences.discountPerItem", { locale: language })}
+                    description={Lng.t("settings.preferences.discountPerItemPlaceholder", { locale: language })}
+                    onChangeCallback={(val) => saveDiscountPerItem(val)
+                    }
+                />
 
-                    <Field
-                        name="date_format"
-                        items={dateFormatList}
-                        displayName="display_date"
-                        component={SelectField}
-                        label={Lng.t("settings.preferences.dateFormat", { locale: language })}
-                        icon='calendar-alt'
-                        rightIcon='angle-right'
-                        placeholder={Lng.t("settings.preferences.dateFormatPlaceholder", { locale: language })}
-                        fakeInputProps={{
-                            valueStyle: styles.selectedField,
-                            placeholderStyle: styles.selectedField,
-                        }}
-                        navigation={navigation}
-                        searchFields={['display_date']}
-                        compareField="carbon_format_value"
-                        onSelect={(val) => {
-                            this.setFormField('carbon_date_format', val.carbon_format_value)
-                            this.setFormField('moment_date_format', val.moment_format_value)
-                            this.setFormField('date_format', val.carbon_format_value)
-                        }}
-                        headerProps={{
-                            title: Lng.t("dateFormats.title", { locale: language }),
-                            titleStyle: headerTitle({ marginLeft: -20, marginRight: -55 }),
-                            rightIconPress: null
-                        }}
-                        emptyContentProps={{
-                            contentType: "dateFormats",
-                        }}
-                        isRequired
-                    />
+                <Field
+                    name="tax_per_item"
+                    component={ToggleSwitch}
+                    status={taxPerItem === 'YES' ? true : false}
+                    hint={Lng.t("settings.preferences.taxPerItem", { locale: language })}
+                    description={Lng.t("settings.preferences.taxPerItemPlaceholder", { locale: language })}
+                    onChangeCallback={(val) => saveTaxPerItem(val)
+                    }
+                    mainContainerStyle={{ marginVertical: 12 }}
+                />
 
-                    <Field
-                        name="fiscal_year"
-                        items={fiscalYearLst}
-                        displayName="key"
-                        component={SelectField}
-                        label={Lng.t("settings.preferences.fiscalYear", { locale: language })}
-                        icon='calendar-alt'
-                        rightIcon='angle-right'
-                        placeholder={Lng.t("settings.preferences.fiscalYearPlaceholder", { locale: language })}
-                        fakeInputProps={{
-                            valueStyle: styles.selectedField,
-                            placeholderStyle: styles.selectedField,
-                        }}
-                        navigation={navigation}
-                        searchFields={['key']}
-                        compareField="value"
-                        onSelect={(val) => {
-                            this.setFormField('fiscal_year', val.value)
-                        }}
-                        headerProps={{
-                            title: Lng.t("fiscalYears.title", { locale: language }),
-                            titleStyle: headerTitle({ marginLeft: -15, marginRight: -35 }),
-                            rightIconPress: null
-                        }}
-                        emptyContentProps={{
-                            contentType: "fiscalYears",
-                        }}
-                        isRequired
-                    />
-                    <CtDivider
-                        dividerStyle={styles.dividerLine}
-                    />
-
-                    <Field
-                        name="discount_per_item"
-                        component={ToggleSwitch}
-                        status={discountPerItem === 'YES' ? true : false}
-                        hint={Lng.t("settings.preferences.discountPerItem", { locale: language })}
-                        description={Lng.t("settings.preferences.discountPerItemPlaceholder", { locale: language })}
-                        onChangeCallback={(val) => this.setDiscountPerItem(val)
-                        }
-                    />
-
-                    <Field
-                        name="tax_per_item"
-                        component={ToggleSwitch}
-                        status={taxPerItem === 'YES' ? true : false}
-                        hint={Lng.t("settings.preferences.taxPerItem", { locale: language })}
-                        description={Lng.t("settings.preferences.taxPerItemPlaceholder", { locale: language })}
-                        onChangeCallback={(val) => this.setTaxPerItem(val)
-                        }
-                        mainContainerStyle={{ marginVertical: 12 }}
-                    />
-
-                </View>
-            </DefaultLayout>
-        );
-    }
+            </View>
+        </DefaultLayout>
+    );
 }

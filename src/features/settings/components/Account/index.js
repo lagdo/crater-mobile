@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import styles from './styles';
 import { DefaultLayout, CtButton, InputField, CtDivider, FilePicker } from '../../../../components';
@@ -26,39 +26,38 @@ type IProps = {
     isLoading: Boolean,
     editAccountLoading: Boolean
 }
-export class Account extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
+export const Account = (props: IProps) =>  {
+    const {
+        navigation,
+        language,
+        isLoading,
+        handleSubmit,
+        getAccount,
+        editAccount,
+        editAccountLoading,
+    } = props;
 
-        this.state = {
-            avatar: null,
-            avatarUrl: null,
-            fileLoading: false,
-        }
-    }
+    const [avatar, setAvatar] = useState(null);
+    const [avatarUrl, setAvatarUrl] = useState(null);
+    const [fileLoading, setFileLoading] = useState(false);
 
-    componentDidMount() {
-        const { getAccount, navigation } = this.props
+    useEffect(() => {
         getAccount({
             onResult: ({ avatar }) => {
-                this.setState({ avatarUrl: avatar })
+                setAvatarUrl(avatar)
             }
         })
-        goBack(MOUNT, navigation)
-    }
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
+        goBack(MOUNT, navigation);
 
-    setFormField = (field, value) => {
-        this.props.dispatch(change(EDIT_ACCOUNT, field, value));
+        return () => goBack(UNMOUNT);
+    }, []);
+
+    const setFormField = (field, value) => {
+        props.dispatch(change(EDIT_ACCOUNT, field, value));
     };
 
-    onProfileUpdate = (value) => {
-        const { navigation, editAccount, editAccountLoading } = this.props
-        const { avatar, fileLoading } = this.state
-
+    const onProfileUpdate = (value) => {
         if (!fileLoading && !editAccountLoading) {
             editAccount({
                 params: value,
@@ -68,154 +67,140 @@ export class Account extends React.Component<IProps> {
         }
     }
 
-    BOTTOM_ACTION = (handleSubmit) => {
-        const { editAccountLoading, language } = this.props
+    const BOTTOM_ACTION = () => {
         return (
             <View style={styles.submitButton}>
                 <CtButton
-                    onPress={handleSubmit(this.onProfileUpdate)}
+                    onPress={handleSubmit(onProfileUpdate)}
                     btnTitle={Lng.t("button.save", { locale: language })}
-                    loading={editAccountLoading || this.state.fileLoading}
+                    loading={editAccountLoading || fileLoading}
                 />
             </View>
         )
     }
 
-    render() {
-        const {
-            navigation,
-            handleSubmit,
-            language,
-            isLoading,
-        } = this.props;
+    let accountRefs = {}
 
-        let accountRefs = {}
+    return (
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: () => navigation.goBack(null),
+                title: Lng.t("header.setting.account", { locale: language }),
+                titleStyle: headerTitle({ marginLeft: -20, marginRight: -25 }),
+                placement: "center",
+                rightIcon: "save",
+                rightIconProps: {
+                    solid: true,
+                },
+                rightIconPress: handleSubmit(onProfileUpdate),
+            }}
+            bottomAction={BOTTOM_ACTION()}
+            loadingProps={{
+                is: isLoading
+            }}
+        >
 
-        return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: () => navigation.goBack(null),
-                    title: Lng.t("header.setting.account", { locale: language }),
-                    titleStyle: headerTitle({ marginLeft: -20, marginRight: -25 }),
-                    placement: "center",
-                    rightIcon: "save",
-                    rightIconProps: {
-                        solid: true,
-                    },
-                    rightIconPress: handleSubmit(this.onProfileUpdate),
-                }}
-                bottomAction={this.BOTTOM_ACTION(handleSubmit)}
-                loadingProps={{
-                    is: isLoading
-                }}
-            >
+            <View style={styles.mainContainer}>
 
-                <View style={styles.mainContainer}>
+                <Field
+                    name={"avatar"}
+                    component={FilePicker}
+                    navigation={navigation}
+                    onChangeCallback={(val) => setAvatar(val)}
+                    imageUrl={avatarUrl}
+                    containerStyle={styles.avatarContainer}
+                    fileLoading={(val) => setFileLoading(val)}
+                    hasAvatar
+                    imageContainerStyle={styles.imageContainerStyle}
+                    imageStyle={styles.imageStyle}
+                    loadingContainerStyle={styles.loadingContainerStyle}
+                    defaultImage={IMAGES.DEFAULT_AVATAR}
+                />
 
-                    <Field
-                        name={"avatar"}
-                        component={FilePicker}
-                        navigation={navigation}
-                        onChangeCallback={(val) =>
-                            this.setState({ avatar: val })
+                <Field
+                    name={name}
+                    component={InputField}
+                    isRequired
+                    hint={Lng.t("settings.account.name", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCorrect: true,
+                        onSubmitEditing: () => {
+                            accountRefs.email.focus();
                         }
-                        imageUrl={this.state.avatarUrl}
-                        containerStyle={styles.avatarContainer}
-                        fileLoading={(val) => {
-                            this.setState({ fileLoading: val })
-                        }}
-                        hasAvatar
-                        imageContainerStyle={styles.imageContainerStyle}
-                        imageStyle={styles.imageStyle}
-                        loadingContainerStyle={styles.loadingContainerStyle}
-                        defaultImage={IMAGES.DEFAULT_AVATAR}
-                    />
+                    }}
+                />
 
-                    <Field
-                        name={name}
-                        component={InputField}
-                        isRequired
-                        hint={Lng.t("settings.account.name", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCorrect: true,
-                            onSubmitEditing: () => {
-                                accountRefs.email.focus();
-                            }
-                        }}
-                    />
+                <Field
+                    name={Email}
+                    component={InputField}
+                    isRequired
+                    hint={Lng.t("settings.account.email", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        keyboardType: 'email-address',
+                        onSubmitEditing: () => {
+                            accountRefs.password.focus();
+                        }
+                    }}
+                    refLinkFn={(ref) => {
+                        accountRefs.email = ref;
+                    }}
+                />
 
-                    <Field
-                        name={Email}
-                        component={InputField}
-                        isRequired
-                        hint={Lng.t("settings.account.email", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            keyboardType: 'email-address',
-                            onSubmitEditing: () => {
-                                accountRefs.password.focus();
-                            }
-                        }}
-                        refLinkFn={(ref) => {
-                            accountRefs.email = ref;
-                        }}
-                    />
+                <Field
+                    name={password}
+                    component={InputField}
+                    hint={Lng.t("settings.account.password", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        onSubmitEditing: () => {
+                            accountRefs.confirm.focus();
+                        }
+                    }}
+                    secureTextEntry
+                    secureTextIconContainerStyle={styles.eyeIcon}
+                    refLinkFn={(ref) => {
+                        accountRefs.password = ref;
+                    }}
+                />
 
-                    <Field
-                        name={password}
-                        component={InputField}
-                        hint={Lng.t("settings.account.password", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            onSubmitEditing: () => {
-                                accountRefs.confirm.focus();
-                            }
-                        }}
-                        secureTextEntry
-                        secureTextIconContainerStyle={styles.eyeIcon}
-                        refLinkFn={(ref) => {
-                            accountRefs.password = ref;
-                        }}
-                    />
+                <Field
+                    name={cpassword}
+                    component={InputField}
+                    hint={Lng.t("settings.account.confirmPassword", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'go',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        onSubmitEditing: handleSubmit(onProfileUpdate)
+                    }}
+                    secureTextEntry
+                    secureTextIconContainerStyle={styles.eyeIcon}
+                    refLinkFn={(ref) => {
+                        accountRefs.confirm = ref;
+                    }}
+                />
 
-                    <Field
-                        name={cpassword}
-                        component={InputField}
-                        hint={Lng.t("settings.account.confirmPassword", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'go',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            onSubmitEditing: handleSubmit(this.onProfileUpdate)
-                        }}
-                        secureTextEntry
-                        secureTextIconContainerStyle={styles.eyeIcon}
-                        refLinkFn={(ref) => {
-                            accountRefs.confirm = ref;
-                        }}
-                    />
+                <CtDivider
+                    dividerStyle={styles.dividerLine}
+                />
 
-                    <CtDivider
-                        dividerStyle={styles.dividerLine}
-                    />
-
-                    <View style={styles.versionContainer}>
-                        <Text style={styles.versionTitle}>
-                            {Lng.t("settings.account.version", { locale: language })}
-                            {'  '}
-                            <Text style={styles.version}>
-                                {env.APP_VERSION}
-                            </Text>
+                <View style={styles.versionContainer}>
+                    <Text style={styles.versionTitle}>
+                        {Lng.t("settings.account.version", { locale: language })}
+                        {'  '}
+                        <Text style={styles.version}>
+                            {env.APP_VERSION}
                         </Text>
-                    </View>
-
+                    </Text>
                 </View>
-            </DefaultLayout>
-        );
-    }
+
+            </View>
+        </DefaultLayout>
+    );
 }

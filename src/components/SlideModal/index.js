@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-
+import React from 'react';
 import {
     View,
     Modal,
@@ -24,83 +23,73 @@ type IProps = {
     searchInputProps: Object,
 };
 
-export class SlideModal extends Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-        };
-    }
+export const SlideModal = (props: IProps) => {
+    const {
+        visible,
+        onToggle,
+        headerProps,
+        onSearch,
+        bottomDivider = false,
+        listViewProps,
+        hasListView,
+        imageListView,
+        defaultLayout,
+        children,
+        hasSearchField,
+        bottomAction,
+        searchInputProps
+    } = props;
 
-    render() {
+    return (
+        <Modal
+            animationType="slide"
+            visible={visible}
+            onRequestClose={onToggle && onToggle}
+            hardwareAccelerated={true}
+        >
+            <StatusBar
+                backgroundColor={colors.secondary}
+                barStyle={"dark-content"}
+                translucent={true}
+            />
 
-        const {
-            visible,
-            onToggle,
-            headerProps,
-            onSearch,
-            bottomDivider = false,
-            listViewProps,
-            hasListView,
-            imageListView,
-            defaultLayout,
-            children,
-            hasSearchField,
-            bottomAction,
-            searchInputProps
-        } = this.props
+            <View style={styles.modalContainer}>
+                {!defaultLayout && (
+                    <MainLayout
+                        headerProps={headerProps && headerProps}
+                        onSearch={onSearch}
+                        bottomDivider={bottomDivider}
+                        bottomAction={bottomAction}
+                        inputProps={searchInputProps && searchInputProps}
+                    >
+                        <View style={styles.listViewContainer}>
+                            <ListView
+                                {...listViewProps}
+                            />
+                        </View>
+                    </MainLayout>
+                )}
 
-        return (
-            <Modal
-                animationType="slide"
-                visible={visible}
-                onRequestClose={onToggle && onToggle}
-                hardwareAccelerated={true}
-            >
-                <StatusBar
-                    backgroundColor={colors.secondary}
-                    barStyle={"dark-content"}
-                    translucent={true}
-                />
-
-                <View style={styles.modalContainer}>
-                    {!defaultLayout && (
-                        <MainLayout
-                            headerProps={headerProps && headerProps}
-                            onSearch={onSearch}
-                            bottomDivider={bottomDivider}
-                            bottomAction={bottomAction}
-                            inputProps={searchInputProps && searchInputProps}
-                        >
-                            <View style={styles.listViewContainer}>
-                                <ListView
-                                    {...listViewProps}
-                                />
+                {defaultLayout && (
+                    <DefaultLayout
+                        headerProps={headerProps && headerProps}
+                        bottomAction={bottomAction}
+                    >
+                        {children ? (
+                            <View style={styles.bodyContainer}>
+                                {children}
                             </View>
-                        </MainLayout>
-                    )}
-
-                    {defaultLayout && (
-                        <DefaultLayout
-                            headerProps={headerProps && headerProps}
-                            bottomAction={bottomAction}
-                        >
-                            {children ? (
-                                <View style={styles.bodyContainer}>
-                                    {children}
+                        ) : (
+                                <View style={styles.listViewContainer}>
+                                    <ListView
+                                        {...listViewProps}
+                                    />
                                 </View>
-                            ) : (
-                                    <View style={styles.listViewContainer}>
-                                        <ListView
-                                            {...listViewProps}
-                                        />
-                                    </View>
-                                )}
+                            )}
 
-                        </DefaultLayout>
-                    )}
-                </View>
-            </Modal>
-        );
-    }
+                    </DefaultLayout>
+                )}
+            </View>
+        </Modal>
+    );
 }
-

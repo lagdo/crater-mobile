@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import queryString from 'query-string';
 
 // Forms
@@ -28,7 +28,7 @@ export const CUSTOMERS_TRIGGER_SPINNER = 'customers/CUSTOMERS_TRIGGER_SPINNER';
 export const REMOVE_CUSTOMER = 'customers/REMOVE_CUSTOMER';
 
 
-// Address Country 
+// Address Country
 // -----------------------------------------
 export const GET_COUNTRIES = 'address/GET_COUNTRIES';
 export const SET_COUNTRIES = 'address/SET_COUNTRIES';

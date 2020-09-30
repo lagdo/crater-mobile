@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import styles from './styles';
 import { Field, change } from 'redux-form';
@@ -22,71 +22,71 @@ import { goBack, UNMOUNT, MOUNT } from '../../../../navigation/actions';
 import { ADD_TAX } from '../../../settings/constants';
 import { MAX_LENGTH, alertMe, formatSelectPickerName, hasValue } from '../../../../api/global';
 
-export class Item extends React.Component {
-    constructor(props) {
-        super(props);
+export const Item = (props) => {
+    const {
+        navigation,
+        type,
+        language,
+        loading,
+        getEditItem,
+        addItem,
+        editItem,
+        clearItem,
+        removeItem,
+        itemId,
+        getItemUnits,
+        getSettingItem,
+        formValues: { taxes, price },
+        handleSubmit,
+        units,
+        taxTypes,
+    } = props;
 
-        this.state = {
-            isTaxPerItem: true
-        }
-    }
+    const isCreateItem = (type === ADD_ITEM)
 
-    componentDidMount() {
-        const { navigation, getItemUnits, getSettingItem, type } = this.props
+    const currency = navigation.getParam('currency')
 
+    const [isTaxPerItem, setTaxPerItem] = useState(true);
+
+    useEffect(() => {
         getItemUnits()
 
         type === ADD_ITEM && getSettingItem({
             key: 'tax_per_item',
-            onResult: (res) => this.setState({ isTaxPerItem: res === 'YES' })
+            onResult: (res) => setTaxPerItem(res === 'YES')
         })
 
         goBack(MOUNT, navigation)
-    }
-
-    componentWillMount() {
-        const { getEditItem, type, itemId } = this.props;
 
         const isEdit = (type === EDIT_ITEM)
-
         isEdit && getEditItem({ id: itemId })
-    }
 
-    componentWillUnmount() {
-        const { clearItem } = this.props
-        clearItem()
-        goBack(UNMOUNT)
-    }
+        return () => {
+            clearItem()
+            goBack(UNMOUNT)
+        }
+    }, []);
 
-    setFormField = (field, value) => {
-        this.props.dispatch(change(ITEM_FORM, field, value));
+    const setFormField = (field, value) => {
+        props.dispatch(change(ITEM_FORM, field, value));
     };
 
-    saveItem = (values) => {
-        const {
-            addItem,
-            editItem,
-            itemId,
-            navigation,
-            type,
-            language,
-        } = this.props
-
-        if (this.finalAmount() < 0) {
+    const saveItem = (values) => {
+        if (finalAmount() < 0) {
             alert(Lng.t("items.lessAmount", { locale: language }))
             return
         }
 
         const item = {
             ...values,
-            total: this.finalAmount(),
-            tax: this.itemTax() + this.itemCompoundTax(),
+            total: finalAmount(),
+            tax: itemTax() + itemCompoundTax(),
             taxes: values.taxes && values.taxes.map(val => {
                 return {
                     ...val,
                     amount: val.compound_tax ?
-                        this.getCompoundTaxValue(val.percent) :
-                        this.getTaxValue(val.percent),
+                        getCompoundTaxValue(val.percent) :
+                        getTaxValue(val.percent),
                 }
             }),
         }
@@ -106,9 +106,7 @@ export class Item extends React.Component {
 
     };
 
-    removeItem = () => {
-        const { removeItem, itemId, navigation, language } = this.props
-
+    const onRemoveItem = () => {
         alertMe({
             title: Lng.t("alert.title", { locale: language }),
             desc: Lng.t("items.alertDescription", { locale: language }),
@@ -128,51 +126,43 @@ export class Item extends React.Component {
 
     }
 
-    totalAmount = () => {
-        const { formValues: { price } } = this.props
-
-        return price + this.itemTax()
+    const totalAmount = () => {
+        return price + itemTax()
     }
 
-    itemTax = () => {
-        const { formValues: { taxes } } = this.props
-
+    const itemTax = () => {
         let totalTax = 0
 
         taxes && taxes.map(val => {
             if (!val.compound_tax) {
-                totalTax += this.getTaxValue(val.percent)
+                totalTax += getTaxValue(val.percent)
             }
         })
 
         return totalTax
     }
 
-    itemCompoundTax = () => {
-        const { formValues: { taxes } } = this.props
-
+    const itemCompoundTax = () => {
         let totalTax = 0
 
         taxes && taxes.map(val => {
             if (val.compound_tax) {
-                totalTax += this.getCompoundTaxValue(val.percent)
+                totalTax += getCompoundTaxValue(val.percent)
             }
         })
 
         return totalTax
     }
 
-    getTaxValue = (tax) => {
-        const { formValues: { price } } = this.props
+    const getTaxValue = (tax) => {
         return (tax * price) / 100
     }
 
-    getCompoundTaxValue = (tax) => {
-        return (tax * JSON.parse(this.totalAmount())) / 100
+    const getCompoundTaxValue = (tax) => {
+        return (tax * JSON.parse(totalAmount())) / 100
     }
 
-    getTaxName = (tax) => {
-        const { taxTypes } = this.props
+    const getTaxName = (tax) => {
         let taxName = ''
 
         const type = taxTypes && taxTypes.filter(val => val.fullItem.id === tax.tax_type_id)
@@ -183,19 +173,11 @@ export class Item extends React.Component {
         return taxName
     }
 
-    finalAmount = () => {
-        return this.totalAmount() + this.itemCompoundTax()
+    const finalAmount = () => {
+        return totalAmount() + itemCompoundTax()
     }
 
-    FINAL_AMOUNT = () => {
-        const {
-            language,
-            formValues: { taxes, price },
-            navigation,
-        } = this.props
-
-        const currency = navigation.getParam('currency')
-
+    const FINAL_AMOUNT = () => {
         return (
             <View style={styles.amountContainer}>
                 <View style={styles.subContainer}>
@@ -218,12 +200,12 @@ export class Item extends React.Component {
                         <View style={styles.subContainer}>
                             <View>
                                 <Text style={styles.label}>
-                                    {this.getTaxName(val)} ({val.percent} %)
+                                    {getTaxName(val)} ({val.percent} %)
                             </Text>
                             </View>
                             <View>
                                 <CurrencyFormat
-                                    amount={this.getTaxValue(val.percent)}
+                                    amount={getTaxValue(val.percent)}
                                     currency={currency}
                                     style={styles.price}
                                 />
@@ -237,12 +219,12 @@ export class Item extends React.Component {
                         <View style={styles.subContainer}>
                             <View>
                                 <Text style={styles.label}>
-                                    {this.getTaxName(val)} ({val.percent} %)
+                                    {getTaxName(val)} ({val.percent} %)
                             </Text>
                             </View>
                             <View>
                                 <CurrencyFormat
-                                    amount={this.getCompoundTaxValue(val.percent)}
+                                    amount={getCompoundTaxValue(val.percent)}
                                     currency={currency}
                                     style={styles.price}
                                 />
@@ -261,7 +243,7 @@ export class Item extends React.Component {
                     </View>
                     <View>
                         <CurrencyFormat
-                            amount={this.finalAmount()}
+                            amount={finalAmount()}
                             currency={currency}
                             style={styles.totalPrice}
                         />
@@ -271,14 +253,11 @@ export class Item extends React.Component {
         )
     };
 
-    BOTTOM_ACTION = (handleSubmit) => {
-        const { language, loading, type } = this.props
-        const isCreateItem = (type === ADD_ITEM)
-
+    const BOTTOM_ACTION = () => {
         return (
             <View style={styles.submitButton}>
                 <CtButton
-                    onPress={handleSubmit(this.saveItem)}
+                    onPress={handleSubmit(saveItem)}
                     btnTitle={Lng.t("button.save", { locale: language })}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
@@ -286,7 +265,7 @@ export class Item extends React.Component {
                 />
                 {!isCreateItem && (
                     <CtButton
-                        onPress={this.removeItem}
+                        onPress={onRemoveItem}
                         btnTitle={Lng.t("button.remove", { locale: language })}
                         containerStyle={styles.handleBtn}
                         buttonContainerStyle={styles.buttonContainer}
@@ -298,14 +277,7 @@ export class Item extends React.Component {
         )
     }
 
-    TAX_FIELD_VIEW = () => {
-        const {
-            navigation,
-            language,
-            taxTypes,
-            formValues: { taxes }
-        } = this.props;
-
+    const TAX_FIELD_VIEW = () => {
         return (
             <Field
                 name="taxes"
@@ -338,7 +310,7 @@ export class Item extends React.Component {
                     () => navigation.navigate(ROUTES.TAX, {
                         type: ADD_TAX,
                         onSelect: (val) => {
-                            this.setFormField('taxes',
+                            setFormField('taxes',
                                 [...val, ...taxes]
                             )
                         }
@@ -351,109 +323,93 @@ export class Item extends React.Component {
         )
     }
 
-    render() {
-        const {
-            navigation,
-            handleSubmit,
-            loading,
-            language,
-            type,
-            units,
-            formValues: { taxes }
-        } = this.props;
-        const { isTaxPerItem } = this.state
-        const isCreateItem = (type === ADD_ITEM)
-        let itemRefs = {}
+    let itemRefs = {}
 
-        return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: () => navigation.navigate(ROUTES.GLOBAL_ITEMS),
-                    title: isCreateItem ?
-                        Lng.t("header.addItem", { locale: language }) :
-                        Lng.t("header.editItem", { locale: language }),
-                    placement: "center",
-                    rightIcon: 'save',
-                    rightIconProps: {
-                        solid: true
-                    },
-                    rightIconPress: handleSubmit(this.saveItem),
-                }}
-                bottomAction={this.BOTTOM_ACTION(handleSubmit)}
-                loadingProps={{ is: loading || !hasValue(isTaxPerItem) }}
-            >
-                <View style={styles.bodyContainer}>
-                    <Field
-                        name="name"
-                        component={InputField}
-                        isRequired
-                        hint={Lng.t("items.name", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            autoFocus: true,
-                            onSubmitEditing: () => {
-                                itemRefs.price.focus();
-                            }
-                        }}
-                    />
+    return (
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: () => navigation.navigate(ROUTES.GLOBAL_ITEMS),
+                title: isCreateItem ?
+                    Lng.t("header.addItem", { locale: language }) :
+                    Lng.t("header.editItem", { locale: language }),
+                placement: "center",
+                rightIcon: 'save',
+                rightIconProps: {
+                    solid: true
+                },
+                rightIconPress: handleSubmit(saveItem),
+            }}
+            bottomAction={BOTTOM_ACTION()}
+            loadingProps={{ is: loading || !hasValue(isTaxPerItem) }}
+        >
+            <View style={styles.bodyContainer}>
+                <Field
+                    name="name"
+                    component={InputField}
+                    isRequired
+                    hint={Lng.t("items.name", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        autoFocus: true,
+                        onSubmitEditing: () => {
+                            itemRefs.price.focus();
+                        }
+                    }}
+                />
 
-                    <Field
-                        name="price"
-                        component={InputField}
-                        isRequired
-                        hint={Lng.t("items.price", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            keyboardType: 'numeric'
-                        }}
-                        isCurrencyInput
-                        refLinkFn={(ref) => {
-                            itemRefs.price = ref;
-                        }}
-                    />
+                <Field
+                    name="price"
+                    component={InputField}
+                    isRequired
+                    hint={Lng.t("items.price", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        keyboardType: 'numeric'
+                    }}
+                    isCurrencyInput
+                    refLinkFn={(ref) => {
+                        itemRefs.price = ref;
+                    }}
+                />
 
-                    <Field
-                        name="unit_id"
-                        component={SelectPickerField}
-                        label={Lng.t("items.unit", { locale: language })}
-                        items={formatSelectPickerName(units)}
-                        fieldIcon={'balance-scale'}
-                        containerStyle={styles.selectPicker}
-                        defaultPickerOptions={{
-                            label: Lng.t("items.unitPlaceholder", { locale: language }),
-                            value: '',
-                        }}
-                    />
+                <Field
+                    name="unit_id"
+                    component={SelectPickerField}
+                    label={Lng.t("items.unit", { locale: language })}
+                    items={formatSelectPickerName(units)}
+                    fieldIcon={'balance-scale'}
+                    containerStyle={styles.selectPicker}
+                    defaultPickerOptions={{
+                        label: Lng.t("items.unitPlaceholder", { locale: language }),
+                        value: '',
+                    }}
+                />
 
-                    {isTaxPerItem && this.TAX_FIELD_VIEW()}
+                {isTaxPerItem && TAX_FIELD_VIEW()}
 
-                    {this.FINAL_AMOUNT()}
+                {FINAL_AMOUNT()}
 
-                    <Field
-                        name="description"
-                        component={InputField}
-                        hint={Lng.t("items.description", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            multiline: true,
-                            maxLength: MAX_LENGTH
-                        }}
-                        height={80}
-                        refLinkFn={(ref) => {
-                            itemRefs.description = ref;
-                        }}
-                    />
-
-                </View>
-
-            </DefaultLayout>
-
-        );
-    }
+                <Field
+                    name="description"
+                    component={InputField}
+                    hint={Lng.t("items.description", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        multiline: true,
+                        maxLength: MAX_LENGTH
+                    }}
+                    height={80}
+                    refLinkFn={(ref) => {
+                        itemRefs.description = ref;
+                    }}
+                />
+            </View>
+        </DefaultLayout>
+    );
 }

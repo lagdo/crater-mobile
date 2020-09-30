@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { DefaultLayout, CtButton, InputField, ToggleSwitch } from '../../../../components';
@@ -12,29 +12,30 @@ import { ADD_TAX } from '../../constants';
 import { UNMOUNT, MOUNT, goBack } from '../../../../navigation/actions';
 import { MAX_LENGTH, alertMe } from '../../../../api/global';
 
-export class Tax extends React.Component {
-    constructor(props) {
-        super(props);
+export const Tax = (props) => {
+    const {
+        navigation,
+        language,
+        addTax,
+        editTax,
+        removeTax,
+        taxId,
+        initialValues,
+        initialValues: { name },
+        handleSubmit,
+        type,
+        loading,
+    } = props
 
-        this.state = {
-            endpointVisible: false
-        }
-    }
+    const isCreate = (type === ADD_TAX)
 
-    componentDidMount() {
-        const { navigation } = this.props
+    useEffect(() => {
         goBack(MOUNT, navigation)
-    }
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
+        return () => goBack(UNMOUNT)
+    }, []);
 
-
-    onSave = (tax) => {
-        const { addTax, navigation, type, editTax, loading } = this.props
-        const isCreate = (type === ADD_TAX)
-
+    const onSave = (tax) => {
         if (!loading) {
             isCreate ?
                 addTax({
@@ -46,22 +47,12 @@ export class Tax extends React.Component {
                     }
                 }) : editTax({
                     tax,
-                    onResult: () => {
-                        navigation.goBack(null)
-                    }
+                    onResult: () => navigation.goBack(null)
                 })
         }
     }
 
-    removeTax = () => {
-        const {
-            removeTax,
-            taxId,
-            navigation,
-            language,
-            initialValues: { name }
-        } = this.props
-
+    const onRemoveTax = () => {
         alertMe({
             title: Lng.t("alert.title", { locale: language }),
             desc: Lng.t("taxes.alertDescription", { locale: language }),
@@ -76,14 +67,11 @@ export class Tax extends React.Component {
         })
     }
 
-    BOTTOM_ACTION = (handleSubmit) => {
-        const { loading, language, type } = this.props
-        const isCreate = (type === ADD_TAX)
-
+    const BOTTOM_ACTION = () => {
         return (
             <View style={[styles.submitButton, !isCreate && styles.multipleButton]}>
                 <CtButton
-                    onPress={handleSubmit(this.onSave)}
+                    onPress={handleSubmit(onSave)}
                     btnTitle={Lng.t("button.save", { locale: language })}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={!isCreate && styles.buttonContainer}
@@ -91,7 +79,7 @@ export class Tax extends React.Component {
                 />
                 {!isCreate &&
                     <CtButton
-                        onPress={this.removeTax}
+                        onPress={onRemoveTax}
                         btnTitle={Lng.t("button.remove", { locale: language })}
                         containerStyle={styles.handleBtn}
                         buttonContainerStyle={styles.buttonContainer}
@@ -103,86 +91,83 @@ export class Tax extends React.Component {
         )
     }
 
-    render() {
-        const { navigation, handleSubmit, language, type, initialValues } = this.props;
-        const isCreate = (type === ADD_TAX)
+    let taxRefs = {}
 
-        let taxRefs = {}
+    return (
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: () => navigation.goBack(null),
+                title: isCreate ?
+                    Lng.t("header.addTaxes", { locale: language }) :
+                    Lng.t("header.editTaxes", { locale: language }),
+                placement: "center",
+                rightIcon: "save",
+                rightIconProps: {
+                    solid: true,
+                },
+                rightIconPress: handleSubmit(onSave),
+            }}
+            bottomAction={BOTTOM_ACTION()}
+        >
+            <View style={styles.mainContainer}>
+                <Field
+                    name="name"
+                    component={InputField}
+                    isRequired
+                    hint={Lng.t("taxes.type", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        autoFocus: true,
+                        onSubmitEditing: () => {
+                            taxRefs.percent.focus();
+                        }
+                    }}
+                />
 
-        return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: () => navigation.goBack(null),
-                    title: isCreate ? Lng.t("header.addTaxes", { locale: language }) : Lng.t("header.editTaxes", { locale: language }),
-                    placement: "center",
-                    rightIcon: "save",
-                    rightIconProps: {
-                        solid: true,
-                    },
-                    rightIconPress: handleSubmit(this.onSave),
-                }}
-                bottomAction={this.BOTTOM_ACTION(handleSubmit)}
-            >
-                <View style={styles.mainContainer}>
-                    <Field
-                        name="name"
-                        component={InputField}
-                        isRequired
-                        hint={Lng.t("taxes.type", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            autoFocus: true,
-                            onSubmitEditing: () => {
-                                taxRefs.percent.focus();
-                            }
-                        }}
-                    />
+                <Field
+                    name="percent"
+                    isRequired
+                    component={InputField}
+                    hint={Lng.t("taxes.percentage", { locale: language }) + ' (%)'}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        keyboardType: 'numeric',
+                        onSubmitEditing: () => {
+                            taxRefs.description.focus();
+                        }
+                    }}
+                    refLinkFn={(ref) => {
+                        taxRefs.percent = ref;
+                    }}
+                    maxNumber={100}
+                />
 
-                    <Field
-                        name="percent"
-                        isRequired
-                        component={InputField}
-                        hint={Lng.t("taxes.percentage", { locale: language }) + ' (%)'}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            keyboardType: 'numeric',
-                            onSubmitEditing: () => {
-                                taxRefs.description.focus();
-                            }
-                        }}
-                        refLinkFn={(ref) => {
-                            taxRefs.percent = ref;
-                        }}
-                        maxNumber={100}
-                    />
+                <Field
+                    name="description"
+                    component={InputField}
+                    hint={Lng.t("taxes.description", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        multiline: true,
+                        maxLength: MAX_LENGTH
+                    }}
+                    refLinkFn={(ref) => {
+                        taxRefs.description = ref;
+                    }}
+                    height={80}
+                />
 
-                    <Field
-                        name="description"
-                        component={InputField}
-                        hint={Lng.t("taxes.description", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            multiline: true,
-                            maxLength: MAX_LENGTH
-                        }}
-                        refLinkFn={(ref) => {
-                            taxRefs.description = ref;
-                        }}
-                        height={80}
-                    />
+                <Field
+                    name="compound_tax"
+                    component={ToggleSwitch}
+                    hint={Lng.t("taxes.compoundTax", { locale: language })}
+                />
 
-                    <Field
-                        name="compound_tax"
-                        component={ToggleSwitch}
-                        hint={Lng.t("taxes.compoundTax", { locale: language })}
-                    />
-
-                </View>
-            </DefaultLayout>
-        );
-    }
+            </View>
+        </DefaultLayout>
+    );
 }

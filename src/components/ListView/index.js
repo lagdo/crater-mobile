@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { styles } from './styles';
 import { ListItem, Avatar, CheckBox } from 'react-native-elements';
+import { styles } from './styles';
 import { InfiniteScroll } from '../InfiniteScroll';
 import { Empty } from '../Empty';
 import { fonts } from '../../styles/fonts';
@@ -30,13 +30,37 @@ type IProps = {
     listViewContainerStyle: Object,
 };
 
-export class ListView extends Component<IProps> {
-    constructor(props) {
-        super(props);
-    }
+export const ListView = (props: IProps) => {
+    const {
+        items,
+        loading = false,
+        refreshing = true,
+        hasAvatar = false,
+        getItems,
+        getFreshItems,
+        canLoadMore,
+        isEmpty,
+        containerStyle,
+        emptyContentProps,
+        listViewContainerStyle,
+        leftTitleStyle,
+        compareField,
+        checkedItems,
+        valueCompareField,
+        leftSubTitleLabelStyle,
+        leftSubTitleStyle,
+        onPress,
+        bottomDivider = false,
+        rightTitleStyle,
+        backgroundColor,
+        itemContainer,
+        listItemProps,
+        hasCheckbox,
+        contentContainerStyle,
+        leftIconStyle,
+    } = props;
 
-    leftTitle = (title) => {
-        const { leftTitleStyle } = this.props;
+    const leftTitle = (title) => {
         return (
             <Text numberOfLines={1} style={[styles.leftTitle, leftTitleStyle && leftTitleStyle]}>
                 {title}
@@ -44,23 +68,19 @@ export class ListView extends Component<IProps> {
         );
     };
 
-    getCheckedItem = (item) => {
-        const { compareField, checkedItems, valueCompareField } = this.props
-
+    const getCheckedItem = (item) => {
         if (checkedItems) {
             return checkedItems.filter(
                 val => val[valueCompareField] === item.fullItem[compareField]
-            ).length > 0
+            ).length > 0;
         }
 
-
-        return false
+        return false;
     }
 
-    leftSubTitle = ({ title, label, labelBgColor, labelTextColor, labelComponent } = {}) => {
-        const { leftSubTitleLabelStyle, leftSubTitleStyle } = this.props;
+    const leftSubTitle = ({ title, label, labelBgColor, labelTextColor, labelComponent } = {}) => {
         if (!title && !label && !labelComponent) {
-            return
+            return;
         }
 
         return (
@@ -102,23 +122,12 @@ export class ListView extends Component<IProps> {
         );
     };
 
-    itemsList = (item, index) => {
-        const {
-            onPress,
-            bottomDivider = false,
-            containerStyle,
-            rightTitleStyle,
-            backgroundColor,
-            itemContainer,
-            listItemProps,
-            hasCheckbox,
-            contentContainerStyle,
-        } = this.props;
+    const itemsList = (item, index) => {
         return (
             <ListItem
                 key={index}
-                title={this.leftTitle(item.title)}
-                subtitle={this.leftSubTitle(item.subtitle)}
+                title={leftTitle(item.title)}
+                subtitle={leftSubTitle(item.subtitle)}
                 rightTitle={
                     item.amount ? (
                         <CurrencyFormat
@@ -160,26 +169,26 @@ export class ListView extends Component<IProps> {
                         size={20}
                         checkedColor={colors.primary}
                         uncheckedColor={colors.lightGray}
-                        checked={this.getCheckedItem(item)}
+                        checked={getCheckedItem(item)}
                         onPress={() => onPress(item.fullItem)}
                     />
                 )}
                 fontFamily={fonts.poppins}
                 onPress={() => onPress(item.fullItem)}
+                onLongPress={() => onPress(item.fullItem)}
                 {...listItemProps}
             />
         );
     };
 
-    itemsWithAvatar = (item, index) => {
-        const { onPress, bottomDivider = false, itemContainer, listItemProps, leftIconStyle } = this.props;
-        const { title, subtitle, fullItem, leftAvatar, leftIcon, leftIconSolid = false, iconSize = 22 } = item
+    const itemsWithAvatar = (item, index) => {
+        const { title, subtitle, fullItem, leftAvatar, leftIcon, leftIconSolid = false, iconSize = 22 } = item;
 
         return (
             <ListItem
                 key={index}
-                title={this.leftTitle(title)}
-                subtitle={this.leftSubTitle(subtitle)}
+                title={leftTitle(title)}
+                subtitle={leftSubTitle(subtitle)}
                 bottomDivider={bottomDivider}
                 containerStyle={[
                     styles.containerWithAvatar,
@@ -212,41 +221,25 @@ export class ListView extends Component<IProps> {
         );
     };
 
-    render() {
-        const {
-            items,
-            loading = false,
-            refreshing = true,
-            hasAvatar = false,
-            getItems,
-            getFreshItems,
-            canLoadMore,
-            isEmpty,
-            containerStyle,
-            emptyContentProps,
-            listViewContainerStyle,
-        } = this.props;
-
-        return (
-            <InfiniteScroll
-                loading={loading}
-                isEmpty={isEmpty}
-                canLoadMore={canLoadMore}
-                style={listViewContainerStyle && listViewContainerStyle}
-                onEndReached={getItems}
-                refreshControlColor={colors.veryDarkGray}
-                onPullToRefresh={refreshing ? (onHide) => onHide && onHide() : getFreshItems}
-            >
-                {!isEmpty
-                    ? items.map((item, index) =>
-                        !hasAvatar
-                            ? this.itemsList(item, index)
-                            : this.itemsWithAvatar(item, index),
-                    )
-                    : !loading && <Empty {...emptyContentProps} />}
-            </InfiniteScroll>
-        );
-    }
+    return (
+        <InfiniteScroll
+            loading={loading}
+            isEmpty={isEmpty}
+            canLoadMore={canLoadMore}
+            style={listViewContainerStyle && listViewContainerStyle}
+            onEndReached={getItems}
+            refreshControlColor={colors.veryDarkGray}
+            onPullToRefresh={refreshing ? (onHide) => onHide && onHide() : getFreshItems}
+        >
+            {!isEmpty
+                ? items.map((item, index) =>
+                    !hasAvatar
+                        ? itemsList(item, index)
+                        : itemsWithAvatar(item, index),
+                )
+                : !loading && <Empty {...emptyContentProps} />}
+        </InfiniteScroll>
+    );
 }
 
 export default ListView;

@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { ListView, MainLayout } from '../../../../components';
@@ -10,37 +10,33 @@ import { EDIT_TAX, ADD_TAX } from '../../constants';
 import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { itemsDescriptionStyle } from '../../../invoices/components/Invoice/styles';
 
-export class Taxes extends React.Component {
-    constructor(props) {
-        super(props)
+export const Taxes = (props) => {
+    const {
+        navigation,
+        language,
+        loading,
+        taxTypes,
+        getTaxes,
+    } = props;
 
-        this.state = {
-            refreshing: false,
-            search: '',
-            found: true,
-            taxesFilter: []
-        };
-    }
+    const [refreshing, setRefreshing] = useState(false);
+    const [search, setSearch] = useState('');
+    const [found, setFound] = useState(true);
+    const [taxesFilter, setTaxesFilter] = useState([]);
 
-    componentDidMount() {
-        const { navigation } = this.props
+    useEffect(() => {
         goBack(MOUNT, navigation)
-    }
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
+        return () => goBack(UNMOUNT)
+    }, []);
 
-    onSearch = (search) => {
-
-        const { taxTypes } = this.props;
+    const onSearch = (keywords) => {
         let searchFields = [
             'name',
             'percent'
         ];
 
         if (typeof taxTypes !== 'undefined' && taxTypes.length != 0) {
-
             let newData = taxTypes.filter(({ fullItem }) => {
                 let filterData = false
 
@@ -54,7 +50,7 @@ export class Taxes extends React.Component {
                     if (itemField !== null && itemField !== 'undefined') {
                         itemField = itemField.toLowerCase()
 
-                        let searchData = search.toString().toLowerCase()
+                        let searchData = keywords.toString().toLowerCase()
 
                         if (itemField.indexOf(searchData) > -1) {
                             filterData = true
@@ -64,92 +60,60 @@ export class Taxes extends React.Component {
                 return filterData
             });
 
-            this.setState({
-                taxesFilter: newData,
-                found: newData.length != 0 ? true : false,
-                search
-            })
+            setTaxesFilter(newData)
+            setFound(newData.length != 0 ? true : false)
+            setSearch(keywords)
         }
     }
 
+    const onTaxSelect = (tax) => navigation.navigate(ROUTES.TAX, { tax, type: EDIT_TAX })
 
-    onTaxSelect = (tax) => {
-        const { navigation } = this.props
-        navigation.navigate(ROUTES.TAX, { tax, type: EDIT_TAX })
-    }
+    let emptyTitle = Lng.t("taxes.empty.title", { locale: language })
+    let empty = (!search) ? {
+        description: Lng.t("taxes.empty.description", { locale: language }),
+        buttonTitle: Lng.t("taxes.empty.buttonTitle", { locale: language }),
+        buttonPress: () => navigation.navigate(ROUTES.TAX, { type: ADD_TAX }),
+    } : {}
 
-    render() {
-        const {
-            taxTypes,
-            navigation,
-            loading,
-            language,
-            getTaxes
-        } = this.props
-
-        const {
-            refreshing,
-            search,
-            found,
-            taxesFilter,
-        } = this.state
-
-        let emptyTitle = Lng.t("taxes.empty.title", { locale: language })
-
-        let empty = (!search) ? {
-            description: Lng.t("taxes.empty.description", { locale: language }),
-            buttonTitle: Lng.t("taxes.empty.buttonTitle", { locale: language }),
-            buttonPress: () => {
-                navigation.navigate(ROUTES.TAX, { type: ADD_TAX })
-            },
-        } : {}
-
-        return (
-
-            <View style={styles.container}>
-                <MainLayout
-                    headerProps={{
-                        leftIcon: "long-arrow-alt-left",
-                        leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
-                        title: Lng.t("header.taxes", { locale: language }),
-                        titleStyle: styles.headerTitle,
-                        placement: "center",
-                        rightIcon: "plus",
-                        rightIconPress: () => navigation.navigate(ROUTES.TAX, { type: ADD_TAX }),
-                    }}
-                    onSearch={this.onSearch}
-                    bottomDivider
-                >
-
-                    <View style={styles.listViewContainer}>
-                        <ListView
-                            items={taxesFilter.length !== 0 ?
-                                taxesFilter : found ? taxTypes : []
-                            }
-                            refreshing={refreshing}
-                            getFreshItems={(onHide) => {
-                                onHide && onHide()
-                                getTaxes();
-                            }}
-                            onPress={this.onTaxSelect}
-                            loading={loading}
-                            isEmpty={found ? taxTypes.length <= 0 : true}
-                            bottomDivider
-                            contentContainerStyle={{ flex: 3 }}
-                            leftSubTitleStyle={itemsDescriptionStyle(45)}
-                            emptyContentProps={{
-                                title: found ? emptyTitle :
-                                    search ?
-                                        Lng.t("search.noResult", { locale: language, search })
-                                        : emptyTitle,
-                                ...empty
-                            }}
-                        />
-                    </View>
-
-                </MainLayout>
-            </View>
-        );
-    }
+    return (
+        <View style={styles.container}>
+            <MainLayout
+                headerProps={{
+                    leftIcon: "long-arrow-alt-left",
+                    leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
+                    title: Lng.t("header.taxes", { locale: language }),
+                    titleStyle: styles.headerTitle,
+                    placement: "center",
+                    rightIcon: "plus",
+                    rightIconPress: () => navigation.navigate(ROUTES.TAX, { type: ADD_TAX }),
+                }}
+                onSearch={onSearch}
+                bottomDivider
+            >
+                <View style={styles.listViewContainer}>
+                    <ListView
+                        items={taxesFilter.length !== 0 ? taxesFilter : found ? taxTypes : []}
+                        refreshing={refreshing}
+                        getFreshItems={(onHide) => {
+                            onHide && onHide()
+                            getTaxes();
+                        }}
+                        onPress={onTaxSelect}
+                        loading={loading}
+                        isEmpty={found ? taxTypes.length <= 0 : true}
+                        bottomDivider
+                        contentContainerStyle={{ flex: 3 }}
+                        leftSubTitleStyle={itemsDescriptionStyle(45)}
+                        emptyContentProps={{
+                            title: found ? emptyTitle :
+                                search ?
+                                    Lng.t("search.noResult", { locale: language, search })
+                                    : emptyTitle,
+                            ...empty
+                        }}
+                    />
+                </View>
+            </MainLayout>
+        </View>
+    );
 }
-

@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import React from 'react';
 import {
     StatusBar,
     ScrollView,
@@ -26,15 +26,21 @@ type IProps = {
     socialLoading: Boolean,
     language: String,
 }
-export class Login extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
-    }
+
+export const Login = (props: IProps) => {
+    const {
+        loading,
+        // socialLoading,
+        navigation,
+        language,
+        login,
+        // socialLogin,
+        handleSubmit,
+    } = props;
 
     /*
      * Sign in with google
-     onSocialLogin = async () => {
-         const { navigation, socialLogin } = this.props;
+     const onSocialLogin = async () => {
          socialLogin({});
          try {
              const result = await Google.logInAsync({
@@ -55,137 +61,126 @@ export class Login extends React.Component<IProps> {
          }
      }; */
 
-    onLogin = (values) => {
-
-        const { navigation, login } = this.props;
+    const onLogin = (values) => {
         login({
             params: values,
             navigation,
         });
     };
 
-    render() {
-        let passwordInput = {};
-        const {
-            loading,
-            socialLoading,
-            navigation,
-            language,
-        } = this.props;
+    let passwordInput = {};
+    let loginRefs = {}
 
-        let loginRefs = {}
+    return (
 
-        return (
+        <View style={styles.container}>
 
-            <View style={styles.container}>
+            <StatusBar
+                barStyle="dark-content"
+                hidden={false}
+                translucent={true}
+            />
 
-                <StatusBar
-                    barStyle="dark-content"
-                    hidden={false}
-                    translucent={true}
-                />
-
-                <ScrollView
-                    style={{ paddingTop: '34%' }}
-                    bounces={false}
-                    showsVerticalScrollIndicator={false}
-                    keyboardShouldPersistTaps='handled'
+            <ScrollView
+                style={{ paddingTop: '34%' }}
+                bounces={false}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps='handled'
+            >
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={{ flex: 1 }}
+                    keyboardVerticalOffset={0}
+                    behavior="height"
                 >
-                    <KeyboardAvoidingView
-                        style={{ flex: 1 }}
-                        contentContainerStyle={{ flex: 1 }}
-                        keyboardVerticalOffset={0}
-                        behavior="height"
-                    >
-                        <View style={styles.main}>
-                            <View style={styles.logoContainer}>
-                                <AssetImage
-                                    imageSource={IMAGES.LOGO_DARK}
-                                    imageStyle={styles.imgLogo}
-                                />
-                            </View>
-
-                            <View style={styles.loginContainer}>
-                                <Field
-                                    name="username"
-                                    component={InputField}
-                                    inputProps={{
-                                        returnKeyType: 'next',
-                                        autoCapitalize: 'none',
-                                        placeholder: Lng.t("login.email", { locale: language }),
-                                        autoCorrect: true,
-                                        keyboardType: 'email-address',
-                                        onSubmitEditing: () => {
-                                            loginRefs.password.focus();
-                                        }
-                                    }}
-                                    placeholderColor={colors.white5}
-                                    inputContainerStyle={styles.inputField}
-                                />
-                                <Field
-                                    refLinkFn={(ref) => {
-                                        passwordInput = ref;
-                                    }}
-                                    name="password"
-                                    component={InputField}
-                                    inputProps={{
-                                        returnKeyType: 'go',
-                                        autoCapitalize: 'none',
-                                        placeholder: Lng.t("login.password", { locale: language }),
-                                        autoCorrect: true,
-                                        onSubmitEditing: this.props.handleSubmit(this.onLogin),
-                                    }}
-                                    inputContainerStyle={styles.inputField}
-                                    secureTextEntry
-                                    refLinkFn={(ref) => {
-                                        loginRefs.password = ref;
-                                    }}
-                                />
-
-                                <View style={styles.forgetPasswordContainer}>
-                                    <TouchableOpacity
-                                        onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}
-                                    >
-                                        <Text style={styles.forgetPassword}>
-                                            {Lng.t("button.forget", { locale: language })}
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            <View style={{ marginTop: 25 }}>
-                                <CtGradientButton
-                                    onPress={this.props.handleSubmit(this.onLogin)}
-                                    btnTitle={Lng.t("button.singIn", { locale: language })}
-                                    loading={loading}
-                                />
-                            </View>
-
-
-                            {/*
-                            * Sign in with google
-
-
-                            <CtDivider title="or" />
-
-                            <View style={styles.socialLoginContainer}>
-                                <CtButton
-                                    raised
-                                    imageSource={IMAGES.GOOGLE_ICON}
-                                    imageIcon
-                                    onPress={() => this.onSocialLogin()}
-                                    btnTitle={Lng.t("button.singInGoogle", { locale: language })}
-                                    loading={socialLoading}
-                                    buttonType={BUTTON_COLOR.WHITE}
-                                    color={colors.dark3}
-                                />
-                            </View>
-                        */}
-
+                    <View style={styles.main}>
+                        <View style={styles.logoContainer}>
+                            <AssetImage
+                                imageSource={IMAGES.LOGO_DARK}
+                                imageStyle={styles.imgLogo}
+                            />
                         </View>
-                    </KeyboardAvoidingView>
-                </ScrollView>
-            </View>
-        );
-    }
+
+                        <View style={styles.loginContainer}>
+                            <Field
+                                name="username"
+                                component={InputField}
+                                inputProps={{
+                                    returnKeyType: 'next',
+                                    autoCapitalize: 'none',
+                                    placeholder: Lng.t("login.email", { locale: language }),
+                                    autoCorrect: true,
+                                    keyboardType: 'email-address',
+                                    onSubmitEditing: () => {
+                                        loginRefs.password.focus();
+                                    }
+                                }}
+                                placeholderColor={colors.white5}
+                                inputContainerStyle={styles.inputField}
+                            />
+                            <Field
+                                refLinkFn={(ref) => {
+                                    passwordInput = ref;
+                                }}
+                                name="password"
+                                component={InputField}
+                                inputProps={{
+                                    returnKeyType: 'go',
+                                    autoCapitalize: 'none',
+                                    placeholder: Lng.t("login.password", { locale: language }),
+                                    autoCorrect: true,
+                                    onSubmitEditing: handleSubmit(onLogin),
+                                }}
+                                inputContainerStyle={styles.inputField}
+                                secureTextEntry
+                                refLinkFn={(ref) => {
+                                    loginRefs.password = ref;
+                                }}
+                            />
+
+                            <View style={styles.forgetPasswordContainer}>
+                                <TouchableOpacity
+                                    onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}
+                                >
+                                    <Text style={styles.forgetPassword}>
+                                        {Lng.t("button.forget", { locale: language })}
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        <View style={{ marginTop: 25 }}>
+                            <CtGradientButton
+                                onPress={handleSubmit(onLogin)}
+                                btnTitle={Lng.t("button.singIn", { locale: language })}
+                                loading={loading}
+                            />
+                        </View>
+
+
+                        {/*
+                        * Sign in with google
+
+
+                        <CtDivider title="or" />
+
+                        <View style={styles.socialLoginContainer}>
+                            <CtButton
+                                raised
+                                imageSource={IMAGES.GOOGLE_ICON}
+                                imageIcon
+                                onPress={() => onSocialLogin()}
+                                btnTitle={Lng.t("button.singInGoogle", { locale: language })}
+                                loading={socialLoading}
+                                buttonType={BUTTON_COLOR.WHITE}
+                                color={colors.dark3}
+                            />
+                        </View>
+                    */}
+
+                    </View>
+                </KeyboardAvoidingView>
+            </ScrollView>
+        </View>
+    );
 }

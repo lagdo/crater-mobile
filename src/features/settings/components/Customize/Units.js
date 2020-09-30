@@ -1,76 +1,59 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import styles from './styles';
 import { ListView, InputModal, CtDivider } from '../../../../components';
 import { formatListByName, alertMe } from '../../../../api/global';
 import Lng from '../../../../api/lang/i18n';
 
-export class Units extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            visible: false,
-            isCreateMethod: true,
-        };
-    }
+export const Units = (props) => {
+    const {
+        navigation,
+        language,
+        units,
+        setFormField,
+        itemUnitLoading = false,
+        formValues: { unitName = "", unitId = null },
+        createItemUnit,
+        editItemUnit,
+        removeItemUnit,
+    } = props
 
-    onToggle = () => {
-        this.setState(({ visible }) => {
-            return { visible: !visible }
-        });
-    }
+    const [visible, setVisible] = useState(false);
+    const [isCreateMethod, setCreateMethod] = useState(true);
 
-    onSave = () => {
-        const { isCreateMethod } = this.state
-        const {
-            props: {
-                formValues: { unitName = "", unitId = null },
-                createItemUnit,
-                editItemUnit
-            }
-        } = this.props
+    const onToggle = () => setVisible(!visible);
 
+    const onSave = () => {
         const params = {
             id: unitId,
             name: unitName
         }
 
         if (unitName) {
-            this.onToggle()
+            onToggle()
 
             isCreateMethod ? createItemUnit({ params }) :
                 editItemUnit({ params, id: unitId })
         }
     }
 
-    onRemove = () => {
-        const {
-            props: {
-                language,
-                removeItemUnit,
-                formValues: { unitId = null },
-            }
-        } = this.props
-
+    const onRemove = () => {
         alertMe({
             title: Lng.t("alert.title", { locale: language }),
             desc: Lng.t("items.alertUnit", { locale: language }),
             showCancel: true,
             okPress: () => {
-                this.onToggle()
+                onToggle()
                 removeItemUnit({ id: unitId })
             }
         })
     }
 
-    IMPORT_INPUT_MODAL = () => {
-        const { visible, isCreateMethod } = this.state
-        const { props: { navigation, language, itemUnitLoading = false } } = this.props
-
+    const IMPORT_INPUT_MODAL = () => {
         return (
             <InputModal
                 visible={visible}
-                onToggle={() => this.onToggle()}
+                onToggle={onToggle}
                 navigation={navigation}
                 language={language}
                 headerTitle={isCreateMethod ?
@@ -79,8 +62,8 @@ export class Units extends Component {
                 }
                 hint={Lng.t("items.unitHint", { locale: language })}
                 fieldName="unitName"
-                onSubmit={() => this.onSave()}
-                onRemove={() => this.onRemove()}
+                onSubmit={onSave}
+                onRemove={onRemove}
                 showRemoveButton={!isCreateMethod}
                 onSubmitLoading={itemUnitLoading}
                 onRemoveLoading={itemUnitLoading}
@@ -88,43 +71,39 @@ export class Units extends Component {
         )
     }
 
-    onSelectUnit = ({ name, id }) => {
-        this.props.setFormField("unitId", id)
-        this.openModal(name)
+    const onSelectUnit = ({ name, id }) => {
+        setFormField("unitId", id)
+        openModal(name)
     }
 
-    openModal = (name = "") => {
-        this.setState({ isCreateMethod: name ? false : true })
-        this.props.setFormField("unitName", name)
-        this.onToggle()
+    const openModal = (name = "") => {
+        setCreateMethod(name ? false : true)
+        setFormField("unitName", name)
+        onToggle()
     }
 
-    render() {
-        const { props: { units, language } } = this.props
+    return (
+        <View style={styles.bodyContainer}>
+            {IMPORT_INPUT_MODAL()}
 
-        return (
-            <View style={styles.bodyContainer}>
-                {this.IMPORT_INPUT_MODAL()}
-
-                <View>
-                    <ListView
-                        items={formatListByName(units)}
-                        getFreshItems={(onHide) => {
-                            onHide && onHide()
-                        }}
-                        onPress={this.onSelectUnit}
-                        isEmpty={units ? units.length <= 0 : true}
-                        bottomDivider
-                        contentContainerStyle={{ flex: 3 }}
-                        emptyContentProps={{
-                            title: Lng.t("payments.empty.modeTitle", { locale: language }),
-                        }}
-                        itemContainer={{
-                            paddingVertical: 8
-                        }}
-                    />
-                </View>
+            <View>
+                <ListView
+                    items={formatListByName(units)}
+                    getFreshItems={(onHide) => {
+                        onHide && onHide()
+                    }}
+                    onPress={onSelectUnit}
+                    isEmpty={units ? units.length <= 0 : true}
+                    bottomDivider
+                    contentContainerStyle={{ flex: 3 }}
+                    emptyContentProps={{
+                        title: Lng.t("payments.empty.modeTitle", { locale: language }),
+                    }}
+                    itemContainer={{
+                        paddingVertical: 8
+                    }}
+                />
             </View>
-        );
-    }
+        </View>
+    );
 }
