@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { ListView, MainLayout } from '../../../../components';
@@ -25,51 +25,46 @@ let params = {
     phone: '',
 }
 
-export class Customers extends React.Component<IProps> {
-    constructor(props) {
-        super(props)
+export const Customers = (props: IProps) => {
+    const {
+        navigation,
+        loading,
+        language,
+        handleSubmit,
+        customers,
+        filterCustomers,
+        getCustomer,
+        formValues: {
+            name = '',
+            contact_name = '',
+            phone = ''
+        },
+    } = props;
 
-        this.state = {
-            refreshing: false,
-            fresh: true,
-            pagination: {
-                page: 1,
-                limit: 10,
-                lastPage: 1,
-            },
-            search: '',
-            filter: false,
-        };
-    }
+    const [refreshing, setRefreshing] = useState(false);
+    const [fresh, setFresh] = useState(true);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 10,
+        lastPage: 1,
+    });
+    const [search, setSearch] = useState('');
+    const [filter, setFilter] = useState(false);
 
-    componentDidMount() {
-        const { navigation } = this.props
+    useEffect(() => {
         goBack(MOUNT, navigation, { route: ROUTES.MAIN_INVOICES })
-        this.getItems({ fresh: true });
-    }
+        getItems({ fresh: true });
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
+        return () => goBack(UNMOUNT);
+    }, []);
 
-    getItems = ({
-        fresh = false,
-        params,
-        onResult,
-        filter = false
-    } = {}) => {
-
-        const { getCustomer } = this.props;
-        const { refreshing, pagination } = this.state;
-
+    const getItems = ({ fresh = false, params, onResult, filter = false } = {}) => {
         if (refreshing) {
             return;
         }
 
-        this.setState({
-            refreshing: true,
-            fresh,
-        });
+        setRefreshing(true);
+        setFresh(fresh);
 
         const paginationParams = fresh ? { ...pagination, page: 1 } : pagination;
 
@@ -83,40 +78,35 @@ export class Customers extends React.Component<IProps> {
             params,
             filter,
             onMeta: ({ last_page, current_page }) => {
-                this.setState({
-                    pagination: {
-                        ...paginationParams,
-                        lastPage: last_page,
-                        page: current_page + 1,
-                    },
+                setPagination({
+                    ...paginationParams,
+                    lastPage: last_page,
+                    page: current_page + 1,
                 });
             },
             onResult: (val) => {
-                this.setState({
-                    refreshing: false,
-                    fresh: !val,
-                });
+                setRefreshing(false);
+                setFresh(!val);
                 onResult && onResult();
             },
         });
     };
 
-    onSearch = (search) => {
-        this.onResetFilter()
-        this.setState({ search })
-        this.getItems({ fresh: true, params: { ...params, search } })
+    const onSearch = (keywords) => {
+        onResetFilter()
+        setSearch(keywords)
+        getItems({ fresh: true, params: { ...params, search: keywords } })
     };
 
-    onResetFilter = () => {
-        this.setState({ filter: false })
+    const onResetFilter = () => {
+        setFilter(false)
     }
 
-    onSubmitFilter = ({ name = '', contact_name = '', phone = '' }) => {
-
+    const onSubmitFilter = ({ name = '', contact_name = '', phone = '' }) => {
         if (name || contact_name || phone) {
-            this.setState({ filter: true })
+            setFilter(false)
 
-            this.getItems({
+            getItems({
                 fresh: true,
                 params: {
                     ...params,
@@ -125,181 +115,154 @@ export class Customers extends React.Component<IProps> {
                     phone
                 },
                 filter: true
-            })
+            });
+            return;
         }
-        else
-            this.onResetFilter()
+
+        onResetFilter();
     }
 
-    onCustomerSelect = (customer) => {
-        const { navigation } = this.props
+    const onCustomerSelect = (customer) => {
         navigation.navigate(ROUTES.CUSTOMER,
             { customerId: customer.id, type: CUSTOMER_EDIT }
         )
-        this.onResetFilter()
+        onResetFilter()
     }
 
-    loadMoreItems = () => {
-        const { search, filter } = this.state
-
-        const {
-            formValues: {
-                name = '',
-                contact_name = '',
-                phone = ''
-            }
-
-        } = this.props
-
-        if (filter) {
-            this.getItems({
-                q: name,
-                params: {
-                    ...params,
-                    display_name: name,
-                    contact_name,
-                    phone
-                },
-                contact_name,
-                phone,
-                filter: true
-            })
+    const loadMoreItems = () => {
+        if (!filter) {
+            getItems({ params: { ...params, search } });
+            return;
         }
-        else
-            this.getItems({ params: { ...params, search } });
+
+        getItems({
+            q: name,
+            params: {
+                ...params,
+                display_name: name,
+                contact_name,
+                phone
+            },
+            contact_name,
+            phone,
+            filter: true
+        });
     }
 
+    const {
+        lastPage,
+        page,
+    } = pagination;
 
-    render() {
-        const {
-            customers,
-            filterCustomers,
-            navigation,
-            loading,
-            language,
-            handleSubmit
-        } = this.props
+    let filterRefs = {}
+    const canLoadMore = lastPage >= page;
 
-        let filterRefs = {}
-
-        const {
-            refreshing,
-            pagination: { lastPage, page },
-            fresh,
-            search,
-            filter,
-        } = this.state;
-
-        const canLoadMore = lastPage >= page;
-
-        let inputFields = [
-            {
-                name: 'name',
-                hint: Lng.t("customers.filterDisplayName", { locale: language }),
-                inputProps: {
-                    autoCorrect: true,
-                    autoFocus: true,
-                    onSubmitEditing: () => {
-                        filterRefs.contactName.focus();
-                    }
-                }
-            },
-            {
-                name: 'contact_name',
-                hint: Lng.t("customers.filterContactName", { locale: language }),
-                inputProps: {
-                    autoCorrect: true,
-                    onSubmitEditing: () => {
-                        filterRefs.phone.focus();
-                    }
-                },
-                refLinkFn: (ref) => {
-                    filterRefs.contactName = ref;
-                }
-            },
-            {
-                name: 'phone',
-                hint: Lng.t("customers.phone", { locale: language }),
-                inputProps: {
-                    keyboardType: 'phone-pad'
-                },
-                refLinkFn: (ref) => {
-                    filterRefs.phone = ref;
+    let inputFields = [
+        {
+            name: 'name',
+            hint: Lng.t("customers.filterDisplayName", { locale: language }),
+            inputProps: {
+                autoCorrect: true,
+                autoFocus: true,
+                onSubmitEditing: () => {
+                    filterRefs.contactName.focus();
                 }
             }
-        ]
-
-        let empty = (!filter && !search) ? {
-            description: Lng.t("customers.empty.description", { locale: language }),
-            buttonTitle: Lng.t("customers.empty.buttonTitle", { locale: language }),
-            buttonPress: () => {
-                navigation.navigate(ROUTES.CUSTOMER, { type: CUSTOMER_ADD })
-                this.onResetFilter()
+        },
+        {
+            name: 'contact_name',
+            hint: Lng.t("customers.filterContactName", { locale: language }),
+            inputProps: {
+                autoCorrect: true,
+                onSubmitEditing: () => {
+                    filterRefs.phone.focus();
+                }
+            },
+            refLinkFn: (ref) => {
+                filterRefs.contactName = ref;
             }
-        } : {}
+        },
+        {
+            name: 'phone',
+            hint: Lng.t("customers.phone", { locale: language }),
+            inputProps: {
+                keyboardType: 'phone-pad'
+            },
+            refLinkFn: (ref) => {
+                filterRefs.phone = ref;
+            }
+        }
+    ]
 
-        let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
-            : (!filter) ? Lng.t("customers.empty.title", { locale: language }) :
-                Lng.t("filter.empty.filterTitle", { locale: language })
+    let empty = (!filter && !search) ? {
+        description: Lng.t("customers.empty.description", { locale: language }),
+        buttonTitle: Lng.t("customers.empty.buttonTitle", { locale: language }),
+        buttonPress: () => {
+            navigation.navigate(ROUTES.CUSTOMER, { type: CUSTOMER_ADD })
+            onResetFilter()
+        }
+    } : {}
 
-        let isLoading = navigation.getParam('loading', false)
+    let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
+        : (!filter) ? Lng.t("customers.empty.title", { locale: language }) :
+            Lng.t("filter.empty.filterTitle", { locale: language })
 
-        return (
-            <View style={styles.container} >
-                <MainLayout
-                    headerProps={{
-                        rightIcon: "plus",
-                        rightIconPress: () => {
-                            navigation.navigate(ROUTES.CUSTOMER, { type: CUSTOMER_ADD })
-                            this.onResetFilter()
-                        },
-                        title: Lng.t("header.customers", { locale: language })
-                    }}
-                    onSearch={this.onSearch}
-                    filterProps={{
-                        onSubmitFilter: handleSubmit(this.onSubmitFilter),
-                        inputFields: inputFields,
-                        clearFilter: this.props,
-                        language: language,
-                        onResetFilter: () => this.onResetFilter()
-                    }}
-                    bottomDivider
-                    loadingProps={{ is: isLoading || (loading && fresh) }}
-                >
+    let isLoading = navigation.getParam('loading', false)
 
-                    <View style={styles.listViewContainer}>
-                        <ListView
-                            items={!filter ? customers : filterCustomers}
-                            onPress={this.onCustomerSelect}
-                            refreshing={refreshing}
-                            loading={loading}
-                            isEmpty={!filter ? customers && customers.length <= 0 :
-                                filterCustomers && filterCustomers.length <= 0
-                            }
-                            canLoadMore={canLoadMore}
-                            getFreshItems={(onHide) => {
-                                this.onResetFilter()
-                                this.getItems({
-                                    fresh: true,
-                                    onResult: onHide,
-                                    params: { ...params, search }
-                                });
-                            }}
-                            getItems={() => {
-                                this.loadMoreItems()
-                            }}
-                            bottomDivider
-                            hasAvatar
-                            emptyContentProps={{
-                                title: emptyTitle,
-                                image: IMAGES.EMPTY_CUSTOMERS,
-                                ...empty
-                            }}
-                        />
-                    </View>
+    return (
+        <View style={styles.container} >
+            <MainLayout
+                headerProps={{
+                    rightIcon: "plus",
+                    rightIconPress: () => {
+                        navigation.navigate(ROUTES.CUSTOMER, { type: CUSTOMER_ADD })
+                        onResetFilter()
+                    },
+                    title: Lng.t("header.customers", { locale: language })
+                }}
+                onSearch={onSearch}
+                filterProps={{
+                    onSubmitFilter: handleSubmit(onSubmitFilter),
+                    inputFields: inputFields,
+                    clearFilter: props,
+                    language: language,
+                    onResetFilter: () => onResetFilter()
+                }}
+                bottomDivider
+                loadingProps={{ is: isLoading || (loading && fresh) }}
+            >
 
-                </MainLayout>
-            </View>
-        );
-    }
+                <View style={styles.listViewContainer}>
+                    <ListView
+                        items={!filter ? customers : filterCustomers}
+                        onPress={onCustomerSelect}
+                        refreshing={refreshing}
+                        loading={loading}
+                        isEmpty={!filter ? customers && customers.length <= 0 :
+                            filterCustomers && filterCustomers.length <= 0
+                        }
+                        canLoadMore={canLoadMore}
+                        getFreshItems={(onHide) => {
+                            onResetFilter()
+                            getItems({
+                                fresh: true,
+                                onResult: onHide,
+                                params: { ...params, search }
+                            });
+                        }}
+                        getItems={() => {
+                            loadMoreItems()
+                        }}
+                        bottomDivider
+                        hasAvatar
+                        emptyContentProps={{
+                            title: emptyTitle,
+                            image: IMAGES.EMPTY_CUSTOMERS,
+                            ...empty
+                        }}
+                    />
+                </View>
+            </MainLayout>
+        </View>
+    );
 }

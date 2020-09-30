@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { Field, change } from 'redux-form';
 import styles from './styles';
@@ -28,31 +28,32 @@ type IProps = {
     categoryLoading: Boolean,
 }
 
-export class Category extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-        };
-    }
+export const Category = (props: IProps) => {
+    const {
+        navigation,
+        language,
+        getEditCategory,
+        type,
+        onFirstTimeCreateExpense,
+        createCategory,
+        editCategory,
+        removeCategory,
+        formValues: { name },
+        categoryLoading,
+        handleSubmit,
+        getEditCategoryLoading,
+    } = props;
 
-    componentDidMount() {
-        const {
-            navigation,
-            getEditCategory,
-            type,
-            onFirstTimeCreateExpense,
-        } = this.props;
-
+    useEffect(() => {
         if (type === CATEGORY_EDIT) {
 
             let id = navigation.getParam('categoryId', null)
             getEditCategory({
                 id,
                 onResult: (val) => {
-
                     const { name, description } = val
-                    this.setFormField('name', name)
-                    this.setFormField('description', description)
+                    setFormField('name', name)
+                    setFormField('description', description)
                 }
             });
         }
@@ -60,27 +61,15 @@ export class Category extends React.Component<IProps> {
         !onFirstTimeCreateExpense ?
             goBack(MOUNT, navigation) :
             goBack(MOUNT, navigation, { route: ROUTES.MAIN_EXPENSES })
-    }
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
+        return () => goBack(UNMOUNT)
+    }, []);
 
-    setFormField = (field, value) => {
-        this.props.dispatch(change(CATEGORY_FORM, field, value));
+    const setFormField = (field, value) => {
+        props.dispatch(change(CATEGORY_FORM, field, value));
     };
 
-    onSubmitCategory = (values) => {
-
-        const {
-            type,
-            createCategory,
-            editCategory,
-            navigation,
-            categoryLoading,
-            onFirstTimeCreateExpense
-        } = this.props
-
+    const onSubmitCategory = (values) => {
         if (!categoryLoading) {
             if (type === CATEGORY_ADD)
                 createCategory({
@@ -98,10 +87,7 @@ export class Category extends React.Component<IProps> {
         }
     };
 
-    removeCategory = () => {
-
-        const { removeCategory, navigation, language, formValues: { name } } = this.props
-
+    const onRemoveCategory = () => {
         alertMe({
             title: Lng.t("alert.title", { locale: language }),
             desc: Lng.t("categories.alertDescription", { locale: language }),
@@ -116,18 +102,11 @@ export class Category extends React.Component<IProps> {
         })
     }
 
-    BOTTOM_ACTION = (handleSubmit) => {
-
-        const {
-            language,
-            categoryLoading,
-            type
-        } = this.props
-
+    const BOTTOM_ACTION = () => {
         return (
             <View style={[styles.submitButton, type === CATEGORY_EDIT && styles.multipleButton]}>
                 <CtButton
-                    onPress={handleSubmit(this.onSubmitCategory)}
+                    onPress={handleSubmit(onSubmitCategory)}
                     btnTitle={Lng.t("button.save", { locale: language })}
                     buttonContainerStyle={type === CATEGORY_EDIT && styles.flex}
                     containerStyle={styles.btnContainerStyle}
@@ -136,7 +115,7 @@ export class Category extends React.Component<IProps> {
 
                 {type === CATEGORY_EDIT &&
                     <CtButton
-                        onPress={this.removeCategory}
+                        onPress={onRemoveCategory}
                         btnTitle={Lng.t("button.remove", { locale: language })}
                         buttonColor={BUTTON_COLOR.DANGER}
                         containerStyle={styles.btnContainerStyle}
@@ -148,81 +127,68 @@ export class Category extends React.Component<IProps> {
         )
     }
 
-    render() {
-        const {
-            navigation,
-            handleSubmit,
-            language,
-            getEditCategoryLoading,
-            type,
-            onFirstTimeCreateExpense,
-        } = this.props;
+    let categoryRefs = {}
 
+    return (
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: () => {
+                    !onFirstTimeCreateExpense ? navigation.goBack(null) :
+                        navigation.navigate(ROUTES.MAIN_EXPENSES)
+                },
+                title: type === CATEGORY_EDIT ?
+                    Lng.t("header.editCategory", { locale: language }) :
+                    Lng.t("header.addCategory", { locale: language }),
+                placement: "center",
+                rightIcon: "save",
+                rightIconProps: {
+                    solid: true,
+                },
+                rightIconPress: handleSubmit(onSubmitCategory),
+            }}
+            bottomAction={BOTTOM_ACTION()}
+            loadingProps={{
+                is: getEditCategoryLoading
+            }}
+        >
+            <View style={styles.bodyContainer}>
 
-        let categoryRefs = {}
+                <Field
+                    name="name"
+                    component={InputField}
+                    isRequired
+                    hint={Lng.t("categories.title", { locale: language })}
+                    inputFieldStyle={styles.inputFieldStyle}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCorrect: true,
+                        autoFocus: true,
+                        onSubmitEditing: () => {
+                            categoryRefs.description.focus();
+                        }
+                    }}
+                    validationStyle={styles.inputFieldValidation}
+                />
 
-        return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: () => {
-                        !onFirstTimeCreateExpense ? navigation.goBack(null) :
-                            navigation.navigate(ROUTES.MAIN_EXPENSES)
-                    },
-                    title: type === CATEGORY_EDIT ?
-                        Lng.t("header.editCategory", { locale: language }) :
-                        Lng.t("header.addCategory", { locale: language }),
-                    placement: "center",
-                    rightIcon: "save",
-                    rightIconProps: {
-                        solid: true,
-                    },
-                    rightIconPress: handleSubmit(this.onSubmitCategory),
-                }}
-                bottomAction={this.BOTTOM_ACTION(handleSubmit)}
-                loadingProps={{
-                    is: getEditCategoryLoading
-                }}
-            >
-                <View style={styles.bodyContainer}>
+                <Field
+                    name="description"
+                    component={InputField}
+                    hint={Lng.t("categories.description", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        multiline: true,
+                        maxLength: MAX_LENGTH
+                    }}
+                    height={100}
+                    autoCorrect={true}
+                    refLinkFn={(ref) => {
+                        categoryRefs.description = ref;
+                    }}
+                />
 
-                    <Field
-                        name="name"
-                        component={InputField}
-                        isRequired
-                        hint={Lng.t("categories.title", { locale: language })}
-                        inputFieldStyle={styles.inputFieldStyle}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCorrect: true,
-                            autoFocus: true,
-                            onSubmitEditing: () => {
-                                categoryRefs.description.focus();
-                            }
-                        }}
-                        validationStyle={styles.inputFieldValidation}
-                    />
-
-                    <Field
-                        name="description"
-                        component={InputField}
-                        hint={Lng.t("categories.description", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            multiline: true,
-                            maxLength: MAX_LENGTH
-                        }}
-                        height={100}
-                        autoCorrect={true}
-                        refLinkFn={(ref) => {
-                            categoryRefs.description = ref;
-                        }}
-                    />
-
-                </View>
-            </DefaultLayout>
-        );
-    }
+            </View>
+        </DefaultLayout>
+    );
 }
-

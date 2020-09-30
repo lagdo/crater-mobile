@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import styles from './styles';
 import { Field, change } from 'redux-form';
@@ -51,95 +51,94 @@ let addressField = [
     "type"
 ]
 
+export const Address = (props: IProps) => {
+    const {
+        navigation,
+        language,
+        type,
+        handleSubmit,
+        containerStyle,
+        label,
+        icon,
+        placeholder,
+        meta,
+        rightIcon,
+        hasBillingAddress,
+        fakeInputProps,
+        addressValue,
+        autoFillValue,
+        onChangeCallback,
+        formValues,
+        countries,
+    } = props
 
-export class Address extends Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            visible: false,
-            values: '',
-            status: false,
-        };
-    }
+    const [visible, setVisible] = useState(false);
+    const [values, setValues] = useState('');
+    const [status, setStatus] = useState(false);
 
-    componentDidMount() {
-    }
-
-
-    fillShippingAddress = (status) => {
-
-        if (status) {
-            this.setState({ status })
-            const { autoFillValue } = this.props
+    const fillShippingAddress = (st) => {
+        if (st) {
+            setStatus(st)
+            const { autoFillValue } = props
 
             if (typeof autoFillValue !== 'undefined') {
                 addressField.map((field) => {
-                    this.setFormField(field, autoFillValue[field])
+                    setFormField(field, autoFillValue[field])
                 })
             }
         }
         else {
-            this.setState({ status })
-            this.clearFormField()
+            setStatus(st)
+            clearFormField()
         }
     }
 
-    onToggle = () => {
-        const { visible, status } = this.state
-        const { addressValue,
-            hasBillingAddress,
-            autoFillValue
-        } = this.props
-
+    const onToggle = () => {
         if (!visible) {
             if (typeof addressValue !== 'undefined') {
                 addressField.map((field) => {
-                    this.setFormField(field, addressValue[field])
+                    setFormField(field, addressValue[field])
                 })
             }
 
             if (!hasBillingAddress && status === true && typeof addressValue === 'undefined') {
                 if (typeof autoFillValue !== 'undefined') {
                     addressField.map((field) => {
-                        this.setFormField(field, autoFillValue[field])
+                        setFormField(field, autoFillValue[field])
                     })
                 }
             }
         }
         else {
             if (typeof addressValue === 'undefined')
-                this.clearFormField()
+                clearFormField()
         }
-        this.setState((prevState) => {
-            return { visible: !prevState.visible }
-        });
+        setVisible(!visible);
     }
 
-    setFormField = (field, value) => {
-        this.props.dispatch(change(CUSTOMER_ADDRESS, field, value));
+    const setFormField = (field, value) => {
+        props.dispatch(change(CUSTOMER_ADDRESS, field, value));
     };
 
-    clearFormField = () => {
+    const clearFormField = () => {
         addressField.map((field) => {
-            this.setFormField(field, "")
+            setFormField(field, "")
         })
     };
 
-    saveAddress = (address) => {
-        const { onChangeCallback } = this.props
-        this.onToggle()
+    const saveAddress = (address) => {
+        onToggle()
 
         onChangeCallback(address)
-        this.clearFormField()
+        clearFormField()
     }
 
-    BOTTOM_ACTION = (handleSubmit) => {
-        const { language } = this.props
+    const BOTTOM_ACTION = () => {
         return (
             <View style={styles.submitButton}>
                 <View style={{ flex: 1 }}>
                     <CtButton
-                        onPress={handleSubmit(this.saveAddress)}
+                        onPress={handleSubmit(saveAddress)}
                         btnTitle={Lng.t("button.done", { locale: language })}
                         containerStyle={styles.handleBtn}
                     />
@@ -148,21 +147,7 @@ export class Address extends Component<IProps> {
         )
     }
 
-    Screen = () => {
-
-
-        const {
-            handleSubmit,
-            hasBillingAddress,
-            navigation,
-            addressValue,
-            formValues,
-            language,
-            countries
-        } = this.props
-
-        const { status } = this.state
-
+    const Screen = () => {
         let addressRefs = {}
 
         return (
@@ -176,7 +161,7 @@ export class Address extends Component<IProps> {
                         values={Lng.t("customers.address.sameAs", { locale: language })}
                         valueStyle={styles.sameAsToggle}
                         onChangeCallback={
-                            () => this.fillShippingAddress(!status)
+                            () => fillShippingAddress(!status)
                         }
                     />
                 )}
@@ -205,7 +190,7 @@ export class Address extends Component<IProps> {
                     searchFields={['name']}
                     compareField="id"
                     onSelect={({ id }) => {
-                        this.setFormField(country, id)
+                        setFormField(country, id)
                     }}
                     headerProps={{
                         title: Lng.t("header.country", { locale: language }),
@@ -308,64 +293,47 @@ export class Address extends Component<IProps> {
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
                         autoCorrect: true,
-                        onSubmitEditing: handleSubmit(this.saveAddress)
+                        onSubmitEditing: handleSubmit(saveAddress)
                     }}
                 />
             </View>
         )
     }
 
-    render() {
-        const {
-            containerStyle,
-            label,
-            icon,
-            placeholder,
-            meta,
-            rightIcon,
-            hasBillingAddress,
-            handleSubmit,
-            language,
-            type,
-            fakeInputProps,
-        } = this.props;
+    return (
+        <View style={styles.container}>
+            <FakeInput
+                label={label}
+                icon={icon}
+                rightIcon={rightIcon}
+                values={values || placeholder}
+                placeholder={placeholder}
+                onChangeCallback={onToggle}
+                containerStyle={containerStyle}
+                meta={meta}
+                {...fakeInputProps}
+            />
 
+            <SlideModal
+                defaultLayout
+                visible={visible}
+                onToggle={onToggle}
+                headerProps={{
+                    leftIcon: "long-arrow-alt-left",
+                    leftIconPress: onToggle,
+                    title: hasBillingAddress ?
+                        Lng.t("header.billingAddress", { locale: language }) :
+                        Lng.t("header.shippingAddress", { locale: language }),
+                    placement: "center",
+                    hasCircle: false,
+                    noBorder: false,
+                    transparent: false,
+                }}
+                bottomAction={BOTTOM_ACTION()}
+            >
+                {Screen()}
+            </SlideModal>
 
-        const { visible, values } = this.state
-
-        return (
-            <View style={styles.container}>
-                <FakeInput
-                    label={label}
-                    icon={icon}
-                    rightIcon={rightIcon}
-                    values={values || placeholder}
-                    placeholder={placeholder}
-                    onChangeCallback={this.onToggle}
-                    containerStyle={containerStyle}
-                    meta={meta}
-                    {...fakeInputProps}
-                />
-
-                <SlideModal
-                    defaultLayout
-                    visible={visible}
-                    onToggle={this.onToggle}
-                    headerProps={{
-                        leftIcon: "long-arrow-alt-left",
-                        leftIconPress: () => this.onToggle(),
-                        title: hasBillingAddress ? Lng.t("header.billingAddress", { locale: language }) : Lng.t("header.shippingAddress", { locale: language }),
-                        placement: "center",
-                        hasCircle: false,
-                        noBorder: false,
-                        transparent: false,
-                    }}
-                    bottomAction={this.BOTTOM_ACTION(handleSubmit)}
-                >
-                    {this.Screen()}
-                </SlideModal>
-
-            </View>
-        );
-    }
+        </View>
+    );
 }

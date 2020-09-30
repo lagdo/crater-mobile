@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Linking } from 'react-native';
 import { Field, change } from 'redux-form';
 import styles, { itemsDescriptionStyle } from './styles';
@@ -38,7 +38,6 @@ import { ADD_TAX } from '../../../settings/constants';
 import { PAYMENT_ADD } from '../../../payments/constants';
 import { MAX_LENGTH, alertMe } from '../../../../api/global';
 
-
 type IProps = {
     navigation: Object,
     invoiceItems: Object,
@@ -60,92 +59,97 @@ type IProps = {
     items: Object,
     language: String,
     type: String
-
 }
-export class Invoice extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            taxTypeList: [],
-            currency: {},
-            itemList: [],
-            customerName: '',
-            markAsStatus: null,
-        };
-    }
 
+export const Invoice = (props: IProps) => {
+    const {
+        navigation,
+        language,
+        loading,
+        type,
+        getCreateInvoice,
+        invoiceItems,
+        getEditInvoice,
+        clearInvoice,
+        removeInvoice,
+        formValues: {
+            id,
+            user,
+            user_id,
+            due_amount,
+            invoice_number,
+            taxes,
+            discount,
+            discount_type,
+        },
+        invoiceData: {
+            invoice_prefix = '',
+            invoiceTemplates,
+            discount_per_item,
+            tax_per_item,
+        } = {},
+        getItems,
+        itemsLoading,
+        items,
+        initLoading,
+        getCustomers,
+        customers,
+        customersLoading,
+        taxTypes,
+        createInvoice,
+        editInvoice,
+        changeInvoiceStatus,
+        handleSubmit,
+    } = props;
 
-    componentDidMount() {
+    // const [taxTypeList, setTaxTypeList] = useState([]);
+    const [currency, setCurrency] = useState({});
+    // const [itemList, setItemList] = useState([]);
+    const [customerName, setCustomerName] = useState('');
+    const [markAsStatus, setMarkAsStatus] = useState(null);
 
-        const {
-            getCreateInvoice,
-            navigation,
-            invoiceItems,
-            getEditInvoice,
-            type,
-        } = this.props;
-
+    useEffect(() => {
         type === INVOICE_EDIT ?
             getEditInvoice({
                 id: navigation.getParam('id'),
-                onResult: ({ user: { currency, name }, status }) => {
-                    this.setState({
-                        currency,
-                        customerName: name,
-                        markAsStatus: status
-                    })
+                onResult: ({ user, status }) => {
+                    setCurrency(user.currency)
+                    setCustomerName(user.name)
+                    setMarkAsStatus(status)
                 }
             }) :
             getCreateInvoice({
                 onResult: (val) => {
-                    const { currency } = val
-
-                    this.setState({ currency })
+                    setCurrency(val.currency)
                 }
             });
 
-        navigation.addListener(
-            'didFocus',
-            payload => {
-                this.forceUpdate();
-            }
-        );
-        this.getInvoiceItemList(invoiceItems)
+        getInvoiceItemList(invoiceItems)
 
-        this.androidBackHandler()
+        androidBackHandler()
+
+        return () => {
+            clearInvoice();
+            goBack(UNMOUNT)
+        }
+    }, []);
+
+    const androidBackHandler = () => {
+        goBack(MOUNT, navigation, { callback: () => onDraft(handleSubmit) })
     }
 
-    componentWillUnmount() {
-        const { clearInvoice } = this.props
-        clearInvoice();
-        goBack(UNMOUNT)
-    }
-
-    androidBackHandler = () => {
-        const { navigation, handleSubmit } = this.props
-        goBack(MOUNT, navigation, { callback: () => this.onDraft(handleSubmit) })
-    }
-
-    setFormField = (field, value) => {
-        this.props.dispatch(change(INVOICE_FORM, field, value));
+    const setFormField = (field, value) => {
+        props.dispatch(change(INVOICE_FORM, field, value));
     };
 
-    onEditItem = (item) => {
-        const {
-            navigation,
-            invoiceData: { discount_per_item, tax_per_item }
-        } = this.props
-        const { currency } = this.state
-
+    const onEditItem = (item) => {
         navigation.navigate(
             ROUTES.INVOICE_ITEM,
             { item, type: ITEM_EDIT, currency, discount_per_item, tax_per_item }
         )
     }
 
-    onDraft = (handleSubmit) => {
-        const { language, navigation, type } = this.props
-
+    const onDraft = (handleSubmit) => {
         if (type === INVOICE_EDIT) {
             navigation.navigate(ROUTES.MAIN_INVOICES)
             return
@@ -157,21 +161,12 @@ export class Invoice extends React.Component<IProps> {
             cancelText: Lng.t("alert.action.discard", { locale: language }),
             cancelPress: () => navigation.navigate(ROUTES.MAIN_INVOICES),
             okText: Lng.t("alert.action.saveAsDraft", { locale: language }),
-            okPress: handleSubmit(this.onSubmitInvoice)
+            okPress: handleSubmit(onSubmitInvoice)
         })
     }
 
-    onSubmitInvoice = (values, status = 'draft') => {
-        const {
-            createInvoice,
-            navigation,
-            type,
-            editInvoice,
-            language,
-            invoiceData: { invoice_prefix = '' } = {}
-        } = this.props
-
-        if (this.finalAmount() < 0) {
+    const onSubmitInvoice = (values, status = 'draft') => {
+        if (finalAmount() < 0) {
             alert(Lng.t("invoices.alert.lessAmount", { locale: language }))
             return
         }
@@ -179,16 +174,16 @@ export class Invoice extends React.Component<IProps> {
         let invoice = {
             ...values,
             invoice_number: `${invoice_prefix}-${values.invoice_number}`,
-            total: this.finalAmount(),
-            sub_total: this.invoiceSubTotal(),
-            tax: this.invoiceTax() + this.invoiceCompoundTax(),
-            discount_val: this.totalDiscount(),
+            total: finalAmount(),
+            sub_total: invoiceSubTotal(),
+            tax: invoiceTax() + invoiceCompoundTax(),
+            discount_val: totalDiscount(),
             taxes: values.taxes ? values.taxes.map(val => {
                 return {
                     ...val,
                     amount: val.compound_tax ?
-                        this.getCompoundTaxValue(val.percent) :
-                        this.getTaxValue(val.percent),
+                        getCompoundTaxValue(val.percent) :
+                        getTaxValue(val.percent),
                 }
             }) : [],
         }
@@ -218,8 +213,7 @@ export class Invoice extends React.Component<IProps> {
             })
     };
 
-    invoiceSubTotal = () => {
-        const { invoiceItems } = this.props
+    const invoiceSubTotal = () => {
         let subTotal = 0
         invoiceItems.map(val => {
             subTotal += JSON.parse(val.total)
@@ -228,52 +222,47 @@ export class Invoice extends React.Component<IProps> {
         return JSON.parse(subTotal)
     }
 
-    subTotal = () => {
+    const subTotal = () => {
         let invoiceTax = 0
-        this.invoiceItemTotalTaxes().filter(val => {
+        invoiceItemTotalTaxes().filter(val => {
             invoiceTax += val.amount
         })
-        return (this.invoiceSubTotal() + invoiceTax) - this.totalDiscount()
+        return (invoiceSubTotal() + invoiceTax) - totalDiscount()
     }
 
-    invoiceTax = () => {
-        const { formValues: { taxes } } = this.props
-
+    const invoiceTax = () => {
         let totalTax = 0
 
         taxes && taxes.map(val => {
             if (!val.compound_tax) {
-                totalTax += this.getTaxValue(val.percent)
+                totalTax += getTaxValue(val.percent)
             }
         })
 
         return totalTax
     }
 
-    invoiceCompoundTax = () => {
-        const { formValues: { taxes } } = this.props
-
+    const invoiceCompoundTax = () => {
         let totalTax = 0
 
         taxes && taxes.map(val => {
             if (val.compound_tax) {
-                totalTax += this.getCompoundTaxValue(val.percent)
+                totalTax += getCompoundTaxValue(val.percent)
             }
         })
 
         return totalTax
     }
 
-    getTaxValue = (tax) => {
-        return (tax * JSON.parse(this.subTotal())) / 100
+    const getTaxValue = (tax) => {
+        return (tax * JSON.parse(subTotal())) / 100
     }
 
-    getCompoundTaxValue = (tax) => {
-        return (tax * JSON.parse(this.totalAmount())) / 100
+    const getCompoundTaxValue = (tax) => {
+        return (tax * JSON.parse(totalAmount())) / 100
     }
 
-    getTaxName = (tax) => {
-        const { taxTypes } = this.props
+    const getTaxName = (tax) => {
         let taxName = ''
         const type = taxTypes.filter(val => val.fullItem.id === tax.tax_type_id)
 
@@ -283,13 +272,11 @@ export class Invoice extends React.Component<IProps> {
         return taxName
     }
 
-    totalDiscount = () => {
-        const { formValues: { discount, discount_type } } = this.props
-
+    const totalDiscount = () => {
         let discountPrice = 0
 
         if (discount_type === 'percentage') {
-            discountPrice = ((discount * this.invoiceSubTotal()) / 100)
+            discountPrice = ((discount * invoiceSubTotal()) / 100)
         } else {
             discountPrice = (discount * 100)
         }
@@ -297,16 +284,15 @@ export class Invoice extends React.Component<IProps> {
         return discountPrice
     }
 
-    totalAmount = () => {
-        return this.subTotal() + this.invoiceTax()
+    const totalAmount = () => {
+        return subTotal() + invoiceTax()
     }
 
-    finalAmount = () => {
-        return this.totalAmount() + this.invoiceCompoundTax()
+    const finalAmount = () => {
+        return totalAmount() + invoiceCompoundTax()
     }
 
-    invoiceItemTotalTaxes = () => {
-        const { invoiceItems } = this.props
+    const invoiceItemTotalTaxes = () => {
         let taxes = []
         invoiceItems.map(val => {
             val.taxes && val.taxes.filter(tax => {
@@ -333,17 +319,7 @@ export class Invoice extends React.Component<IProps> {
         return taxes
     }
 
-    FINAL_AMOUNT = () => {
-        const { currency } = this.state
-
-        const {
-            language,
-            taxTypes,
-            navigation,
-            invoiceData: { discount_per_item, tax_per_item },
-            formValues: { taxes }
-        } = this.props
-
+    const FINAL_AMOUNT = () => {
         let taxPerItem = !(tax_per_item === 'NO' || typeof tax_per_item === 'undefined' || tax_per_item === null)
 
         let discountPerItem = !(discount_per_item === 'NO' || typeof discount_per_item === 'undefined' || discount_per_item === null)
@@ -358,7 +334,7 @@ export class Invoice extends React.Component<IProps> {
                     </View>
                     <View>
                         <CurrencyFormat
-                            amount={this.invoiceSubTotal()}
+                            amount={invoiceSubTotal()}
                             currency={currency}
                             style={styles.subAmount}
                         />
@@ -389,7 +365,7 @@ export class Invoice extends React.Component<IProps> {
                                 component={SelectPickerField}
                                 items={INVOICE_DISCOUNT_OPTION}
                                 onChangeCallback={(val) => {
-                                    this.setFormField('discount_type', val)
+                                    setFormField('discount_type', val)
                                 }}
                                 isFakeInput
                                 defaultPickerOptions={{
@@ -414,12 +390,12 @@ export class Invoice extends React.Component<IProps> {
                         >
                             <View>
                                 <Text style={styles.amountHeading}>
-                                    {this.getTaxName(val)} ({val.percent} %)
+                                    {getTaxName(val)} ({val.percent} %)
                                 </Text>
                             </View>
                             <View>
                                 <CurrencyFormat
-                                    amount={this.getTaxValue(val.percent)}
+                                    amount={getTaxValue(val.percent)}
                                     currency={currency}
                                     style={styles.subAmount}
                                 />
@@ -437,12 +413,12 @@ export class Invoice extends React.Component<IProps> {
                         >
                             <View>
                                 <Text style={styles.amountHeading}>
-                                    {this.getTaxName(val)} ({val.percent} %)
+                                    {getTaxName(val)} ({val.percent} %)
                                 </Text>
                             </View>
                             <View>
                                 <CurrencyFormat
-                                    amount={this.getCompoundTaxValue(val.percent)}
+                                    amount={getCompoundTaxValue(val.percent)}
                                     currency={currency}
                                     style={styles.subAmount}
                                 />
@@ -452,7 +428,7 @@ export class Invoice extends React.Component<IProps> {
                     )
                 }
 
-                {this.DISPLAY_ITEM_TAX()}
+                {DISPLAY_ITEM_TAX()}
 
                 {(!taxPerItem) && (
                     <Field
@@ -483,7 +459,7 @@ export class Invoice extends React.Component<IProps> {
                             () => navigation.navigate(ROUTES.TAX, {
                                 type: ADD_TAX,
                                 onSelect: (val) => {
-                                    this.setFormField('taxes',
+                                    setFormField('taxes',
                                         [...val, ...taxes]
                                     )
                                 }
@@ -508,7 +484,7 @@ export class Invoice extends React.Component<IProps> {
                     </View>
                     <View>
                         <CurrencyFormat
-                            amount={this.finalAmount()}
+                            amount={finalAmount()}
                             currency={currency}
                             style={styles.finalAmount}
                         />
@@ -518,13 +494,11 @@ export class Invoice extends React.Component<IProps> {
         )
     };
 
-    BOTTOM_ACTION = () => {
-        const { language, loading, handleSubmit } = this.props
-
+    const BOTTOM_ACTION = () => {
         return (
             <View style={styles.submitButton}>
                 <CtButton
-                    onPress={handleSubmit((val) => this.onSubmitInvoice(val, status = INVOICE_ACTIONS.VIEW))}
+                    onPress={handleSubmit((val) => onSubmitInvoice(val, status = INVOICE_ACTIONS.VIEW))}
                     btnTitle={Lng.t("button.viewPdf", { locale: language })}
                     type={BUTTON_TYPE.OUTLINE}
                     containerStyle={styles.handleBtn}
@@ -533,7 +507,7 @@ export class Invoice extends React.Component<IProps> {
                 />
 
                 <CtButton
-                    onPress={handleSubmit((val) => this.onSubmitInvoice(val, status = 'save'))}
+                    onPress={handleSubmit((val) => onSubmitInvoice(val, status = 'save'))}
                     btnTitle={Lng.t("button.save", { locale: language })}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
@@ -544,9 +518,8 @@ export class Invoice extends React.Component<IProps> {
         )
     }
 
-    DISPLAY_ITEM_TAX = () => {
-        const { currency } = this.state
-        let taxes = this.invoiceItemTotalTaxes()
+    const DISPLAY_ITEM_TAX = () => {
+        let taxes = invoiceItemTotalTaxes()
 
         return taxes ? (
             taxes.map((val, index) => (
@@ -556,7 +529,7 @@ export class Invoice extends React.Component<IProps> {
                 >
                     <View>
                         <Text style={styles.amountHeading}>
-                            {this.getTaxName(val)} ({val.percent} %)
+                            {getTaxName(val)} ({val.percent} %)
                         </Text>
                     </View>
                     <View>
@@ -572,10 +545,8 @@ export class Invoice extends React.Component<IProps> {
         ) : null
     }
 
-    getInvoiceItemList = (invoiceItems) => {
-        this.setFormField('items', invoiceItems)
-
-        const { currency } = this.state
+    const getInvoiceItemList = (invoiceItems) => {
+        setFormField('items', invoiceItems)
 
         let invoiceItemList = []
 
@@ -609,9 +580,7 @@ export class Invoice extends React.Component<IProps> {
         return invoiceItemList
     }
 
-    getItemList = (items) => {
-        const { currency } = this.state
-
+    const getItemList = (items) => {
         let itemList = []
 
         if (typeof items !== 'undefined' && items.length != 0) {
@@ -635,25 +604,8 @@ export class Invoice extends React.Component<IProps> {
         return itemList
     }
 
-    onOptionSelect = (action) => {
-        const {
-            removeInvoice,
-            navigation,
-            language,
-            formValues: {
-                user,
-                user_id,
-                due_amount,
-                invoice_number,
-                id,
-            },
-            handleSubmit,
-            changeInvoiceStatus,
-            type
-        } = this.props
-
+    const onOptionSelect = (action) => {
         switch (action) {
-
             case INVOICE_ACTIONS.SEND:
                 alertMe({
                     title: Lng.t("alert.title", { locale: language }),
@@ -733,267 +685,241 @@ export class Invoice extends React.Component<IProps> {
 
     }
 
-    render() {
-        const {
-            navigation,
-            handleSubmit,
-            invoiceData: {
-                invoiceTemplates,
-                discount_per_item,
-                tax_per_item,
-                invoice_prefix
-            } = {},
-            invoiceItems,
-            getItems,
-            itemsLoading,
-            items,
+    const isEditInvoice = (type === INVOICE_EDIT)
+
+    let hasSentStatus = (markAsStatus === 'SENT' || markAsStatus === 'VIEWED')
+    let hasCompleteStatus = (markAsStatus === 'COMPLETED')
+
+    let drownDownProps = (isEditInvoice && !initLoading) ? {
+        options: EDIT_INVOICE_ACTIONS(
             language,
-            initLoading,
-            type,
-            getCustomers,
-            customers,
-            customersLoading,
-        } = this.props;
-
-        const { currency, customerName, markAsStatus } = this.state
-
-        const isEditInvoice = (type === INVOICE_EDIT)
-
-        let hasSentStatus = (markAsStatus === 'SENT' || markAsStatus === 'VIEWED')
-        let hasCompleteStatus = (markAsStatus === 'COMPLETED')
-
-        let drownDownProps = (isEditInvoice && !initLoading) ? {
-            options: EDIT_INVOICE_ACTIONS(
-                language,
-                hasSentStatus,
-                hasCompleteStatus
-            ),
-            onSelect: this.onOptionSelect,
-            cancelButtonIndex:
-                hasSentStatus ? 3 :
-                    hasCompleteStatus ? 2 : 5,
-            destructiveButtonIndex:
-                hasSentStatus ? 2 :
-                    hasCompleteStatus ? 1 : 4,
-        } : null
+            hasSentStatus,
+            hasCompleteStatus
+        ),
+        onSelect: onOptionSelect,
+        cancelButtonIndex:
+            hasSentStatus ? 3 :
+                hasCompleteStatus ? 2 : 5,
+        destructiveButtonIndex:
+            hasSentStatus ? 2 :
+                hasCompleteStatus ? 1 : 4,
+    } : null
 
 
-        return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: () => this.onDraft(handleSubmit),
-                    title: isEditInvoice ?
-                        Lng.t("header.editInvoice", { locale: language }) :
-                        Lng.t("header.addInvoice", { locale: language }),
-                    rightIcon: !isEditInvoice ? 'save' : null,
-                    rightIconPress: handleSubmit((val) => this.onSubmitInvoice(val, status = 'save')),
-                    rightIconProps: {
-                        solid: true
-                    },
-                    placement: "center",
-                }}
+    return (
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: () => onDraft(handleSubmit),
+                title: isEditInvoice ?
+                    Lng.t("header.editInvoice", { locale: language }) :
+                    Lng.t("header.addInvoice", { locale: language }),
+                rightIcon: !isEditInvoice ? 'save' : null,
+                rightIconPress: handleSubmit((val) => onSubmitInvoice(val, status = 'save')),
+                rightIconProps: {
+                    solid: true
+                },
+                placement: "center",
+            }}
 
-                bottomAction={this.BOTTOM_ACTION(handleSubmit)}
-                loadingProps={{ is: initLoading }}
-                dropdownProps={drownDownProps}
-            >
-                <View style={styles.bodyContainer}>
-                    <View style={styles.dateFieldContainer}>
-                        <View style={styles.dateField}>
-                            <Field
-                                name={'invoice_date'}
-                                isRequired
-                                component={DatePickerField}
-                                label={Lng.t("invoices.invoiceDate", { locale: language })}
-                                icon={'calendar-alt'}
-                                onChangeCallback={(val) =>
-                                    this.setFormField('invoice_date', val)
-                                }
-                            />
-                        </View>
-                        <View style={styles.dateField}>
-                            <Field
-                                name="due_date"
-                                isRequired
-                                component={DatePickerField}
-                                label={Lng.t("invoices.dueDate", { locale: language })}
-                                icon={'calendar-alt'}
-                                onChangeCallback={(val) =>
-                                    this.setFormField('due_date', val)
-                                }
-                            />
-                        </View>
-                    </View>
-
-                    <Field
-                        name="invoice_number"
-                        component={FakeInput}
-                        label={Lng.t("invoices.invoiceNumber", { locale: language })}
-                        isRequired
-                        prefixProps={{
-                            fieldName: "invoice_number",
-                            prefix: invoice_prefix,
-                            icon: 'hashtag',
-                            iconSolid: false,
-                        }}
-                    />
-
-                    <Field
-                        name="user_id"
-                        items={customers}
-                        apiSearch
-                        hasPagination
-                        isRequired
-                        getItems={getCustomers}
-                        displayName="name"
-                        component={SelectField}
-                        label={Lng.t("invoices.customer", { locale: language })}
-                        icon={'user'}
-                        placeholder={customerName ? customerName :
-                            Lng.t("invoices.customerPlaceholder", { locale: language })
-                        }
-                        navigation={navigation}
-                        compareField="id"
-                        onSelect={(item) => {
-                            this.setFormField('user_id', item.id)
-                            this.setState({ currency: item.currency })
-                        }}
-                        rightIconPress={
-                            () => navigation.navigate(ROUTES.CUSTOMER, {
-                                type: CUSTOMER_ADD,
-                                currency,
-                                onSelect: (val) => {
-                                    this.setFormField('user_id', val.id)
-                                    this.setState({ currency: val.currency })
-                                }
-                            })
-                        }
-                        headerProps={{
-                            title: Lng.t("customers.title", { locale: language }),
-                        }}
-                        listViewProps={{
-                            hasAvatar: true,
-                        }}
-                        emptyContentProps={{
-                            contentType: "customers",
-                            image: IMAGES.EMPTY_CUSTOMERS,
-                        }}
-                        fakeInputProps={{ loading: customersLoading }}
-                    />
-
-                    <Text style={[styles.inputTextStyle, styles.label]}>
-                        {Lng.t("invoices.items", { locale: language })}
-                        <Text style={styles.required}> *</Text>
-                    </Text>
-
-                    <ListView
-                        items={this.getInvoiceItemList(invoiceItems)}
-                        itemContainer={styles.itemContainer}
-                        leftTitleStyle={styles.itemLeftTitle}
-                        leftSubTitleLabelStyle={[styles.itemLeftSubTitle, styles.itemLeftSubTitleLabel]}
-                        leftSubTitleStyle={styles.itemLeftSubTitle}
-                        rightTitleStyle={styles.itemRightTitle}
-                        backgroundColor={colors.white}
-                        onPress={this.onEditItem}
-                    />
-
-                    <Field
-                        name="items"
-                        items={this.getItemList(items)}
-                        displayName="name"
-                        component={SelectField}
-                        hasPagination
-                        apiSearch
-                        getItems={getItems}
-                        compareField="id"
-                        valueCompareField="item_id"
-                        icon={'percent'}
-                        placeholder={Lng.t("invoices.addItem", { locale: language })}
-                        navigation={navigation}
-                        onlyPlaceholder
-                        isMultiSelect
-                        loading={itemsLoading}
-                        fakeInputProps={{
-                            icon: 'shopping-basket',
-                            rightIcon: 'angle-right',
-                            color: colors.primaryLight,
-                        }}
-                        onSelect={
-                            (item) => {
-                                navigation.navigate(ROUTES.INVOICE_ITEM, {
-                                    item,
-                                    currency,
-                                    type: ITEM_ADD,
-                                    discount_per_item,
-                                    tax_per_item
-                                })
+            bottomAction={BOTTOM_ACTION()}
+            loadingProps={{ is: initLoading }}
+            dropdownProps={drownDownProps}
+        >
+            <View style={styles.bodyContainer}>
+                <View style={styles.dateFieldContainer}>
+                    <View style={styles.dateField}>
+                        <Field
+                            name={'invoice_date'}
+                            isRequired
+                            component={DatePickerField}
+                            label={Lng.t("invoices.invoiceDate", { locale: language })}
+                            icon={'calendar-alt'}
+                            onChangeCallback={(val) =>
+                                setFormField('invoice_date', val)
                             }
-                        }
-                        rightIconPress={
-                            () => navigation.navigate(ROUTES.INVOICE_ITEM, {
-                                type: ITEM_ADD,
+                        />
+                    </View>
+                    <View style={styles.dateField}>
+                        <Field
+                            name="due_date"
+                            isRequired
+                            component={DatePickerField}
+                            label={Lng.t("invoices.dueDate", { locale: language })}
+                            icon={'calendar-alt'}
+                            onChangeCallback={(val) =>
+                                setFormField('due_date', val)
+                            }
+                        />
+                    </View>
+                </View>
+
+                <Field
+                    name="invoice_number"
+                    component={FakeInput}
+                    label={Lng.t("invoices.invoiceNumber", { locale: language })}
+                    isRequired
+                    prefixProps={{
+                        fieldName: "invoice_number",
+                        prefix: invoice_prefix,
+                        icon: 'hashtag',
+                        iconSolid: false,
+                    }}
+                />
+
+                <Field
+                    name="user_id"
+                    items={customers}
+                    apiSearch
+                    hasPagination
+                    isRequired
+                    getItems={getCustomers}
+                    displayName="name"
+                    component={SelectField}
+                    label={Lng.t("invoices.customer", { locale: language })}
+                    icon={'user'}
+                    placeholder={customerName ? customerName :
+                        Lng.t("invoices.customerPlaceholder", { locale: language })
+                    }
+                    navigation={navigation}
+                    compareField="id"
+                    onSelect={(item) => {
+                        setFormField('user_id', item.id)
+                        setCurrency(item.currency)
+                    }}
+                    rightIconPress={
+                        () => navigation.navigate(ROUTES.CUSTOMER, {
+                            type: CUSTOMER_ADD,
+                            currency,
+                            onSelect: (val) => {
+                                setFormField('user_id', val.id)
+                                setCurrency(val.currency)
+                            }
+                        })
+                    }
+                    headerProps={{
+                        title: Lng.t("customers.title", { locale: language }),
+                    }}
+                    listViewProps={{
+                        hasAvatar: true,
+                    }}
+                    emptyContentProps={{
+                        contentType: "customers",
+                        image: IMAGES.EMPTY_CUSTOMERS,
+                    }}
+                    fakeInputProps={{ loading: customersLoading }}
+                />
+
+                <Text style={[styles.inputTextStyle, styles.label]}>
+                    {Lng.t("invoices.items", { locale: language })}
+                    <Text style={styles.required}> *</Text>
+                </Text>
+
+                <ListView
+                    items={getInvoiceItemList(invoiceItems)}
+                    itemContainer={styles.itemContainer}
+                    leftTitleStyle={styles.itemLeftTitle}
+                    leftSubTitleLabelStyle={[styles.itemLeftSubTitle, styles.itemLeftSubTitleLabel]}
+                    leftSubTitleStyle={styles.itemLeftSubTitle}
+                    rightTitleStyle={styles.itemRightTitle}
+                    backgroundColor={colors.white}
+                    onPress={onEditItem}
+                />
+
+                <Field
+                    name="items"
+                    items={getItemList(items)}
+                    displayName="name"
+                    component={SelectField}
+                    hasPagination
+                    apiSearch
+                    getItems={getItems}
+                    compareField="id"
+                    valueCompareField="item_id"
+                    icon={'percent'}
+                    placeholder={Lng.t("invoices.addItem", { locale: language })}
+                    navigation={navigation}
+                    onlyPlaceholder
+                    isMultiSelect
+                    loading={itemsLoading}
+                    fakeInputProps={{
+                        icon: 'shopping-basket',
+                        rightIcon: 'angle-right',
+                        color: colors.primaryLight,
+                    }}
+                    onSelect={
+                        (item) => {
+                            navigation.navigate(ROUTES.INVOICE_ITEM, {
+                                item,
                                 currency,
+                                type: ITEM_ADD,
                                 discount_per_item,
                                 tax_per_item
                             })
                         }
-                        headerProps={{
-                            title: Lng.t("items.title", { locale: language }),
-                        }}
-                        emptyContentProps={{
-                            contentType: "items",
-                            image: IMAGES.EMPTY_ITEMS,
-                        }}
-                        listViewProps={{
-                            leftSubTitleStyle: itemsDescriptionStyle()
-                        }}
-                    />
+                    }
+                    rightIconPress={
+                        () => navigation.navigate(ROUTES.INVOICE_ITEM, {
+                            type: ITEM_ADD,
+                            currency,
+                            discount_per_item,
+                            tax_per_item
+                        })
+                    }
+                    headerProps={{
+                        title: Lng.t("items.title", { locale: language }),
+                    }}
+                    emptyContentProps={{
+                        contentType: "items",
+                        image: IMAGES.EMPTY_ITEMS,
+                    }}
+                    listViewProps={{
+                        leftSubTitleStyle: itemsDescriptionStyle()
+                    }}
+                />
 
-                    {this.FINAL_AMOUNT(invoiceItems)}
+                {FINAL_AMOUNT()}
 
-                    <Field
-                        name="reference_number"
-                        component={InputField}
-                        hint={Lng.t("invoices.referenceNumber", { locale: language })}
-                        leftIcon={'hashtag'}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                        }}
-                    />
+                <Field
+                    name="reference_number"
+                    component={InputField}
+                    hint={Lng.t("invoices.referenceNumber", { locale: language })}
+                    leftIcon={'hashtag'}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                    }}
+                />
 
-                    <Field
-                        name="notes"
-                        component={InputField}
-                        hint={Lng.t("invoices.notes", { locale: language })}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            placeholder: Lng.t("invoices.notePlaceholder", { locale: language }),
-                            autoCorrect: true,
-                            multiline: true,
-                            maxLength: MAX_LENGTH
-                        }}
-                        height={80}
-                        hintStyle={styles.noteHintStyle}
-                        autoCorrect={true}
-                    />
+                <Field
+                    name="notes"
+                    component={InputField}
+                    hint={Lng.t("invoices.notes", { locale: language })}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        placeholder: Lng.t("invoices.notePlaceholder", { locale: language }),
+                        autoCorrect: true,
+                        multiline: true,
+                        maxLength: MAX_LENGTH
+                    }}
+                    height={80}
+                    hintStyle={styles.noteHintStyle}
+                    autoCorrect={true}
+                />
 
-                    <Field
-                        name="invoice_template_id"
-                        templates={invoiceTemplates}
-                        component={TemplateField}
-                        label={Lng.t("invoices.template", { locale: language })}
-                        icon={'file-alt'}
-                        placeholder={Lng.t("invoices.templatePlaceholder", { locale: language })}
-                        navigation={navigation}
-                        language={language}
-                    />
+                <Field
+                    name="invoice_template_id"
+                    templates={invoiceTemplates}
+                    component={TemplateField}
+                    label={Lng.t("invoices.template", { locale: language })}
+                    icon={'file-alt'}
+                    placeholder={Lng.t("invoices.templatePlaceholder", { locale: language })}
+                    navigation={navigation}
+                    language={language}
+                />
 
-                </View>
+            </View>
 
-            </DefaultLayout>
-        );
-    }
+        </DefaultLayout>
+    );
 }
-

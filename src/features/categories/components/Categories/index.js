@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import {
@@ -12,7 +12,6 @@ import Lng from '../../../../api/lang/i18n';
 import { CATEGORY_ADD, CATEGORY_EDIT } from '../../constants';
 import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 
-
 type IProps = {
     navigation: Object,
     getPayments: Function,
@@ -21,39 +20,35 @@ type IProps = {
     language: String,
 }
 
-export class Categories extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            search: '',
-            categoriesFilter: [],
-            found: true,
-            refreshing: false
-        };
-    }
+export const Categories = (props: IProps) => {
+    const {
+        navigation,
+        loading,
+        language,
+        categories,
+        getExpenseCategories,
+    } = props;
 
-    componentDidMount() {
-        const { getExpenseCategories, navigation } = this.props
-        getExpenseCategories()
+    const [search, setSearch] = useState('');
+    const [categoriesFilter, setCategoriesFilter] = useState([]);
+    const [found, setFound] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
-        goBack(MOUNT, navigation)
-    }
+    useEffect(() => {
+        getExpenseCategories();
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
+        goBack(MOUNT, navigation);
 
-    onSelectCategory = (category) => {
+        return () => goBack(UNMOUNT);
+    }, []);
 
-        const { navigation } = this.props
+    const onSelectCategory = (category) => {
         navigation.navigate(ROUTES.CATEGORY,
             { type: CATEGORY_EDIT, categoryId: category.id }
         )
     }
 
-    onSearch = (search) => {
-
-        const { categories } = this.props;
+    const onSearch = (keywords) => {
         let searchFields = ['name'];
 
         if (typeof categories !== 'undefined' && categories.length != 0) {
@@ -67,7 +62,7 @@ export class Categories extends React.Component<IProps> {
                     if (itemField !== null && itemField !== 'undefined') {
                         itemField = itemField.toLowerCase()
 
-                        let searchData = search.toString().toLowerCase()
+                        let searchData = keywords.toString().toLowerCase()
 
                         if (itemField.indexOf(searchData) > -1) {
                             filterData = true
@@ -77,17 +72,13 @@ export class Categories extends React.Component<IProps> {
                 return filterData
             });
 
-            let categoriesFilter = this.itemList(newData)
-
-            this.setState({
-                categoriesFilter,
-                found: categoriesFilter.length != 0 ? true : false,
-                search
-            })
+            setCategoriesFilter(itemList(newData))
+            setFound(categoriesFilter.length != 0 ? true : false)
+            setSearch(keywords)
         }
     };
 
-    itemList = (categories) => {
+    const itemList = (categories) => {
         let categoriesList = []
         if (typeof categories !== 'undefined' && categories.length != 0) {
             categoriesList = categories.map((category) => {
@@ -105,84 +96,62 @@ export class Categories extends React.Component<IProps> {
         return categoriesList
     }
 
-    getFreshItems = (onHide) => {
-        const { getExpenseCategories } = this.props
+    const getFreshItems = (onHide) => {
         getExpenseCategories()
 
         setTimeout(() => {
             onHide && onHide()
         }, 400);
-
     }
 
-    render() {
+    let categoriesList = itemList(categories)
 
-        const {
-            navigation,
-            loading,
-            language,
-            categories,
-        } = this.props;
+    let empty = (!search) ? {
+        description: Lng.t("categories.empty.description", { locale: language }),
+        buttonTitle: Lng.t("categories.empty.buttonTitle", { locale: language }),
+        buttonPress: () => navigation.navigate(ROUTES.CATEGORY, { type: CATEGORY_ADD }),
+    } : {}
 
-        const {
-            search,
-            categoriesFilter,
-            found,
-            refreshing
-        } = this.state
+    return (
+        <View style={styles.container}>
+            <MainLayout
+                headerProps={{
+                    leftIcon: "long-arrow-alt-left",
+                    leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
+                    title: Lng.t("header.expenseCategory", { locale: language }),
+                    titleStyle: styles.titleStyle,
+                    placement: "center",
+                    rightIcon: "plus",
+                    rightIconPress: () => navigation.navigate(ROUTES.CATEGORY, { type: CATEGORY_ADD }),
+                }}
+                onSearch={onSearch}
+                bottomDivider
+                loadingProps={{ is: loading }}
+            >
 
-        let categoriesList = [];
-        categoriesList = this.itemList(categories)
+                <View style={styles.listViewContainer}>
+                    <ListView
+                        items={categoriesFilter.length != 0 ?
+                            categoriesFilter : found ? categoriesList : []
+                        }
+                        refreshing={refreshing}
+                        getFreshItems={(onHide) => {
+                            getFreshItems(onHide)
+                        }}
+                        onPress={onSelectCategory}
+                        loading={loading}
+                        isEmpty={found ? categoriesList.length <= 0 : true}
+                        bottomDivider
+                        emptyContentProps={{
+                            title: found ?
+                                Lng.t("categories.empty.title", { locale: language }) :
+                                Lng.t("search.noResult", { locale: language, search }),
+                            ...empty
+                        }}
+                    />
+                </View>
 
-        let empty = (!search) ? {
-            description: Lng.t("categories.empty.description", { locale: language }),
-            buttonTitle: Lng.t("categories.empty.buttonTitle", { locale: language }),
-            buttonPress: () => navigation.navigate(ROUTES.CATEGORY, { type: CATEGORY_ADD }),
-        } : {}
-
-
-        return (
-            <View style={styles.container}>
-                <MainLayout
-                    headerProps={{
-                        leftIcon: "long-arrow-alt-left",
-                        leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
-                        title: Lng.t("header.expenseCategory", { locale: language }),
-                        titleStyle: styles.titleStyle,
-                        placement: "center",
-                        rightIcon: "plus",
-                        rightIconPress: () => navigation.navigate(ROUTES.CATEGORY, { type: CATEGORY_ADD }),
-                    }}
-                    onSearch={this.onSearch}
-                    bottomDivider
-                    loadingProps={{ is: loading }}
-                >
-
-                    <View style={styles.listViewContainer}>
-                        <ListView
-                            items={categoriesFilter.length != 0 ?
-                                categoriesFilter : found ? categoriesList : []
-                            }
-                            refreshing={refreshing}
-                            getFreshItems={(onHide) => {
-                                this.getFreshItems(onHide)
-                            }}
-                            onPress={this.onSelectCategory}
-                            loading={loading}
-                            isEmpty={found ? categoriesList.length <= 0 : true}
-                            bottomDivider
-                            emptyContentProps={{
-                                title: found ?
-                                    Lng.t("categories.empty.title", { locale: language }) :
-                                    Lng.t("search.noResult", { locale: language, search }),
-                                ...empty
-                            }}
-                        />
-                    </View>
-
-                </MainLayout>
-            </View>
-        );
-    }
+            </MainLayout>
+        </View>
+    );
 }
-

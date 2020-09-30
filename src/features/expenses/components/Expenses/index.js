@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { change } from 'redux-form';
 import styles from './styles';
@@ -26,66 +26,63 @@ type IProps = {
     language: String,
 }
 
-export class Expenses extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            refreshing: false,
-            fresh: true,
-            pagination: {
-                page: 1,
-                limit: 10,
-                lastPage: 1,
-            },
-            search: '',
-            selectedCategory: '',
-            filter: false,
-            selectedFromDate: '',
-            selectedToDate: '',
-            selectedFromDateValue: '',
-            selectedToDateValue: ''
-        };
-    }
+export const Expenses = (props: IProps) => {
+    const {
+        navigation,
+        expenses,
+        filterExpenses,
+        loading,
+        language,
+        currency,
+        handleSubmit,
+        categories,
+        getExpenses,
+        formValues: {
+            from_date = '',
+            to_date = '',
+            expense_category_id = ''
+        },
+    } = props
 
-    componentDidMount() {
-        const { getCategories, navigation } = this.props
+    const [refreshing, setRefreshing] = useState(false);
+    const [fresh, setFresh] = useState(true);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 10,
+        lastPage: 1,
+    });
+    const [search, setSearch] = useState('');
+    const [filter, setFilter] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedFromDate, setSelectedFromDate] = useState('');
+    const [selectedToDate, setSelectedToDate] = useState('');
+    const [selectedFromDateValue, setSelectedFromDateValue] = useState('');
+    const [selectedToDateValue, setSelectedToDateValue] = useState('');
+
+    useEffect(() => {
+        const { getCategories, navigation } = props
 
         getCategories()
 
-        this.getItems({ fresh: true });
+        getItems({ fresh: true });
 
         goBack(MOUNT, navigation, { route: ROUTES.MAIN_INVOICES })
-    }
 
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
+        return () => goBack(UNMOUNT)
+    }, []);
 
-    onExpenseSelect = ({ id }) => {
-        const { navigation } = this.props
-
+    const onExpenseSelect = ({ id }) => {
         navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_EDIT, id })
-        this.onResetFilter()
+        onResetFilter()
     }
 
-
-    getItems = ({
-        fresh = false,
-        onResult,
-        filter = false,
-        params,
-    } = {}) => {
-        const { getExpenses } = this.props;
-        const { refreshing, pagination } = this.state;
-
+    const getItems = ({ fresh = false, onResult, filter = false, params } = {}) => {
         if (refreshing) {
             return;
         }
 
-        this.setState({
-            refreshing: true,
-            fresh,
-        });
+        setRefreshing(true);
+        setFresh(fresh);
 
         const paginationParams = fresh ? { ...pagination, page: 1 } : pagination;
 
@@ -99,47 +96,42 @@ export class Expenses extends React.Component<IProps> {
             params,
             filter,
             onMeta: ({ last_page, current_page }) => {
-                this.setState({
-                    pagination: {
-                        ...paginationParams,
-                        lastPage: last_page,
-                        page: current_page + 1,
-                    },
+                setPagination({
+                    ...paginationParams,
+                    lastPage: last_page,
+                    page: current_page + 1,
                 });
             },
             onResult: (val) => {
-                this.setState({
-                    refreshing: false,
-                    fresh: !val,
-                });
+                setRefreshing(false);
+                setFresh(!val);
                 onResult && onResult();
             },
         });
     };
 
-    setFormField = (field, value) => {
-        this.props.dispatch(change(EXPENSE_SEARCH, field, value));
+    const setFormField = (field, value) => {
+        props.dispatch(change(EXPENSE_SEARCH, field, value));
 
         if (field === 'expense_category_id')
-            this.setState({ selectedCategory: value })
+            setSelectedCategory(value)
     };
 
-    onSearch = (search) => {
-        this.onResetFilter()
-        this.setState({ search })
-        this.getItems({ fresh: true, params: { ...params, search } })
+    const onSearch = (keywords) => {
+        onResetFilter()
+        setSearch(keywords)
+        getItems({ fresh: true, params: { ...params, search: keywords } })
     };
 
-    onResetFilter = () => {
-        this.setState({ filter: false })
+    const onResetFilter = () => {
+        setFilter(false)
     }
 
-    onSubmitFilter = ({ from_date, to_date, expense_category_id }) => {
-
+    const onSubmitFilter = ({ from_date, to_date, expense_category_id }) => {
         if (from_date || to_date || expense_category_id) {
-            this.setState({ filter: true })
+            setFilter(false)
 
-            this.getItems({
+            getItems({
                 fresh: true,
                 params: {
                     ...params,
@@ -148,44 +140,32 @@ export class Expenses extends React.Component<IProps> {
                     to_date,
                 },
                 filter: true
-            })
+            });
+            return;
         }
-        else
-            this.onResetFilter()
+
+        onResetFilter();
     }
 
-
-    loadMoreItems = () => {
-        const { search, filter } = this.state
-        const {
-            formValues: {
-                from_date = '',
-                to_date = '',
-                expense_category_id = ''
-            }
-        } = this.props
-
-
-        if (filter) {
-
-            this.getItems({
-                params: {
-                    ...params,
-                    expense_category_id,
-                    from_date,
-                    to_date,
-                },
-                filter: true
-            })
+    const loadMoreItems = () => {
+        if (!filter) {
+            getItems({ params: { ...params, search } });
+            return;
         }
-        else
-            this.getItems({ params: { ...params, search } });
 
+        getItems({
+            params: {
+                ...params,
+                expense_category_id,
+                from_date,
+                to_date,
+            },
+            filter: true
+        });
     }
 
-    getExpensesList = (expenses) => {
+    const getExpensesList = (expenses) => {
         let expensesList = []
-        const { currency } = this.props
 
         if (typeof expenses !== 'undefined' && expenses.length != 0) {
             expensesList = expenses.map((expense) => {
@@ -212,7 +192,7 @@ export class Expenses extends React.Component<IProps> {
         return expensesList
     }
 
-    getCategoriesList = (categories) => {
+    const getCategoriesList = (categories) => {
         let CategoriesList = []
         if (typeof categories !== 'undefined' && categories.length != 0) {
             CategoriesList = categories.map((category) => {
@@ -225,155 +205,125 @@ export class Expenses extends React.Component<IProps> {
         return CategoriesList
     }
 
-    render() {
+    const {
+        lastPage,
+        page,
+    } = pagination;
 
-        const {
-            navigation,
-            expenses,
-            filterExpenses,
-            loading,
-            language,
-            currency,
-            handleSubmit,
-            categories,
-        } = this.props;
+    const canLoadMore = lastPage >= page;
 
-        const {
-            refreshing,
-            pagination: { lastPage, page },
-            fresh,
-            search,
-            filter,
-            selectedCategory,
-            selectedFromDate,
-            selectedToDate,
-            selectedFromDateValue,
-            selectedToDateValue
-        } = this.state;
+    let expensesItem = getExpensesList(expenses);
+    let filterExpensesItem = getExpensesList(filterExpenses);
+    let CategoriesList = getCategoriesList(categories)
+    let dropdownFields = [{
+        name: "expense_category_id",
+        label: Lng.t("expenses.category", { locale: language }),
+        fieldIcon: 'align-center',
+        items: CategoriesList,
+        onChangeCallback: (val) => {
+            setFormField('expense_category_id', val)
+        },
+        defaultPickerOptions: {
+            label: Lng.t("expenses.categoryPlaceholder", { locale: language }),
+            value: '',
+        },
+        selectedItem: selectedCategory,
+        containerStyle: styles.selectPicker
+    }]
 
-        const canLoadMore = lastPage >= page;
-
-        let expensesItem = this.getExpensesList(expenses);
-        let filterExpensesItem = this.getExpensesList(filterExpenses);
-        let CategoriesList = this.getCategoriesList(categories)
-
-
-        let dropdownFields = [{
-            name: "expense_category_id",
-            label: Lng.t("expenses.category", { locale: language }),
-            fieldIcon: 'align-center',
-            items: CategoriesList,
-            onChangeCallback: (val) => {
-                this.setFormField('expense_category_id', val)
+    let datePickerFields = [
+        {
+            name: "from_date",
+            label: Lng.t("expenses.fromDate", { locale: language }),
+            onChangeCallback: (formDate, displayDate) => {
+                setSelectedFromDate(displayDate);
+                setSelectedFromDateValue(formDate);
             },
-            defaultPickerOptions: {
-                label: Lng.t("expenses.categoryPlaceholder", { locale: language }),
-                value: '',
+            selectedDate: selectedFromDate,
+            selectedDateValue: selectedFromDateValue
+        },
+        {
+            name: "to_date",
+            label: Lng.t("expenses.toDate", { locale: language }),
+            onChangeCallback: (formDate, displayDate) => {
+                setSelectedToDate(displayDate);
+                setSelectedToDateValue(formDate);
             },
-            selectedItem: selectedCategory,
-            containerStyle: styles.selectPicker
-        }]
+            selectedDate: selectedToDate,
+            selectedDateValue: selectedToDateValue
+        }
+    ]
 
-        let datePickerFields = [
-            {
-                name: "from_date",
-                label: Lng.t("expenses.fromDate", { locale: language }),
-                onChangeCallback: (formDate, displayDate) => {
-                    this.setState({
-                        selectedFromDate: displayDate,
-                        selectedFromDateValue: formDate
-                    })
-                },
-                selectedDate: selectedFromDate,
-                selectedDateValue: selectedFromDateValue
-            },
-            {
-                name: "to_date",
-                label: Lng.t("expenses.toDate", { locale: language }),
-                onChangeCallback: (formDate, displayDate) => {
-                    this.setState({
-                        selectedToDate: displayDate,
-                        selectedToDateValue: formDate
-                    })
-                },
-                selectedDate: selectedToDate,
-                selectedDateValue: selectedToDateValue
-            }
-        ]
+    let empty = (!filter && !search) ? {
+        description: Lng.t("expenses.empty.description", { locale: language }),
+        buttonTitle: Lng.t("expenses.empty.buttonTitle", { locale: language }),
+        buttonPress: () => {
+            navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_ADD })
+            onResetFilter()
+        }
+    } : {}
 
-        let empty = (!filter && !search) ? {
-            description: Lng.t("expenses.empty.description", { locale: language }),
-            buttonTitle: Lng.t("expenses.empty.buttonTitle", { locale: language }),
-            buttonPress: () => {
-                navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_ADD })
-                this.onResetFilter()
-            }
-        } : {}
+    let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
+        : (!filter) ? Lng.t("expenses.empty.title", { locale: language }) :
+            Lng.t("filter.empty.filterTitle", { locale: language })
 
-        let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
-            : (!filter) ? Lng.t("expenses.empty.title", { locale: language }) :
-                Lng.t("filter.empty.filterTitle", { locale: language })
+    let isLoading = navigation.getParam('loading', false)
 
-        let isLoading = navigation.getParam('loading', false)
+    return (
+        <View style={styles.container}>
+            <MainLayout
+                headerProps={{
+                    rightIcon: "plus",
+                    rightIconPress: () => {
+                        navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_ADD })
+                        onResetFilter()
+                    },
+                    title: Lng.t("header.expenses", { locale: language })
+                }}
+                onSearch={onSearch}
+                bottomDivider
+                filterProps={{
+                    onSubmitFilter: handleSubmit(onSubmitFilter),
+                    datePickerFields: datePickerFields,
+                    dropdownFields: dropdownFields,
+                    clearFilter: props,
+                    language: language,
+                    onResetFilter: () => onResetFilter()
+                }}
+                loadingProps={{ is: isLoading || (loading && fresh) }}
+            >
 
-        return (
-            <View style={styles.container}>
-                <MainLayout
-                    headerProps={{
-                        rightIcon: "plus",
-                        rightIconPress: () => {
-                            navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_ADD })
-                            this.onResetFilter()
-                        },
-                        title: Lng.t("header.expenses", { locale: language })
-                    }}
-                    onSearch={this.onSearch}
-                    bottomDivider
-                    filterProps={{
-                        onSubmitFilter: handleSubmit(this.onSubmitFilter),
-                        datePickerFields: datePickerFields,
-                        dropdownFields: dropdownFields,
-                        clearFilter: this.props,
-                        language: language,
-                        onResetFilter: () => this.onResetFilter()
-                    }}
-                    loadingProps={{ is: isLoading || (loading && fresh) }}
-                >
+                <View style={styles.listViewContainer} >
+                    <ListView
+                        items={!filter ? expensesItem : filterExpensesItem}
+                        onPress={onExpenseSelect}
+                        refreshing={refreshing}
+                        loading={loading}
+                        isEmpty={!filter ? expensesItem.length <= 0 :
+                            filterExpensesItem.length <= 0
+                        }
+                        canLoadMore={canLoadMore}
+                        getFreshItems={(onHide) => {
+                            onResetFilter()
+                            getItems({
+                                fresh: true,
+                                onResult: onHide,
+                                params: { ...params, search }
+                            });
+                        }}
+                        getItems={loadMoreItems}
+                        contentContainerStyle={{ flex: 1 }}
+                        bottomDivider
+                        emptyContentProps={{
+                            title: emptyTitle,
+                            image: IMAGES.EMPTY_EXPENSES,
+                            ...empty
+                        }}
+                        leftSubTitleStyle={{ textAlign: "justify" }}
+                    />
+                </View>
 
-                    <View style={styles.listViewContainer} >
-                        <ListView
-                            items={!filter ? expensesItem : filterExpensesItem}
-                            onPress={this.onExpenseSelect}
-                            refreshing={refreshing}
-                            loading={loading}
-                            isEmpty={!filter ? expensesItem.length <= 0 :
-                                filterExpensesItem.length <= 0
-                            }
-                            canLoadMore={canLoadMore}
-                            getFreshItems={(onHide) => {
-                                this.onResetFilter()
-                                this.getItems({
-                                    fresh: true,
-                                    onResult: onHide,
-                                    params: { ...params, search }
-                                });
-                            }}
-                            getItems={() => {
-                                this.loadMoreItems()
-                            }}
-                            contentContainerStyle={{ flex: 1 }}
-                            bottomDivider
-                            emptyContentProps={{
-                                title: emptyTitle,
-                                image: IMAGES.EMPTY_EXPENSES,
-                                ...empty
-                            }}
-                            leftSubTitleStyle={{ textAlign: "justify" }}
-                        />
-                    </View>
-
-                </MainLayout>
-            </View>
-        );
-    }
+            </MainLayout>
+        </View>
+    );
 }

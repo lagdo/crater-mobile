@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { Field, change } from 'redux-form';
 import styles from './styles';
@@ -38,68 +38,62 @@ type IProps = {
     loading: Boolean,
     handleSubmit: Function,
 }
-export class Report extends React.Component<IProps> {
-    constructor(props) {
-        super(props);
 
-        this.state = {
-            taxTypeList: [],
-            displayFromDate: '',
-            displayToDate: '',
-        }
-    }
+export const Report = (props: IProps) => {
+    const {
+        navigation,
+        handleSubmit,
+        loading,
+        language,
+        initialValues,
+        type,
+        taxTypes,
+    } = props;
 
-    componentWillMount() {
-        const { taxTypes } = this.props;
-        this.setState({ taxTypeList: taxTypes })
-    }
+    const [taxTypeList, setTaxTypeList] = useState(taxTypes);
+    const [displayFromDate, setDisplayFromDate] = useState('');
+    const [displayToDate, setDisplayToDate] = useState('');
 
-    componentDidMount() {
-        const { navigation } = this.props;
+    useEffect(() => {
         goBack(MOUNT, navigation)
-    }
-    componentWillUnmount() {
-        goBack(UNMOUNT)
-    }
 
-    setFormField = (field, value) => {
-        this.props.dispatch(change(REPORT_FORM, field, value));
+        return () => goBack(UNMOUNT)
+    }, []);
+
+    const setFormField = (field, value) => {
+        props.dispatch(change(REPORT_FORM, field, value));
     };
 
-    saveReport = ({ to_date, from_date, report_type }) => {
-
-        const { endpointURL } = store.getState().global;
-
-        const { company } = this.props
+    const saveReport = ({ to_date, from_date, report_type }) => {
+        const { company, endpointURL } = props;
 
         const params = { from_date, to_date }
 
-        const report = this.getReport({ reportType: report_type })
+        const report = getReport({ reportType: report_type })
 
         Linking.openURL(`${endpointURL}/reports/${report}${company.unique_hash}?${QueryString.stringify(params)}`);
-
     };
 
-    getThisDate = (type, time) => {
+    const getThisDate = (type, time) => {
         const date = moment()[type](time)
 
-        type === 'startOf' && this.setState({ displayFromDate: date })
-        type === 'endOf' && this.setState({ displayToDate: date })
+        type === 'startOf' && setDisplayFromDate(date)
+        type === 'endOf' && setDisplayToDate(date)
 
         return date.format(DATE_FORMAT)
     }
 
-    getPreDate = (type, time) => {
+    const getPreDate = (type, time) => {
         const date = moment().subtract(1, time)[type](time)
 
-        type === 'startOf' && this.setState({ displayFromDate: date })
-        type === 'endOf' && this.setState({ displayToDate: date })
+        type === 'startOf' && setDisplayFromDate(date)
+        type === 'endOf' && setDisplayToDate(date)
 
         return date.format(DATE_FORMAT)
     }
 
-    getCurrentFiscalDate = (type, time) => {
-        const { fiscalYear } = this.props
+    const getCurrentFiscalDate = (type, time) => {
+        const { fiscalYear } = props
         const firstMonth = JSON.parse(fiscalYear.split('-')[0]) - 1
         const secondMonth = JSON.parse(fiscalYear.split('-')[1]) - 1
 
@@ -107,16 +101,16 @@ export class Report extends React.Component<IProps> {
 
         if (type === 'startOf') {
             date = date.month(firstMonth)[type]('month')
-            this.setState({ displayFromDate: date })
+            setDisplayFromDate(date)
         } else {
             date = date.month(secondMonth).add(time, 1)[type]('month')
-            this.setState({ displayToDate: date })
+            setDisplayToDate(date)
         }
         return date.format(DATE_FORMAT)
     }
 
-    getPreFiscalDate = (type, time) => {
-        const { fiscalYear } = this.props
+    const getPreFiscalDate = (type, time) => {
+        const { fiscalYear } = props
         const firstMonth = JSON.parse(fiscalYear.split('-')[0]) - 1
         const secondMonth = JSON.parse(fiscalYear.split('-')[1]) - 1
 
@@ -125,86 +119,86 @@ export class Report extends React.Component<IProps> {
         if (type === 'startOf') {
             date = date.month(firstMonth).subtract(time, 1)[type]('month')
 
-            this.setState({ displayFromDate: date })
+            setDisplayFromDate(date)
         } else {
             date = date.month(secondMonth)[type]('month')
 
-            this.setState({ displayToDate: date })
+            setDisplayToDate(date)
         }
 
         return date.format(DATE_FORMAT)
     }
 
-    onDateRangeChange = (val) => {
-        this.setFormField('date_range', val)
+    const onDateRangeChange = (val) => {
+        setFormField('date_range', val)
 
         switch (val) {
             case DATE_RANGE.TODAY:
                 const displayDate = moment()
-                this.setFormField('from_date', displayDate.format(DATE_FORMAT))
-                this.setState({ displayFromDate: displayDate })
-                this.setFormField('to_date', displayDate.format(DATE_FORMAT))
-                this.setState({ displayToDate: displayDate })
+                setFormField('from_date', displayDate.format(DATE_FORMAT))
+                setDisplayFromDate(displayDate)
+                setFormField('to_date', displayDate.format(DATE_FORMAT))
+                setDisplayToDate(displayDate)
                 break;
 
             case DATE_RANGE.THIS_WEEK:
-                this.setFormField('from_date', this.getThisDate('startOf', 'isoWeek'))
-                this.setFormField('to_date', this.getThisDate('endOf', 'isoWeek'))
+                setFormField('from_date', getThisDate('startOf', 'isoWeek'))
+                setFormField('to_date', getThisDate('endOf', 'isoWeek'))
                 break;
 
             case DATE_RANGE.THIS_MONTH:
-                this.setFormField('from_date', this.getThisDate('startOf', 'month'))
-                this.setFormField('to_date', this.getThisDate('endOf', 'month'))
+                setFormField('from_date', getThisDate('startOf', 'month'))
+                setFormField('to_date', getThisDate('endOf', 'month'))
                 break;
 
             case DATE_RANGE.THIS_QUARTER:
-                this.setFormField('from_date', this.getThisDate('startOf', 'quarter'))
-                this.setFormField('to_date', this.getThisDate('endOf', 'quarter'))
+                setFormField('from_date', getThisDate('startOf', 'quarter'))
+                setFormField('to_date', getThisDate('endOf', 'quarter'))
                 break;
 
             case DATE_RANGE.THIS_YEAR:
-                this.setFormField('from_date', this.getThisDate('startOf', 'year'))
-                this.setFormField('to_date', this.getThisDate('endOf', 'year'))
+                setFormField('from_date', getThisDate('startOf', 'year'))
+                setFormField('to_date', getThisDate('endOf', 'year'))
                 break;
 
             case DATE_RANGE.CURRENT_FISCAL_QUARTER:
-                this.setFormField('from_date', this.getCurrentFiscalDate('startOf', 'quarter'))
-                this.setFormField('to_date', this.getCurrentFiscalDate('endOf', 'quarter'))
+                setFormField('from_date', getCurrentFiscalDate('startOf', 'quarter'))
+                setFormField('to_date', getCurrentFiscalDate('endOf', 'quarter'))
                 break;
 
             case DATE_RANGE.CURRENT_FISCAL_YEAR:
-                this.setFormField('from_date', this.getCurrentFiscalDate('startOf', 'year'))
-                this.setFormField('to_date', this.getCurrentFiscalDate('endOf', 'year'))
+                setFormField('from_date', getCurrentFiscalDate('startOf', 'year'))
+                setFormField('to_date', getCurrentFiscalDate('endOf', 'year'))
                 break;
 
             case DATE_RANGE.PREVIOUS_WEEK:
-                this.setFormField('from_date', this.getPreDate('startOf', 'isoWeek'))
-                this.setFormField('to_date', this.getPreDate('endOf', 'isoWeek'))
+                setFormField('from_date', getPreDate('startOf', 'isoWeek'))
+                setFormField('to_date', getPreDate('endOf', 'isoWeek'))
                 break;
 
             case DATE_RANGE.PREVIOUS_MONTH:
-                this.setFormField('from_date', this.getPreDate('startOf', 'month'))
-                this.setFormField('to_date', this.getPreDate('endOf', 'month'))
+                setFormField('from_date', getPreDate('startOf', 'month'))
+                setFormField('to_date', getPreDate('endOf', 'month'))
                 break;
 
             case DATE_RANGE.PREVIOUS_QUARTER:
-                this.setFormField('from_date', this.getPreDate('startOf', 'quarter'))
-                this.setFormField('to_date', this.getPreDate('endOf', 'quarter'))
+                setFormField('from_date', getPreDate('startOf', 'quarter'))
+                setFormField('to_date', getPreDate('endOf', 'quarter'))
                 break;
 
             case DATE_RANGE.PREVIOUS_YEAR:
-                this.setFormField('from_date', this.getPreDate('startOf', 'year'))
-                this.setFormField('to_date', this.getPreDate('endOf', 'year'))
+                setFormField('from_date', getPreDate('startOf', 'year'))
+                setFormField('to_date', getPreDate('endOf', 'year'))
                 break;
 
             case DATE_RANGE.PREVIOUS_FISCAL_QUARTER:
-                this.setFormField('from_date', this.getPreFiscalDate('startOf', 'quarter'))
-                this.setFormField('to_date', this.getPreFiscalDate('endOf', 'quarter'))
+                setFormField('from_date', getPreFiscalDate('startOf', 'quarter'))
+                setFormField('to_date', getPreFiscalDate('endOf', 'quarter'))
                 break;
 
             case DATE_RANGE.PREVIOUS_FISCAL_YEAR:
-                this.setFormField('from_date', this.getPreFiscalDate('startOf', 'year'))
-                this.setFormField('to_date', this.getPreFiscalDate('endOf', 'year'))
+                setFormField('from_date', getPreFiscalDate('startOf', 'year'))
+                setFormField('to_date', getPreFiscalDate('endOf', 'year'))
                 break;
 
             default:
@@ -212,14 +206,12 @@ export class Report extends React.Component<IProps> {
         }
     }
 
-    BOTTOM_ACTION = (handleSubmit) => {
-        const { language, loading } = this.props
-
+    const BOTTOM_ACTION = () => {
         return (
             <View style={styles.submitButton}>
                 <View style={{ flex: 1 }}>
                     <CtButton
-                        onPress={handleSubmit(this.saveReport)}
+                        onPress={handleSubmit(saveReport)}
                         btnTitle={Lng.t("button.generateReport", { locale: language })}
                         containerStyle={styles.handleBtn}
                         loading={loading}
@@ -229,9 +221,7 @@ export class Report extends React.Component<IProps> {
         )
     }
 
-    getReport = ({ isTitle, reportType = '' }) => {
-        const { type, language } = this.props
-
+    const getReport = ({ isTitle, reportType = '' }) => {
         let data = ''
 
         switch (type) {
@@ -265,89 +255,74 @@ export class Report extends React.Component<IProps> {
         return data
     }
 
-    render() {
-        const {
-            navigation,
-            handleSubmit,
-            loading,
-            language,
-            initialValues,
-            type
-        } = this.props;
+    return (
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: () => navigation.navigate(ROUTES.REPORTS),
+                title: getReport({ isTitle: true }),
+                titleStyle: headerTitle({ marginLeft: -26, marginRight: -50 }),
+                placement: "center",
+            }}
+            bottomAction={BOTTOM_ACTION()}
+            loadingProps={{
+                is: loading,
+            }}
+        >
+            <View style={styles.bodyContainer}>
+                <Field
+                    name="date_range"
+                    label={Lng.t("reports.dateRange", { locale: language })}
+                    component={SelectPickerField}
+                    isRequired
+                    fieldIcon='calendar-week'
+                    items={DATE_RANGE_OPTION(language, Lng)}
+                    onChangeCallback={onDateRangeChange}
+                    fakeInputContainerStyle={styles.selectPickerField}
+                />
 
-        const { displayFromDate, displayToDate } = this.state
-
-        return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: () => navigation.navigate(ROUTES.REPORTS),
-                    title: this.getReport({ isTitle: true }),
-                    titleStyle: headerTitle({ marginLeft: -26, marginRight: -50 }),
-                    placement: "center",
-                }}
-                bottomAction={this.BOTTOM_ACTION(handleSubmit)}
-                loadingProps={{
-                    is: loading,
-                }}
-            >
-                <View style={styles.bodyContainer}>
-                    <Field
-                        name="date_range"
-                        label={Lng.t("reports.dateRange", { locale: language })}
-                        component={SelectPickerField}
-                        isRequired
-                        fieldIcon='calendar-week'
-                        items={DATE_RANGE_OPTION(language, Lng)}
-                        onChangeCallback={this.onDateRangeChange}
-                        fakeInputContainerStyle={styles.selectPickerField}
-                    />
-
-                    <View style={styles.dateFieldContainer}>
-                        <View style={styles.dateField}>
-                            <Field
-                                name={'from_date'}
-                                component={DatePickerField}
-                                isRequired
-                                displayValue={displayFromDate}
-                                label={Lng.t("reports.fromDate", { locale: language })}
-                                onChangeCallback={(val) => {
-                                    this.setFormField('date_range', 'custom')
-                                    this.setState({ displayFromDate: '' })
-                                }}
-                            />
-                        </View>
-                        <View style={styles.dateField}>
-                            <Field
-                                name="to_date"
-                                component={DatePickerField}
-                                isRequired
-                                displayValue={displayToDate}
-                                label={Lng.t("reports.toDate", { locale: language })}
-                                onChangeCallback={(val) => {
-                                    this.setFormField('date_range', 'custom')
-                                    this.setState({ displayToDate: '' })
-                                }}
-                            />
-                        </View>
-                    </View>
-
-                    {type === SALES && (
+                <View style={styles.dateFieldContainer}>
+                    <View style={styles.dateField}>
                         <Field
-                            name="report_type"
-                            label={Lng.t("reports.reportType", { locale: language })}
-                            component={SelectPickerField}
-                            fieldIcon='vial'
-                            items={REPORT_TYPE_OPTION(language, Lng)}
+                            name={'from_date'}
+                            component={DatePickerField}
+                            isRequired
+                            displayValue={displayFromDate}
+                            label={Lng.t("reports.fromDate", { locale: language })}
                             onChangeCallback={(val) => {
-                                this.setFormField('report_type', val)
+                                setFormField('date_range', 'custom')
+                                setDisplayFromDate('')
                             }}
-                            fakeInputContainerStyle={styles.selectPickerField}
                         />
-                    )}
+                    </View>
+                    <View style={styles.dateField}>
+                        <Field
+                            name="to_date"
+                            component={DatePickerField}
+                            isRequired
+                            displayValue={displayToDate}
+                            label={Lng.t("reports.toDate", { locale: language })}
+                            onChangeCallback={(val) => {
+                                setFormField('date_range', 'custom')
+                                setDisplayToDate('')
+                            }}
+                        />
+                    </View>
                 </View>
 
-            </DefaultLayout>
-
-        );
-    }
+                {type === SALES && (
+                    <Field
+                        name="report_type"
+                        label={Lng.t("reports.reportType", { locale: language })}
+                        component={SelectPickerField}
+                        fieldIcon='vial'
+                        items={REPORT_TYPE_OPTION(language, Lng)}
+                        onChangeCallback={(val) => {
+                            setFormField('report_type', val)
+                        }}
+                        fakeInputContainerStyle={styles.selectPickerField}
+                    />
+                )}
+            </View>
+        </DefaultLayout>
+    );
 }
