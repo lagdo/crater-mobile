@@ -2,14 +2,10 @@
 
 import { AsyncStorage } from 'react-native';
 // import RNFetchBlob from 'rn-fetch-blob'
-
-import { NavigationActions } from 'react-navigation';
-import { store } from '../store';
 import { env } from '../config';
 import { NAVIGATION_PERSIST_KEY } from './consts/core';
 import { ROUTES } from '../navigation/routes';
 import { isIosPlatform, checkConnection, checkExpiredToken } from './helper';
-import { resetIdToken } from '../features/authentication/actions';
 
 type IProps = {
     path: string,
@@ -18,7 +14,13 @@ type IProps = {
     body?: Object,
 };
 
+let props = null;
+
 export default class Request {
+    static setProps(p) {
+        props = p;
+    }
+
     static async getIdToken() {
         const data = await AsyncStorage.getItem(NAVIGATION_PERSIST_KEY);
 
@@ -44,6 +46,7 @@ export default class Request {
     static patch(params) {
         return this.request({ method: 'PATCH', ...params });
     }
+
     static async request({
         path,
         method,
@@ -56,10 +59,13 @@ export default class Request {
         isPing = null,
         type = 'create',
     }: IProps) {
-        const reduxStore = store.getState();
-
-        const { idToken, expiresIn = null } = reduxStore.auth;
-        const { endpointApi, company } = reduxStore.global;
+        const {
+            idToken,
+            expiresIn = null,
+            endpointApi,
+            company,
+            navigation,
+        } = props;
 
         let apiUrl = (endpointApi !== null && typeof endpointApi !== 'undefined') ? endpointApi : env.ENDPOINT_API
 
@@ -73,24 +79,15 @@ export default class Request {
         const isExpired = checkExpiredToken(expiresIn)
 
         if (!isConnected) {
-            store.dispatch(
-                NavigationActions.navigate({
-                    routeName: ROUTES.LOST_CONNECTION,
-                }),
-            );
+            navigation.navigate(ROUTES.LOST_CONNECTION);
             return
         }
 
         if (isExpired && isAuthRequired) {
-            store.dispatch(resetIdToken());
-            store.dispatch(
-                NavigationActions.navigate({
-                    routeName: ROUTES.AUTH,
-                }),
-            );
+            resetIdToken();
+            navigation.navigate(ROUTES.AUTH);
             return
         }
-
 
         const ID_TOKEN = await this.getIdToken();
         const defaultHeaders = image
@@ -143,11 +140,7 @@ export default class Request {
             }
 
             if (response.status === 401) {
-                store.dispatch(
-                    NavigationActions.navigate({
-                        routeName: ROUTES.AUTH,
-                    }),
-                );
+                navigation.navigate(ROUTES.AUTH);
             }
 
             if (response.status === 403 || response.status === 404) {

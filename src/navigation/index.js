@@ -5,6 +5,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { AuthNavigator } from './navigators/auth';
 import { HomeNavigator } from './navigators/home';
 import { ROUTES } from './routes';
+import { resetIdToken } from '../features/authentication/actions'
+import Request from '../api/request';
 
 const Stack = createStackNavigator();
 const navigationOptions = {
@@ -19,7 +21,9 @@ type IProps = {
 };
 
 const AppNavigatorComponent = (props: IProps) => {
-    const { idToken } = props;
+    const { endpointApi, endpointURL, idToken } = props;
+
+    Request.setProps(props);
 
     return (
     <NavigationContainer>
@@ -34,10 +38,20 @@ const AppNavigatorComponent = (props: IProps) => {
     );
 }
 
-const mapStateToProps = ({ auth: { idToken } }) => ({ idToken });
+const mapStateToProps = (state) => {
+    const {
+        auth: { idToken, expiresIn = null },
+        global: { endpointApi, endpointURL, company },
+    } = state;
+
+    return { idToken, expiresIn, endpointApi, endpointURL, company };
+};
+
+const mapDispatchToProps = { resetIdToken };
 
 export const AppNavigator = connect(
     mapStateToProps,
+    mapDispatchToProps
 )(AppNavigatorComponent);
 
 export default AppNavigator;
