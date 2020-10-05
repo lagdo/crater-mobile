@@ -4,7 +4,6 @@ import React from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
 import { Field } from 'redux-form';
-import { NavigationEvents } from 'react-navigation';
 import { styles } from './styles';
 import { InputField, CtHeader, CtDivider } from '../..';
 import { Content } from '../../Content';
@@ -42,9 +41,6 @@ const MainLayoutComponent = ({
 
     return (
         <View style={styles.page}>
-            <NavigationEvents
-                onWillFocus={onFocus && onFocus}
-            />
             <View style={styles.content}>
                 <CtHeader
                     titleStyle={styles.headerTitleStyle}
