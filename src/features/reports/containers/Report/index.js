@@ -47,8 +47,4 @@ const ReportContainer = connect(
     mapDispatchToProps,
 )(ReportReduxForm);
 
-ReportContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default ReportContainer;

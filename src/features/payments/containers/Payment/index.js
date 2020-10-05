@@ -67,8 +67,4 @@ const AddEditPaymentContainer = connect(
     mapDispatchToProps,
 )(addEditPaymentReduxForm);
 
-AddEditPaymentContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default AddEditPaymentContainer;

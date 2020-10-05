@@ -26,8 +26,4 @@ const TaxesContainer = connect(
     mapDispatchToProps,
 )(TaxesReduxForm);
 
-TaxesContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default TaxesContainer;

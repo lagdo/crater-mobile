@@ -71,8 +71,4 @@ const CustomizeContainer = connect(
     mapDispatchToProps,
 )(CustomizeReduxForm);
 
-CustomizeContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default CustomizeContainer;

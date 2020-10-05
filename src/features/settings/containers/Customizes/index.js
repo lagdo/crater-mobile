@@ -29,8 +29,4 @@ const CustomizesContainer = connect(
     mapDispatchToProps,
 )(Customizes);
 
-CustomizesContainer.navigationOptions = () => ({
-    header: null
-});
-
 export default CustomizesContainer;

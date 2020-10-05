@@ -80,8 +80,4 @@ const InvoiceContainer = connect(
     mapDispatchToProps,
 )(addInvoiceReduxForm);
 
-InvoiceContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default InvoiceContainer;

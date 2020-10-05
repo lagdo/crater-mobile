@@ -31,9 +31,4 @@ const AddressContainer = connect(
     mapDispatchToProps,
 )(addressReduxForm);
 
-AddressContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default AddressContainer;
-

@@ -36,9 +36,4 @@ const LoginContainer = connect(
     mapDispatchToProps,
 )(loginReduxForm);
 
-LoginContainer.navigationOptions = {
-    header: null,
-};
-
 export default LoginContainer;
-

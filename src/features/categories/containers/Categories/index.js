@@ -26,8 +26,4 @@ const CategoriesContainer = connect(
     mapDispatchToProps,
 )(categoriesSearchReduxForm);
 
-CategoriesContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default CategoriesContainer;

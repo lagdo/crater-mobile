@@ -63,8 +63,4 @@ const PreferencesContainer = connect(
     mapDispatchToProps,
 )(PreferencesReduxForm);
 
-PreferencesContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default PreferencesContainer;

@@ -53,8 +53,4 @@ const AccountContainer = connect(
     mapDispatchToProps,
 )(AccountReduxForm);
 
-AccountContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default AccountContainer;

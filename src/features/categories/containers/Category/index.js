@@ -50,8 +50,4 @@ const AddEditCategoryContainer = connect(
     mapDispatchToProps,
 )(addEditPaymentReduxForm);
 
-AddEditCategoryContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default AddEditCategoryContainer;

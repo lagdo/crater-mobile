@@ -67,8 +67,4 @@ const EstimateItemContainer = connect(
     mapDispatchToProps,
 )(addItemReduxForm);
 
-EstimateItemContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default EstimateItemContainer;

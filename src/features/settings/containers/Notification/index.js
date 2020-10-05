@@ -42,8 +42,4 @@ const NotificationContainer = connect(
     mapDispatchToProps,
 )(NotificationReduxForm);
 
-NotificationContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default NotificationContainer;

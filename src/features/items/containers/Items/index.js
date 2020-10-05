@@ -46,8 +46,4 @@ const ItemsContainer = connect(
     mapDispatchToProps,
 )(ItemsSearchReduxForm);
 
-ItemsContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default ItemsContainer;

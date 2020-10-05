@@ -27,8 +27,4 @@ const ForgotPasswordContainer = connect(
     mapDispatchToProps,
 )(forgotPasswordReduxForm);
 
-ForgotPasswordContainer.navigationOptions = {
-    header: null,
-};
-
 export default ForgotPasswordContainer;

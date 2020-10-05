@@ -46,10 +46,4 @@ const EndpointContainer = connect(
     mapDispatchToProps,
 )(EndpointReduxForm);
 
-EndpointContainer.navigationOptions = () => ({
-    header: null
-});
-
 export default EndpointContainer;
-
-

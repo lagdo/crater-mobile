@@ -61,9 +61,4 @@ const AddEditCustomerContainer = connect(
     mapDispatchToProps,
 )(addEditCustomerReduxForm);
 
-AddEditCustomerContainer.navigationOptions = () => ({
-    header: null,
-});
-
-
 export default AddEditCustomerContainer;
