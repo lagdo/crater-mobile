@@ -11,7 +11,6 @@ import {
 import { Field, change } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { EDIT_LANGUAGE_AND_CURRENCY } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { SymbolStyle } from '../../../../components/CurrencyFormat/styles';
 import { headerTitle } from '../../../../api/helper';
 
@@ -55,10 +54,6 @@ export const LanguageAndCurrency = (props: IProps) =>  {
                 setLanguageList(getLanguagesList(languages))
             }
         })
-
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const setFormField = (field, value) => {

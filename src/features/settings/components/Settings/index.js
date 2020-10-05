@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { ListView, DefaultLayout } from '../../../../components';
@@ -8,7 +8,6 @@ import { ROUTES } from '../../../../navigation/routes';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
 import { SETTINGS_MENU } from '../../constants';
-import { MOUNT, goBack, UNMOUNT } from '../../../../navigation/actions';
 
 export const Settings = (props) => {
     const {
@@ -16,12 +15,6 @@ export const Settings = (props) => {
     } = props;
 
     // const [endpointVisible, setEndpointVisible] = useState(false);
-
-    useEffect(() => {
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_MORE });
-
-        return () => goBack(UNMOUNT);
-    }, []);
 
     const onSelectMenu = (item) => {
         if (item.route) {

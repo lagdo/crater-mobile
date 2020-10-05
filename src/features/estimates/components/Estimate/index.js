@@ -31,7 +31,7 @@ import {
 import { BUTTON_TYPE } from '../../../../api/consts/core';
 import { colors } from '../../../../styles/colors';
 import { TemplateField } from '../TemplateField';
-import { MOUNT, UNMOUNT, goBack } from '../../../../navigation/actions';
+import { setOnBackHandler, removeBackHandler } from '../../../../navigation/actions';
 import Lng from '../../../../api/lang/i18n';
 import { ESTIMATE_DISCOUNT_OPTION } from '../../constants';
 import { CUSTOMER_ADD } from '../../../customers/constants';
@@ -103,7 +103,7 @@ export const Estimate = (props: IProps) => {
         type === ESTIMATE_EDIT ?
             getEditEstimate({
                 id: navigation.getParam('id'),
-                onResult: ({ user: { currency, name }, status }) => {
+                onResult: ({ user, status }) => {
                     setCurrency(user.currency)
                     setCustomerName(user.name)
                     setMarkAsStatus(status)
@@ -117,18 +117,14 @@ export const Estimate = (props: IProps) => {
 
         getEstimateItemList(estimateItems)
 
-        androidBackHandler()
+        setOnBackHandler(() => onDraft(handleSubmit))
 
         return () => {
             const { clearEstimate } = props
             clearEstimate();
-            goBack(UNMOUNT)
+            removeBackHandler();
         }
     }, []);
-
-    const androidBackHandler = () => {
-        goBack(MOUNT, navigation, { callback: () => onDraft(handleSubmit) })
-    }
 
     const setFormField = (field, value) => {
         props.dispatch(change(ESTIMATE_FORM, field, value));

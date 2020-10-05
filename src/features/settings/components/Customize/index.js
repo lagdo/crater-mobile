@@ -15,7 +15,6 @@ import {
 import { ROUTES } from '../../../../navigation/routes';
 import { CUSTOMIZE_FORM, CUSTOMIZE_TYPE, PAYMENT_TABS } from '../../constants';
 import Lng from '../../../../api/lang/i18n';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { headerTitle } from '../../../../api/helper';
 import { PaymentModes } from './PaymentModes'
 import { Units } from './Units';
@@ -60,12 +59,8 @@ export const Customize = (props: IProps) =>  {
 
         setData(setParams())
 
-        goBack(MOUNT, navigation)
-
         return () => {
-            isUpdateAutoGenerate &&
-                setCustomizeSettings({ customizes: null })
-            goBack(UNMOUNT)
+            isUpdateAutoGenerate && setCustomizeSettings({ customizes: null })
         }
     }, []);
 

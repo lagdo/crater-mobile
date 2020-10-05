@@ -14,7 +14,6 @@ import {
 } from '../../../../components';
 import { ROUTES } from '../../../../navigation/routes';
 import { EXPENSE_FORM, EXPENSE_ADD, EXPENSE_EDIT, EXPENSE_ACTIONS, ACTIONS_VALUE } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import Lng from '../../../../api/lang/i18n';
 import { CATEGORY_ADD } from '../../../settings/constants';
 import { Linking } from 'expo';
@@ -92,12 +91,7 @@ export const Expense = (props) => {
             })
         }
 
-        goBack(MOUNT, navigation)
-
-        return () => {
-            clearExpense()
-            goBack(UNMOUNT)
-        }
+        return () => clearExpense();
     }, []);
 
     const setFormField = (field, value) => {

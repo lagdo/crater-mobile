@@ -7,7 +7,6 @@ import { DefaultLayout, CtButton, InputField, FilePicker, AssetImage, SelectFiel
 import { Field, change } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { EDIT_COMPANY } from '../../constants';
-import { goBack, UNMOUNT, MOUNT } from '../../../../navigation/actions';
 import { MAX_LENGTH, formatCountries } from '../../../../api/global';
 
 
@@ -71,10 +70,6 @@ export const Company = (props: IProps) =>  {
                 }
             }
         });
-
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const setFormField = (field, value) => {

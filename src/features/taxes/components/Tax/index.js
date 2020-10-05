@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { DefaultLayout, CtButton, InputField, ToggleSwitch } from '../../../../components';
@@ -9,7 +9,6 @@ import { BUTTON_COLOR } from '../../../../api/consts/core';
 import { Field } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { ADD_TAX } from '../../constants';
-import { UNMOUNT, MOUNT, goBack } from '../../../../navigation/actions';
 import { MAX_LENGTH, alertMe } from '../../../../api/global';
 
 export const Tax = (props) => {
@@ -27,12 +26,6 @@ export const Tax = (props) => {
     } = props
 
     const isCreate = (type === ADD_TAX)
-
-    useEffect(() => {
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT)
-    }, []);
 
     const onSave = (tax) => {
         if (!loading) {

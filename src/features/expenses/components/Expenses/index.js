@@ -9,7 +9,6 @@ import { ROUTES } from '../../../../navigation/routes';
 import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
 import { EXPENSE_ADD, EXPENSE_EDIT, EXPENSE_SEARCH } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 
 let params = {
     search: '',
@@ -63,10 +62,6 @@ export const Expenses = (props: IProps) => {
         getCategories()
 
         getItems({ fresh: true });
-
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_INVOICES })
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const onExpenseSelect = ({ id }) => {

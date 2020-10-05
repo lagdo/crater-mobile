@@ -12,7 +12,6 @@ import { ROUTES } from '../../../../navigation/routes';
 import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
 import { PAYMENT_ADD, PAYMENT_EDIT, PAYMENT_SEARCH } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { formatSelectPickerName } from '../../../../api/global';
 
 let params = {
@@ -64,10 +63,6 @@ export const Payments = (props: IProps) => {
     useEffect(() => {
         getItems({ fresh: true });
         getPaymentModes()
-
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_INVOICES })
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const onPaymentSelect = (payment) => {

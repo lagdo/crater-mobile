@@ -8,7 +8,6 @@ import { ROUTES } from '../../../../navigation/routes';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
 import { CUSTOMIZES_MENU } from '../../constants';
-import { MOUNT, goBack, UNMOUNT } from '../../../../navigation/actions';
 
 export const Customizes = (props) =>  {
     const {
@@ -24,10 +23,6 @@ export const Customizes = (props) =>  {
         getCustomizeSettings()
         getPaymentModes()
         getItemUnits()
-
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const onSelectMenu = ({ route, type }) => {

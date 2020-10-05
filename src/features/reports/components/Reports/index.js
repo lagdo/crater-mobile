@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { ListView, DefaultLayout } from '../../../../components';
@@ -8,18 +8,11 @@ import { ROUTES } from '../../../../navigation/routes';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
 import { REPORTS_MENU } from '../../constants';
-import { MOUNT, goBack, UNMOUNT } from '../../../../navigation/actions';
 
 export const Reports = (props) => {
     const {
         navigation,
     } = props;
-
-    useEffect(() => {
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_MORE })
-
-        return () => goBack(UNMOUNT)
-    }, []);
 
     const onSelectMenu = ({ route, type }) => {
         if (route) {

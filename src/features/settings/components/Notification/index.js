@@ -14,8 +14,6 @@ import { Field, change } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { NOTIFICATION } from '../../constants';
 import { colors } from '../../../../styles/colors';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
-
 
 type IProps = {
     navigation: Object,
@@ -56,10 +54,6 @@ export const Notification = (props: IProps) => {
                 setFormField('notification_email', val)
             }
         })
-
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const toastMsg = navigation.getParam('toastMsg', null)

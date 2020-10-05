@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { Field } from 'redux-form';
 import styles from './styles';
@@ -14,7 +14,6 @@ import {
 import { Text } from 'react-native-elements';
 import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 
 type IProps = {
     navigation: Object,
@@ -34,12 +33,6 @@ export const ForgotPassword = (props: IProps) => {
 
     const [lastEmail, setLastEmail] = useState('');
     const [isMailSent, setMailSent] = useState(false);
-
-    useEffect(() => {
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
-    }, []);
 
     const onSendMail = ({ email }) => {
         sendForgotPasswordMail({

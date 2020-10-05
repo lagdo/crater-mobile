@@ -10,7 +10,6 @@ import {
     DefaultLayout
 } from '../../../../components';
 import { BUTTON_COLOR } from '../../../../api/consts/core';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import Lng from '../../../../api/lang/i18n';
 import { CATEGORY_EDIT, CATEGORY_ADD, CATEGORY_FORM } from '../../constants';
 import { ROUTES } from '../../../../navigation/routes';
@@ -55,12 +54,6 @@ export const Category = (props: IProps) => {
                 }
             });
         }
-
-        !onFirstTimeCreateExpense ?
-            goBack(MOUNT, navigation) :
-            goBack(MOUNT, navigation, { route: ROUTES.MAIN_EXPENSES })
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const setFormField = (field, value) => {
@@ -75,7 +68,7 @@ export const Category = (props: IProps) => {
                     onResult: (res) => {
                         onFirstTimeCreateExpense && onFirstTimeCreateExpense(res)
 
-                        navigation.goBack(null)
+                        navigation.goBack()
                     }
                 })
             else {
@@ -130,10 +123,7 @@ export const Category = (props: IProps) => {
     return (
         <DefaultLayout
             headerProps={{
-                leftIconPress: () => {
-                    !onFirstTimeCreateExpense ? navigation.goBack(null) :
-                        navigation.navigate(ROUTES.MAIN_EXPENSES)
-                },
+                leftIconPress: navigation.goBack,
                 title: type === CATEGORY_EDIT ?
                     Lng.t("header.editCategory") :
                     Lng.t("header.addCategory"),

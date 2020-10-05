@@ -8,8 +8,6 @@ import { IMAGES } from '../../../../config';
 import { ROUTES } from '../../../../navigation/routes';
 import Lng from '../../../../api/lang/i18n';
 import { CUSTOMER_ADD, CUSTOMER_EDIT } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
-
 
 type IProps = {
     customers: Object,
@@ -51,10 +49,7 @@ export const Customers = (props: IProps) => {
     const [filter, setFilter] = useState(false);
 
     useEffect(() => {
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_INVOICES })
         getItems({ fresh: true });
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const getItems = ({ fresh = false, params, onResult, filter = false } = {}) => {

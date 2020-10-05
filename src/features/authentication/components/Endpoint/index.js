@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     KeyboardAvoidingView,
@@ -15,7 +15,6 @@ import { InputField, CtButton, AssetImage, CtGradientButton, CtHeader } from '..
 import Lng from '../../../../api/lang/i18n';
 import { ROUTES } from '../../../../navigation/routes';
 import { IMAGES } from '../../../../config';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { alertMe } from '../../../../api/global';
 
 type IProps = {
@@ -43,12 +42,6 @@ export const Endpoint = (props: IProps) => {
     } = props;
 
     const [isFocus, setFocus] = useState(false);
-
-    useEffect(() => {
-        skipEndpoint && goBack(MOUNT, navigation, { route: ROUTES.SETTING_LIST })
-
-        return () => skipEndpoint && goBack(UNMOUNT);
-    }, []);
 
     const onSetEndpointApi = ({ endpointURL }) => {
 

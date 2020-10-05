@@ -18,7 +18,6 @@ import { ITEM_FORM, EDIT_ITEM, ADD_ITEM, ITEM_UNITS } from '../../constants';
 import { BUTTON_COLOR } from '../../../../api/consts/core';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
-import { goBack, UNMOUNT, MOUNT } from '../../../../navigation/actions';
 import { ADD_TAX } from '../../../settings/constants';
 import { MAX_LENGTH, alertMe, formatSelectPickerName, hasValue } from '../../../../api/global';
 
@@ -55,14 +54,11 @@ export const Item = (props) => {
             onResult: (res) => setTaxPerItem(res === 'YES')
         })
 
-        goBack(MOUNT, navigation)
-
         const isEdit = (type === EDIT_ITEM)
         isEdit && getEditItem({ id: itemId })
 
         return () => {
             clearItem()
-            goBack(UNMOUNT)
         }
     }, []);
 

@@ -1,14 +1,12 @@
 // @flow
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { MainLayout, ListView } from '../../../../components';
 import { MORE_MENU } from '../../constants';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
-import { ROUTES } from '../../../../navigation/routes';
 import { alertMe } from '../../../../api/global';
 
 export const More = (props) => {
@@ -16,12 +14,6 @@ export const More = (props) => {
         navigation,
         logout,
     } = props;
-
-    useEffect(() => {
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_INVOICES });
-
-        return () => goBack(UNMOUNT);
-    }, []);
 
     const onLogout = () => {
         alertMe({

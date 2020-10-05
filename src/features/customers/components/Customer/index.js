@@ -13,7 +13,6 @@ import {
     SelectField,
 } from '../../../../components';
 import { CUSTOMER_FORM, CUSTOMER_EDIT, CUSTOMER_ADD, CUSTOMER_ACTIONS, ACTIONS_VALUE } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import AddressContainer from '../../containers/Address';
 import Lng from '../../../../api/lang/i18n';
 import { colors } from '../../../../styles/colors';
@@ -117,10 +116,6 @@ export const Customer = (props: IProps) =>  {
                 setSelectedCurrency(name)
             }
         }
-
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const setFormField = (field, value) => {

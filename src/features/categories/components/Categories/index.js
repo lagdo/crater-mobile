@@ -10,7 +10,6 @@ import {
 import { ROUTES } from '../../../../navigation/routes';
 import Lng from '../../../../api/lang/i18n';
 import { CATEGORY_ADD, CATEGORY_EDIT } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 
 type IProps = {
     navigation: Object,
@@ -34,10 +33,6 @@ export const Categories = (props: IProps) => {
 
     useEffect(() => {
         getExpenseCategories();
-
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const onSelectCategory = (category) => {

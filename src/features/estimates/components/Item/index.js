@@ -26,7 +26,6 @@ import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
 import { ADD_TAX } from '../../../settings/constants';
 import { MAX_LENGTH, formatSelectPickerName, alertMe } from '../../../../api/global';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 
 export const EstimateItem = (props) => {
     const {
@@ -51,10 +50,6 @@ export const EstimateItem = (props) => {
 
     useEffect(() => {
         !itemId && getItemUnits && getItemUnits()
-
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const setFormField = (field, value) => {

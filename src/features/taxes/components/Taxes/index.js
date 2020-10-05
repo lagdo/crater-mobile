@@ -1,13 +1,12 @@
 // @flow
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { ListView, MainLayout } from '../../../../components';
 import { ROUTES } from '../../../../navigation/routes';
 import Lng from '../../../../api/lang/i18n';
 import { EDIT_TAX, ADD_TAX } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { itemsDescriptionStyle } from '../../../invoices/components/Invoice/styles';
 
 export const Taxes = (props) => {
@@ -22,12 +21,6 @@ export const Taxes = (props) => {
     const [search, setSearch] = useState('');
     const [found, setFound] = useState(true);
     const [taxesFilter, setTaxesFilter] = useState([]);
-
-    useEffect(() => {
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT)
-    }, []);
 
     const onSearch = (keywords) => {
         let searchFields = [

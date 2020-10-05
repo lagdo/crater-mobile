@@ -13,7 +13,6 @@ import {
 import { Field, change } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { EDIT_PREFERENCES } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { headerTitle } from '../../../../api/helper';
 
 type IProps = {
@@ -75,10 +74,6 @@ export const Preferences = (props: IProps) => {
                 setTaxPerItem(val !== null ? val : 'NO')
             }
         })
-
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const setFormField = (field, value) => {

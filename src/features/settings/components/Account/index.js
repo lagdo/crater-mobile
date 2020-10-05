@@ -7,7 +7,6 @@ import { DefaultLayout, CtButton, InputField, CtDivider, FilePicker } from '../.
 import { Field, change } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { EDIT_ACCOUNT } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { headerTitle } from '../../../../api/helper';
 import { env, IMAGES } from '../../../../config';
 
@@ -45,10 +44,6 @@ export const Account = (props: IProps) =>  {
                 setAvatarUrl(avatar)
             }
         })
-
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const setFormField = (field, value) => {

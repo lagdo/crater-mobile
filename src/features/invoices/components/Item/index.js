@@ -24,7 +24,6 @@ import {
 import { BUTTON_COLOR } from '../../../../api/consts/core';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { ADD_TAX } from '../../../settings/constants';
 import { MAX_LENGTH, formatSelectPickerName, alertMe } from '../../../../api/global';
 
@@ -51,10 +50,6 @@ export const InvoiceItem = (props) => {
 
     useEffect(() => {
         !itemId && getItemUnits && getItemUnits()
-
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const setFormField = (field, value) => {

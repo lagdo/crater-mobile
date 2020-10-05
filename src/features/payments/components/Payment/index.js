@@ -16,7 +16,6 @@ import {
 } from '../../../../components';
 import { ROUTES } from '../../../../navigation/routes';
 import { DATE_FORMAT } from '../../../../api/consts/core';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { PAYMENT_ADD, PAYMENT_EDIT, PAYMENT_FORM, PAYMENT_ACTIONS, ACTIONS_VALUE } from '../../constants';
 import Lng from '../../../../api/lang/i18n';
 import { IMAGES } from '../../../../config';
@@ -144,11 +143,10 @@ export const Payment = (props: IProps) => {
                 }
             });
         }
-
-        goBack(MOUNT, navigation, { route: hasRecordPayment ? null : ROUTES.MAIN_PAYMENTS })
-
-        return () => goBack(UNMOUNT)
     }, []);
+
+    const onBack = () => hasRecordPayment ?
+        navigation.navigate(ROUTES.MAIN_INVOICES) : navigation.goBack();
 
     const setRecordPaymentField = () => {
         const {
@@ -320,7 +318,7 @@ export const Payment = (props: IProps) => {
     return (
         <DefaultLayout
             headerProps={{
-                leftIconPress: () => navigation.goBack(null),
+                leftIconPress: onBack,
                 title: type === PAYMENT_EDIT ?
                     Lng.t("header.editPayment") :
                     Lng.t("header.addPayment"),

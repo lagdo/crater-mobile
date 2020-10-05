@@ -12,7 +12,6 @@ import { ROUTES } from '../../../../navigation/routes';
 import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
 import { ADD_ITEM, EDIT_ITEM, ITEM_SEARCH } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { itemsDescriptionStyle } from '../../../invoices/components/Invoice/styles';
 import { formatSelectPickerName } from '../../../../api/global';
 
@@ -63,10 +62,6 @@ export const Items = (props: IProps) => {
     useEffect(() => {
         getItems({ fresh: true });
         getItemUnits()
-
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_MORE })
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const onItemSelect = ({ id }) => {

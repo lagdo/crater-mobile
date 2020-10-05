@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Field, change } from 'redux-form';
 import styles from './styles';
@@ -26,7 +26,6 @@ import moment from 'moment';
 import { Linking } from 'expo';
 import { env } from '../../../../config';
 import QueryString from 'qs';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { headerTitle } from '../../../../api/helper';
 import { store } from '../../../../store';
 
@@ -51,12 +50,6 @@ export const Report = (props: IProps) => {
     const [taxTypeList, setTaxTypeList] = useState(taxTypes);
     const [displayFromDate, setDisplayFromDate] = useState('');
     const [displayToDate, setDisplayToDate] = useState('');
-
-    useEffect(() => {
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT)
-    }, []);
 
     const setFormField = (field, value) => {
         props.dispatch(change(REPORT_FORM, field, value));

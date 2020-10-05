@@ -29,7 +29,7 @@ import {
 import { BUTTON_TYPE } from '../../../../api/consts/core';
 import { colors } from '../../../../styles/colors';
 import { TemplateField } from '../TemplateField';
-import { MOUNT, UNMOUNT, goBack } from '../../../../navigation/actions';
+import { setOnBackHandler, removeBackHandler } from '../../../../navigation/actions';
 import Lng from '../../../../api/lang/i18n';
 import { INVOICE_DISCOUNT_OPTION } from '../../constants';
 import { CUSTOMER_ADD } from '../../../customers/constants';
@@ -124,17 +124,13 @@ export const Invoice = (props: IProps) => {
 
         getInvoiceItemList(invoiceItems)
 
-        androidBackHandler()
+        setOnBackHandler(() => onDraft(handleSubmit))
 
         return () => {
             clearInvoice();
-            goBack(UNMOUNT)
+            removeBackHandler();
         }
     }, []);
-
-    const androidBackHandler = () => {
-        goBack(MOUNT, navigation, { callback: () => onDraft(handleSubmit) })
-    }
 
     const setFormField = (field, value) => {
         props.dispatch(change(INVOICE_FORM, field, value));
