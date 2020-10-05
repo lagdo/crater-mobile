@@ -1,13 +1,25 @@
+import React from "react";
+import { createStackNavigator } from '@react-navigation/stack';
+import MoreContainer from "../../features/more/containers/More";
+import { EstimateNavigator } from './estimate';
+import { ItemNavigator } from './item';
+import { ReportNavigator } from './report';
+import { SettingsNavigator } from './settings';
+import { ROUTES, navigationOptions } from "../routes";
 
-import { ROUTES } from "../routes";
-import { generateStackNavigation } from "../actions";
-import LostConnectionContainer from "../../components/LostConnection";
+const Stack = createStackNavigator();
 
-export const MoreNavigator = {
-    // Lost Connection
-    // -----------------------------------------
-    [ROUTES.LOST_CONNECTION]: generateStackNavigation(
-        ROUTES.LOST_CONNECTION,
-        LostConnectionContainer,
-    ),
+export const MoreNavigator = ({ navigation, route }) => {
+    const tabBarVisible = !route.state || route.state.index === 0;
+    navigation.setOptions({ tabBarVisible });
+
+    return (
+    <Stack.Navigator screenOptions={navigationOptions}>
+        <Stack.Screen name={ROUTES.MORE} component={MoreContainer} />
+        <Stack.Screen name={ROUTES.ESTIMATE_LIST} component={EstimateNavigator} />
+        <Stack.Screen name={ROUTES.GLOBAL_ITEMS} component={ItemNavigator} />
+        <Stack.Screen name={ROUTES.REPORTS} component={ReportNavigator} />
+        <Stack.Screen name={ROUTES.SETTING_LIST} component={SettingsNavigator} />
+    </Stack.Navigator>
+    );
 }
