@@ -21,7 +21,6 @@ import {
 } from '../../constants';
 import Lng from '../../../../api/lang/i18n';
 import { IMAGES } from '../../../../config';
-import { goBack, MOUNT } from '../../../../navigation/actions';
 
 let params = {
     search: '',
@@ -57,7 +56,8 @@ export const Invoices = (props: IProps) => {
             invoice_number = '',
             customer_id = '',
         },
-    } = props
+        route: { params = {} },
+    } = props;
 
     const [activeTab, setActiveTab] = useState(INVOICES_TABS.DUE);
     const [refreshing, setRefreshing] = useState(false);
@@ -76,7 +76,6 @@ export const Invoices = (props: IProps) => {
 
     useEffect(() => {
         getItems({ fresh: true, q: '', type: 'UNPAID' });
-        goBack(MOUNT, navigation, { exit: true })
     }, []);
 
     const onSetActiveTab = (tab) => {
@@ -334,6 +333,8 @@ export const Invoices = (props: IProps) => {
         }
     ]
 
+    const { isLoading } = params;
+
     return (
         <View style={styles.container}>
             <MainLayout
@@ -377,6 +378,7 @@ export const Invoices = (props: IProps) => {
                                     loadMoreItems={loadMoreItems}
                                     onAddInvoice={onAddInvoice}
                                     filter={filter}
+                                    isLoading={isLoading}
                                 />
                             ),
                         },
@@ -397,6 +399,7 @@ export const Invoices = (props: IProps) => {
                                     onAddInvoice={onAddInvoice}
                                     fresh={fresh}
                                     filter={filter}
+                                    isLoading={isLoading}
                                 />
                             ),
                         },
@@ -417,6 +420,7 @@ export const Invoices = (props: IProps) => {
                                     loadMoreItems={loadMoreItems}
                                     onAddInvoice={onAddInvoice}
                                     filter={filter}
+                                    isLoading={isLoading}
                                 />
                             ),
                         },

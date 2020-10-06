@@ -30,11 +30,10 @@ const Draft = ({
     getInvoices,
     fresh,
     search,
-    navigation,
     loadMoreItems,
     onAddInvoice,
     filter,
-    route: { params = {} },
+    isLoading,
 }: IProps) => {
     let items = [];
 
@@ -74,8 +73,6 @@ const Draft = ({
     let emptyTitle = search ? Lng.t("search.noResult", { search })
         : (!filter) ? Lng.t("invoices.empty.draft.title") :
             Lng.t("filter.empty.filterTitle")
-
-    const { isLoading } = params;
 
     return (
         <View style={styles.content}>

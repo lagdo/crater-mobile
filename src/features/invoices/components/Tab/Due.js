@@ -30,11 +30,10 @@ const Due = ({
     getInvoices,
     fresh,
     search,
-    navigation,
     loadMoreItems,
     onAddInvoice,
     filter,
-    route: { params = {} },
+    isLoading,
 }: IProps) => {
     let items = [];
 
@@ -73,8 +72,6 @@ const Due = ({
     let emptyTitle = search ? Lng.t("search.noResult", { search })
         : (!filter) ? Lng.t("invoices.empty.due.title") :
             Lng.t("filter.empty.filterTitle")
-
-    const { isLoading } = params;
 
     return (
         <View style={styles.content}>
