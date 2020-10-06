@@ -21,7 +21,7 @@ type IProps = {
 };
 
 const AppNavigatorComponent = (props: IProps) => {
-    const { endpointApi, endpointURL, idToken } = props;
+    const { idToken } = props;
 
     Request.setProps(props);
 
@@ -38,14 +38,7 @@ const AppNavigatorComponent = (props: IProps) => {
     );
 }
 
-const mapStateToProps = (state) => {
-    const {
-        auth: { idToken, expiresIn = null },
-        global: { endpointApi, endpointURL, company },
-    } = state;
-
-    return { idToken, expiresIn, endpointApi, endpointURL, company };
-};
+const mapStateToProps = ({ auth: { idToken } }) => ({ idToken });
 
 const mapDispatchToProps = { resetIdToken };
 

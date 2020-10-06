@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from 'react-redux';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SvgXml } from 'react-native-svg';
 import * as SVG_ICONS from '../../assets/svg';

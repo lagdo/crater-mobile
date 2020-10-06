@@ -4,9 +4,9 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store';
 import { loadFonts } from './api/global';
-import ApplicationNavigator from "./navigation/containers";
 import { getBootstrap, getAppVersion } from './features/authentication/actions';
 import { AppLoader } from './components';
+import AppNavigator from './navigation';
 import compareVersion from './api/compareVersion';
 import { ROUTES } from './navigation/routes';
 import { env } from './config';
@@ -49,12 +49,13 @@ const Root = (props) => {
     return (
         <Provider store={store}>
             <PersistGate persistor={persistor} >
-                {fontLoaded && (
+                { fontLoaded ? (<AppNavigator />) : (<AppLoader />) }
+                {/*fontLoaded && (
                     <View style={{ flex: 1, position: 'relative' }}>
-                        <ApplicationNavigator />
+                        <AppNavigator />
                         <AppLoader />
                     </View>
-                )}
+                )*/}
             </PersistGate>
         </Provider>
     );
