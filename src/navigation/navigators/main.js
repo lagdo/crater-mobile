@@ -1,4 +1,5 @@
 import React from "react";
+import { Text } from 'react-native';
 import { connect } from 'react-redux';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SvgXml } from 'react-native-svg';
@@ -68,14 +69,14 @@ const screenOptions = ({ route }) => ({
         case ROUTES.MAIN_INVOICES:
             titleLabel = 'tabNavigation.invoices';
             break;
+        case ROUTES.MAIN_CUSTOMERS:
+            titleLabel = 'tabNavigation.customers';
+            break;
         case ROUTES.MAIN_PAYMENTS:
             titleLabel = 'tabNavigation.payments';
             break;
-        case ROUTES.MAIN_CUSTOMERS:
-            titleLabel = 'tabNavigation.invoices';
-            break;
         case ROUTES.MAIN_EXPENSES:
-            titleLabel = 'tabNavigation.products';
+            titleLabel = 'tabNavigation.expenses';
             break;
         default:
             titleLabel = 'tabNavigation.more';
