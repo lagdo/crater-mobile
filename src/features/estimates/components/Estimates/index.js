@@ -35,6 +35,7 @@ type IProps = {
 export const Estimates = (props: IProps) => {
     const {
         navigation,
+        language,
         loading,
         handleSubmit,
         estimates,

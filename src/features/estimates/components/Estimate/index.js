@@ -66,6 +66,7 @@ type IProps = {
 export const Estimate = (props: IProps) => {
     const {
         navigation,
+        language,
         loading,
         id,
         type,
