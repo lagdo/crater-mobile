@@ -109,7 +109,7 @@ export const Invoice = (props: IProps) => {
     useEffect(() => {
         type === INVOICE_EDIT ?
             getEditInvoice({
-                id: navigation.getParam('id'),
+                id,
                 onResult: ({ user, status }) => {
                     setCurrency(user.currency)
                     setCustomerName(user.name)
@@ -197,7 +197,7 @@ export const Invoice = (props: IProps) => {
                 }
             }) :
             editInvoice({
-                invoice: { ...invoice, id: navigation.getParam('id') },
+                invoice: { ...invoice, id },
                 onResult: (url) => {
                     if (status === 'download') {
                         Linking.openURL(url);
@@ -605,7 +605,7 @@ export const Invoice = (props: IProps) => {
                     desc: Lng.t("invoices.alert.sendEmail"),
                     showCancel: true,
                     okPress: () => changeInvoiceStatus({
-                        id: navigation.getParam('id'),
+                        id,
                         action: 'send',
                         navigation
                     })
@@ -615,7 +615,7 @@ export const Invoice = (props: IProps) => {
 
             case INVOICE_ACTIONS.MARK_AS_SENT:
                 changeInvoiceStatus({
-                    id: navigation.getParam('id'),
+                    id,
                     action: 'mark-as-sent',
                     navigation
                 })
@@ -642,7 +642,7 @@ export const Invoice = (props: IProps) => {
                     desc: Lng.t("invoices.alert.clone"),
                     showCancel: true,
                     okPress: () => changeInvoiceStatus({
-                        id: navigation.getParam('id'),
+                        id,
                         action: 'clone',
                         navigation
                     })
@@ -656,7 +656,7 @@ export const Invoice = (props: IProps) => {
                     desc: Lng.t("invoices.alert.removeDescription"),
                     showCancel: true,
                     okPress: () => removeInvoice({
-                        id: navigation.getParam('id'),
+                        id,
                         onResult: (res) => {
                             res.success &&
                                 navigation.navigate(ROUTES.MAIN_INVOICES)

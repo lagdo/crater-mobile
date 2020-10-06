@@ -33,7 +33,8 @@ const All = ({
     navigation,
     loadMoreItems,
     onAddInvoice,
-    filter
+    filter,
+    route: { params = {} },
 }: IProps) => {
     let items = [];
 
@@ -74,7 +75,7 @@ const All = ({
         : (!filter) ? Lng.t("invoices.empty.all.title") :
             Lng.t("filter.empty.filterTitle")
 
-    let isLoading = navigation.getParam('loading', false)
+    const { isLoading } = params;
 
     return (
         <View style={styles.content}>

@@ -67,6 +67,7 @@ export const Estimate = (props: IProps) => {
     const {
         navigation,
         loading,
+        id,
         type,
         handleSubmit,
         estimateData: {
@@ -102,7 +103,7 @@ export const Estimate = (props: IProps) => {
     useEffect(() => {
         type === ESTIMATE_EDIT ?
             getEditEstimate({
-                id: navigation.getParam('id'),
+                id,
                 onResult: ({ user, status }) => {
                     setCurrency(user.currency)
                     setCustomerName(user.name)
@@ -191,7 +192,7 @@ export const Estimate = (props: IProps) => {
                 }
             }) :
             editEstimate({
-                estimate: { ...estimate, id: navigation.getParam('id') },
+                estimate: { ...estimate, id },
                 onResult: (url) => {
                     if (status === 'download') {
                         Linking.openURL(url);
@@ -601,7 +602,7 @@ export const Estimate = (props: IProps) => {
 
             case ESTIMATE_ACTIONS.SEND:
                 changeEstimateStatus({
-                    id: navigation.getParam('id'),
+                    id,
                     action: 'send',
                     navigation
                 })
@@ -609,15 +610,15 @@ export const Estimate = (props: IProps) => {
                 break;
 
             case ESTIMATE_ACTIONS.MARK_AS_SENT:
-                changeEstimateStatus && changeEstimateStatus({ id: navigation.getParam('id'), action: 'mark-as-sent', navigation })
+                changeEstimateStatus && changeEstimateStatus({ id, action: 'mark-as-sent', navigation })
                 break;
 
             case ESTIMATE_ACTIONS.MARK_AS_ACCEPTED:
-                changeEstimateStatus && changeEstimateStatus({ id: navigation.getParam('id'), action: 'accept', navigation })
+                changeEstimateStatus && changeEstimateStatus({ id, action: 'accept', navigation })
                 break;
 
             case ESTIMATE_ACTIONS.MARK_AS_REJECTED:
-                changeEstimateStatus && changeEstimateStatus({ id: navigation.getParam('id'), action: 'reject', navigation })
+                changeEstimateStatus && changeEstimateStatus({ id, action: 'reject', navigation })
                 break;
 
             case ESTIMATE_ACTIONS.CONVERT_TO_INVOICE:
@@ -625,7 +626,7 @@ export const Estimate = (props: IProps) => {
                     desc: Lng.t("estimates.alert.convertToInvoiceDescription"),
                     showCancel: true,
                     okPress: () => convertToInvoice({
-                        id: navigation.getParam('id'),
+                        id,
                         onResult: () => {
                             navigation.navigate(ROUTES.MAIN_INVOICES)
                         }
@@ -640,7 +641,7 @@ export const Estimate = (props: IProps) => {
                     desc: Lng.t("estimates.alert.removeDescription"),
                     showCancel: true,
                     okPress: () => removeEstimate({
-                        id: navigation.getParam('id'),
+                        id,
                         onResult: () => {
                             navigation.navigate(ROUTES.ESTIMATE_LIST)
                         }

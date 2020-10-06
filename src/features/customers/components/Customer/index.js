@@ -48,7 +48,9 @@ export const Customer = (props: IProps) =>  {
         createCustomer,
         editCustomer,
         removeCustomer,
+        id,
         type,
+        onSelect,
         currencies,
         currency,
         getCountries,
@@ -76,9 +78,6 @@ export const Customer = (props: IProps) =>  {
         hasCountryApiCalled && getCountries()
 
         if (type === CUSTOMER_EDIT) {
-
-            let id = navigation.getParam('customerId')
-
             getEditCustomer({
                 id,
                 onResult: (customer) => {
@@ -135,7 +134,6 @@ export const Customer = (props: IProps) =>  {
             createCustomer({
                 params: values,
                 onResult: (res) => {
-                    const onSelect = navigation.getParam('onSelect', null)
                     onSelect && onSelect(res)
                     navigation.goBack(null)
                 }
@@ -150,7 +148,7 @@ export const Customer = (props: IProps) =>  {
             desc: Lng.t("customers.alertDescription"),
             showCancel: true,
             okPress: () => removeCustomer({
-                id: navigation.getParam('customerId', null),
+                id,
                 navigation
             })
         })

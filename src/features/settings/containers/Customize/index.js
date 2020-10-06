@@ -6,7 +6,7 @@ import { CUSTOMIZE_FORM } from '../../constants';
 import * as customizeAction from '../../actions'
 import { Customize } from '../../components/Customize';
 
-const mapStateToProps = (state, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { language },
         settings: {
@@ -23,7 +23,7 @@ const mapStateToProps = (state, { navigation }) => {
         }
     } = state;
 
-    const type = navigation.getParam('type');
+    const { type } = params;
     let isLoading = getCustomizeLoading || paymentModesLoading || customizes === null || typeof customizes === 'undefined'
 
     return {

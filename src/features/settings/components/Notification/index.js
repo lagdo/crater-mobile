@@ -32,6 +32,7 @@ export const Notification = (props: IProps) => {
     const [invoiceStatus, setInvoiceStatus] = useState(null);
     const [estimateStatus, setEstimateStatus] = useState(null);
     // const [email, setEmail] = useState(null);
+    const [toastMsg, setToastMsg] = useState(null);
 
     useEffect(() => {
         getSettingItem({
@@ -56,13 +57,8 @@ export const Notification = (props: IProps) => {
         })
     }, []);
 
-    const toastMsg = navigation.getParam('toastMsg', null)
-
     useEffect(() => {
-        toastMsg &&
-            setTimeout(() => {
-                navigation.setParams({ 'toastMsg': null })
-            }, 2500);
+        toastMsg && setTimeout(() => setToastMsg(null), 2500);
     }, [toastMsg]);
 
     const setFormField = (field, value) => {
@@ -100,11 +96,9 @@ export const Notification = (props: IProps) => {
         })
     }
 
-    const toggleToast = (msg) => {
-        navigation.setParams({ "toastMsg": msg })
-    }
+    const toggleToast = (msg) => setToastMsg(msg);
 
-    let toastMessage = navigation.getParam('toastMsg', '')
+    let toastMessage = toastMsg || '';
 
     return (
         <DefaultLayout

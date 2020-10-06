@@ -33,7 +33,8 @@ const Due = ({
     navigation,
     loadMoreItems,
     onAddInvoice,
-    filter
+    filter,
+    route: { params = {} },
 }: IProps) => {
     let items = [];
 
@@ -73,7 +74,7 @@ const Due = ({
         : (!filter) ? Lng.t("invoices.empty.due.title") :
             Lng.t("filter.empty.filterTitle")
 
-    let isLoading = navigation.getParam('loading', false)
+    const { isLoading } = params;
 
     return (
         <View style={styles.content}>

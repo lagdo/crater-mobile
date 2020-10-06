@@ -25,6 +25,7 @@ export const Item = (props) => {
     const {
         navigation,
         type,
+        currency,
         loading,
         getEditItem,
         addItem,
@@ -41,8 +42,6 @@ export const Item = (props) => {
     } = props;
 
     const isCreateItem = (type === ADD_ITEM)
-
-    const currency = navigation.getParam('currency')
 
     const [isTaxPerItem, setTaxPerItem] = useState(true);
 

@@ -29,6 +29,7 @@ type IProps = {
 export const Category = (props: IProps) => {
     const {
         navigation,
+        id,
         getEditCategory,
         type,
         onFirstTimeCreateExpense,
@@ -43,8 +44,6 @@ export const Category = (props: IProps) => {
 
     useEffect(() => {
         if (type === CATEGORY_EDIT) {
-
-            let id = navigation.getParam('categoryId', null)
             getEditCategory({
                 id,
                 onResult: (val) => {
@@ -72,7 +71,6 @@ export const Category = (props: IProps) => {
                     }
                 })
             else {
-                let id = navigation.getParam('categoryId', null);
                 editCategory({ id, params: values, navigation })
             }
         }
@@ -84,7 +82,7 @@ export const Category = (props: IProps) => {
             desc: Lng.t("categories.alertDescription"),
             showCancel: true,
             okPress: () => removeCategory({
-                id: navigation.getParam('categoryId', null),
+                id,
                 navigation,
                 onResult: () => {
                     alertMe({ title: `${name} ${Lng.t("categories.alreadyUsed")}` })

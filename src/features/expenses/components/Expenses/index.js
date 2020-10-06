@@ -39,6 +39,7 @@ export const Expenses = (props: IProps) => {
             to_date = '',
             expense_category_id = ''
         },
+        route: { params = {} },
     } = props
 
     const [refreshing, setRefreshing] = useState(false);
@@ -260,7 +261,7 @@ export const Expenses = (props: IProps) => {
         : (!filter) ? Lng.t("expenses.empty.title") :
             Lng.t("filter.empty.filterTitle")
 
-    let isLoading = navigation.getParam('loading', false)
+    const { isLoading } = params;
 
     return (
         <View style={styles.container}>

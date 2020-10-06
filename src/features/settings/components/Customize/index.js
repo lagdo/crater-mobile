@@ -50,6 +50,7 @@ export const Customize = (props: IProps) =>  {
     const [data, setData] = useState({});
     const [isUpdateAutoGenerate, setUpdateAutoGenerate] = useState(false);
     const [activeTab, setActiveTab] = useState(PAYMENT_TABS.MODE);
+    const [toastMsg, setToastMsg] = useState(null);
 
     useEffect(() => {
         let hasCustomizeApiCalled = customizes ?
@@ -64,13 +65,8 @@ export const Customize = (props: IProps) =>  {
         }
     }, []);
 
-    const toastMsg = navigation.getParam('toastMsg', null);
-
     useEffect(() => {
-        toastMsg &&
-            setTimeout(() => {
-                navigation.setParams({ 'toastMsg': null })
-            }, 2500);
+        toastMsg && setTimeout(() => setToastMsg(null), 2500);
     }, [toastMsg]);
 
     const setParams = (values = null) => {
@@ -177,11 +173,7 @@ export const Customize = (props: IProps) =>  {
         editCustomizeSettings({ params, navigation })
     }
 
-    const toggleToast = () => {
-        navigation.setParams({
-            "toastMsg": "settings.preferences.settingUpdate"
-        })
-    }
+    const toggleToast = () => setToastMsg("settings.preferences.settingUpdate");
 
     const BOTTOM_ACTION = () => {
         let isPaymentMode = (type === CUSTOMIZE_TYPE.PAYMENTS && activeTab === PAYMENT_TABS.MODE)
@@ -290,7 +282,7 @@ export const Customize = (props: IProps) =>  {
         )
     }
 
-    let toastMessage = navigation.getParam('toastMsg', '')
+    let toastMessage = toastMsg || '';
     let isItemsScreen = (type === CUSTOMIZE_TYPE.ITEMS)
     let isPaymentsScreen = (type === CUSTOMIZE_TYPE.PAYMENTS)
 

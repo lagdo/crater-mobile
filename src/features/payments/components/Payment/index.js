@@ -55,6 +55,7 @@ let editPaymentData = [
 export const Payment = (props: IProps) => {
     const {
         navigation,
+        id,
         type,
         handleSubmit,
         customers,
@@ -83,8 +84,6 @@ export const Payment = (props: IProps) => {
 
     useEffect(() => {
         if (type === PAYMENT_EDIT) {
-
-            let id = navigation.getParam('paymentId', null)
             setFormField('id', id)
 
             getEditPayment({
@@ -225,7 +224,7 @@ export const Payment = (props: IProps) => {
             })
             :
             editPayment({
-                id: navigation.getParam('paymentId'),
+                id,
                 params,
                 navigation
             })
@@ -272,7 +271,7 @@ export const Payment = (props: IProps) => {
             desc: Lng.t("payments.alertDescription"),
             showCancel: true,
             okPress: () => removePayment({
-                id: navigation.getParam('paymentId', null),
+                id,
                 navigation
             })
         })
@@ -287,7 +286,7 @@ export const Payment = (props: IProps) => {
                 desc: Lng.t("payments.alertSendDescription"),
                 showCancel: true,
                 okPress: () => sendPaymentReceipt({
-                    params: { id: navigation.getParam('paymentId', null) }
+                    params: { id }
                 })
             })
 

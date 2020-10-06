@@ -26,6 +26,7 @@ export const Expense = (props) => {
     const {
         navigation,
         loading,
+        id,
         type,
         getCreateExpense,
         getEditExpense,
@@ -51,8 +52,6 @@ export const Expense = (props) => {
 
     useEffect(() => {
         if (type === EXPENSE_EDIT) {
-            let id = navigation.getParam('id', null)
-
             getEditExpense({
                 id,
                 onResult: ({ media }) => {
@@ -111,7 +110,7 @@ export const Expense = (props) => {
                 }) :
                 editExpense({
                     params: value,
-                    id: navigation.getParam('id'),
+                    id,
                     attachmentReceipt,
                     onResult: () => {
                         navigation.navigate(ROUTES.MAIN_EXPENSES)
@@ -128,7 +127,7 @@ export const Expense = (props) => {
             desc: Lng.t("expenses.alertDescription"),
             showCancel: true,
             okPress: () => removeExpense({
-                id: navigation.getParam('id', null),
+                id,
                 navigation
             })
         })
@@ -138,7 +137,6 @@ export const Expense = (props) => {
         if (action == ACTIONS_VALUE.REMOVE) {
             onRemoveExpense()
         } else if (action == ACTIONS_VALUE.DOWNLOAD) {
-            const id = navigation.getParam('id')
             Linking.openURL(`${endpointURL}/expenses/${id}/receipt/${unique_hash}`)
         }
     }

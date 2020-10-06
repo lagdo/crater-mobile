@@ -36,6 +36,7 @@ export const Customers = (props: IProps) => {
             contact_name = '',
             phone = ''
         },
+        route: { params = {} },
     } = props;
 
     const [refreshing, setRefreshing] = useState(false);
@@ -201,10 +202,10 @@ export const Customers = (props: IProps) => {
         : (!filter) ? Lng.t("customers.empty.title") :
             Lng.t("filter.empty.filterTitle")
 
-    let isLoading = navigation.getParam('loading', false)
+    const { isLoading } = params;
 
     return (
-        <View style={styles.container} >
+        <View style={styles.container}>
             <MainLayout
                 headerProps={{
                     rightIcon: "plus",

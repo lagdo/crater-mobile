@@ -21,6 +21,7 @@ export const Tax = (props) => {
         initialValues,
         initialValues: { name },
         handleSubmit,
+        onSelect,
         type,
         loading,
     } = props
@@ -33,7 +34,6 @@ export const Tax = (props) => {
                 addTax({
                     tax,
                     onResult: (res) => {
-                        const onSelect = navigation.getParam('onSelect', null)
                         onSelect && onSelect([{ ...res, tax_type_id: res.id }])
                         navigation.goBack(null)
                     }

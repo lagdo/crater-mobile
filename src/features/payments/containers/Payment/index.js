@@ -7,7 +7,7 @@ import { PAYMENT_FORM, PAYMENT_ADD } from '../../constants';
 import { Payment } from '../../components/Payment';
 import { getCustomers } from '../../../customers/actions';
 
-const mapStateToProps = (state, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
 
     const {
         customers: { customers },
@@ -21,11 +21,10 @@ const mapStateToProps = (state, { navigation }) => {
         }
     } = state
 
-    let type = navigation.getParam('type', PAYMENT_ADD)
-    let invoice = navigation.getParam('invoice', null)
-    let hasRecordPayment = navigation.getParam('hasRecordPayment', false)
+    const { id = null, type = PAYMENT_ADD, invoice = null, hasRecordPayment = false } = params;
 
     return {
+        id,
         type,
         customers,
         language: language,

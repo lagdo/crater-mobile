@@ -6,7 +6,7 @@ import * as CategoryAction from '../../actions';
 import { Category } from '../../components/Category';
 import { CATEGORY_FORM, CATEGORY_ADD } from '../../constants';
 
-const mapStateToProps = (state, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
 
     const {
         global: { language },
@@ -16,16 +16,16 @@ const mapStateToProps = (state, { navigation }) => {
                 initExpenseCategoryLoading,
             }
         }
-    } = state
+    } = state;
 
-    let type = navigation.getParam('type', CATEGORY_ADD)
-    let onFirstTimeCreateExpense = navigation.getParam('onSelect', null)
+    const { id = NULL, type = CATEGORY_ADD, onSelect: onFirstTimeCreateExpense = null } = params;
 
     return {
-        categoryLoading: expenseCategoryLoading,
-        getEditCategoryLoading: initExpenseCategoryLoading,
+        id,
         type,
         language,
+        categoryLoading: expenseCategoryLoading,
+        getEditCategoryLoading: initExpenseCategoryLoading,
         onFirstTimeCreateExpense,
         formValues: getFormValues(CATEGORY_FORM)(state) || {},
     };

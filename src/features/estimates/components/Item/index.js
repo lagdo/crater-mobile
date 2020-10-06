@@ -32,6 +32,7 @@ export const EstimateItem = (props) => {
         navigation,
         loading,
         type,
+        currency,
         handleSubmit,
         initialValues,
         discountPerItem,
@@ -192,8 +193,6 @@ export const EstimateItem = (props) => {
     }
 
     const FINAL_AMOUNT = () => {
-        const currency = navigation.getParam('currency')
-
         return (
             <View style={styles.amountContainer}>
                 <View style={styles.subContainer}>

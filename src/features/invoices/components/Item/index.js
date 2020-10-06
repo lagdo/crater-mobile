@@ -32,6 +32,7 @@ export const InvoiceItem = (props) => {
         navigation,
         loading,
         type,
+        currency,
         handleSubmit,
         initialValues,
         discountPerItem,
@@ -192,8 +193,6 @@ export const InvoiceItem = (props) => {
     }
 
     const FINAL_AMOUNT = () => {
-        const currency = navigation.getParam('currency')
-
         return (
             <View style={styles.amountContainer}>
                 <View style={styles.subContainer}>
