@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     StatusBar,
     ScrollView,
@@ -25,6 +25,8 @@ type IProps = {
     loading: Boolean,
     socialLoading: Boolean,
     language: String,
+    endpointApi: String,
+    endpointURL: String,
 }
 
 export const Login = (props: IProps) => {
@@ -36,6 +38,13 @@ export const Login = (props: IProps) => {
         // socialLogin,
         handleSubmit,
     } = props;
+
+    useEffect(() => {
+        const { endpointApi, endpointURL } = props;
+        if (!endpointApi || !endpointURL) {
+            navigation.navigate(ROUTES.ENDPOINTS);
+        }
+    }, []);
 
     /*
      * Sign in with google
@@ -67,13 +76,10 @@ export const Login = (props: IProps) => {
         });
     };
 
-    let passwordInput = {};
     let loginRefs = {}
 
     return (
-
         <View style={styles.container}>
-
             <StatusBar
                 barStyle="dark-content"
                 hidden={false}
@@ -176,7 +182,6 @@ export const Login = (props: IProps) => {
                             />
                         </View>
                     */}
-
                     </View>
                 </KeyboardAvoidingView>
             </ScrollView>
