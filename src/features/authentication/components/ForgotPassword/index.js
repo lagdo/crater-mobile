@@ -21,7 +21,6 @@ type IProps = {
     handleSubmit: Function,
     loading: Boolean,
     socialLoading: Boolean,
-    language: String,
 }
 export const ForgotPassword = (props: IProps) => {
     const {

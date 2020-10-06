@@ -23,7 +23,6 @@ type IProps = {
     dropdownFields: Object,
     selectFields: Object,
     datePickerFields: Object,
-    language: String,
 };
 
 export const Filter = (props: IProps) => {

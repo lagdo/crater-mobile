@@ -29,7 +29,6 @@ export type IProps = {
     emptyContentImage: String,
     compareField: String,
     valueCompareField: String,
-    language: String,
 
     containerStyle: Object,
     meta: Object,

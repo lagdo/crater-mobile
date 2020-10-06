@@ -31,7 +31,6 @@ type IProps = {
     hasBillingAddress: Boolean,
     meta: Object,
     handleSubmit: Function,
-    language: String,
     type: String
 };
 

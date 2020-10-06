@@ -190,9 +190,7 @@ export const FilePickerComponent = (props: IProps) => {
     );
 }
 
-const mapStateToProps = ({ global }) => ({
-    language: global.language,
-});
+const mapStateToProps = ({ global: { language } }) => ({ language });
 
 const mapDispatchToProps = {};
 

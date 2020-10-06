@@ -54,7 +54,6 @@ export const Units = (props) => {
                 visible={visible}
                 onToggle={onToggle}
                 navigation={navigation}
-                language={language}
                 headerTitle={isCreateMethod ?
                     Lng.t("items.addUnit") :
                     Lng.t("items.editUnit")

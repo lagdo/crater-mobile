@@ -27,7 +27,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         id,
         type,
         customers,
-        language: language,
+        language,
         invoice,
         hasRecordPayment,
         initPaymentLoading,

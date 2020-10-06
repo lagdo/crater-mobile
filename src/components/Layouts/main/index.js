@@ -34,7 +34,6 @@ const MainLayoutComponent = ({
     inputProps,
     dividerStyle,
     loadingProps,
-    language
 }: IProps) => {
 
     let hasFilter = filterProps ? { ...filterProps } : null
@@ -91,9 +90,7 @@ const MainLayoutComponent = ({
     );
 };
 
-const mapStateToProps = ({ global }) => ({
-    language: global.language,
-});
+const mapStateToProps = ({ global: { language } }) => ({ language });
 
 const mapDispatchToProps = {};
 

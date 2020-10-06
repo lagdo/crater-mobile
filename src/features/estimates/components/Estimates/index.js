@@ -35,7 +35,6 @@ type IProps = {
 export const Estimates = (props: IProps) => {
     const {
         navigation,
-        language,
         loading,
         handleSubmit,
         estimates,
@@ -378,7 +377,6 @@ export const Estimates = (props: IProps) => {
                                     fresh={fresh}
                                     search={search}
                                     navigation={navigation}
-                                    language={language}
                                     loadMoreItems={loadMoreItems}
                                     onAddEstimate={onAddEstimate}
                                     filter={filter}

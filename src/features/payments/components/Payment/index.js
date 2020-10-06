@@ -307,7 +307,7 @@ export const Payment = (props: IProps) => {
     }
 
     let drownDownProps = (type === PAYMENT_EDIT && !isLoading) ? {
-        options: PAYMENT_ACTIONS(Lng, language),
+        options: PAYMENT_ACTIONS(Lng),
         onSelect: onOptionSelect,
         cancelButtonIndex: 2,
         destructiveButtonIndex: 1

@@ -66,7 +66,6 @@ type IProps = {
 export const Estimate = (props: IProps) => {
     const {
         navigation,
-        language,
         loading,
         id,
         type,
@@ -439,7 +438,6 @@ export const Estimate = (props: IProps) => {
                         navigation={navigation}
                         isMultiSelect
                         isInternalSearch
-                        language={language}
                         concurrentMultiSelect
                         compareField="id"
                         valueCompareField="tax_type_id"
@@ -879,7 +877,6 @@ export const Estimate = (props: IProps) => {
                     icon={'file-alt'}
                     placeholder={Lng.t("estimates.templatePlaceholder")}
                     navigation={navigation}
-                    language={language}
                 />
 
             </View>

@@ -65,9 +65,7 @@ export const LostConnection = (props) => {
     );
 }
 
-const mapStateToProps = ({ global }) => ({
-    language: global.language,
-});
+const mapStateToProps = ({ global: { language } }) => ({ language });
 
 //  connect
 const LostConnectionContainer = connect(
