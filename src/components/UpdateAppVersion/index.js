@@ -7,19 +7,9 @@ import { CtGradientButton } from '../Button';
 import { Text } from 'react-native-elements';
 import { IMAGES } from '../../config';
 import Lng from '../../api/lang/i18n';
-import { goBack, MOUNT, UNMOUNT } from '../../navigation/actions';
-import { ROUTES } from '../../navigation/routes';
 
 export const UpdateAppVersion = (props) => {
     const [loading, setLoading] = useState(false);
-    const { language } = props;
-
-    useEffect(() => {
-        const { navigation } = this.props
-        goBack(MOUNT, navigation, { route: ROUTES.UPDATE_APP_VERSION })
-
-        return () => goBack(UNMOUNT);
-    }, []);
 
     const onUpdateApp = () => {
 
@@ -75,20 +65,9 @@ const mapStateToProps = ({ global }) => ({
     language: global.language,
 });
 
-const mapDispatchToProps = {
-
-};
-
-
 //  connect
 const UpdateAppVersionContainer = connect(
     mapStateToProps,
-    mapDispatchToProps,
 )(UpdateAppVersion);
-
-UpdateAppVersionContainer.navigationOptions = () => ({
-    header: null,
-});
-
 
 export default UpdateAppVersionContainer;
