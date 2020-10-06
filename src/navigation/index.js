@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -7,6 +7,7 @@ import { HomeNavigator } from './navigators/home';
 import { ROUTES } from './routes';
 import { resetIdToken } from '../features/authentication/actions'
 import Request from '../api/request';
+import { navigationRef } from './actions';
 
 const Stack = createStackNavigator();
 const navigationOptions = {
@@ -21,12 +22,14 @@ type IProps = {
 };
 
 const AppNavigatorComponent = (props: IProps) => {
-    const { idToken } = props;
+    const { idToken, expiresIn, endpointApi, company } = props;
 
-    Request.setProps(props);
+    useEffect(() => {
+        Request.setProps(props);
+    }, [idToken, expiresIn, endpointApi, company]);
 
     return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
         <Stack.Navigator screenOptions={navigationOptions}>
         {(idToken) ? (
             <Stack.Screen name={ROUTES.HOME} component={HomeNavigator} />
@@ -38,7 +41,13 @@ const AppNavigatorComponent = (props: IProps) => {
     );
 }
 
-const mapStateToProps = ({ auth: { idToken } }) => ({ idToken });
+const mapStateToProps = (state) => {
+    const {
+        auth: { idToken, expiresIn = null },
+        global: { endpointApi = null, company }
+    } = state;
+    return { idToken, expiresIn, endpointApi, company };
+};
 
 const mapDispatchToProps = { resetIdToken };
 

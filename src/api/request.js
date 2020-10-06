@@ -5,6 +5,7 @@ import { AsyncStorage } from 'react-native';
 import { env } from '../config';
 import { NAVIGATION_PERSIST_KEY } from './consts/core';
 import { ROUTES } from '../navigation/routes';
+import { navigate } from '../navigation/actions';
 import { isIosPlatform, checkConnection, checkExpiredToken } from './helper';
 
 type IProps = {
@@ -64,7 +65,6 @@ export default class Request {
             expiresIn = null,
             endpointApi,
             company,
-            navigation,
         } = props;
 
         let apiUrl = (endpointApi !== null && typeof endpointApi !== 'undefined') ? endpointApi : env.ENDPOINT_API
@@ -79,13 +79,13 @@ export default class Request {
         const isExpired = checkExpiredToken(expiresIn)
 
         if (!isConnected) {
-            navigation.navigate(ROUTES.LOST_CONNECTION);
+            navigate(ROUTES.LOST_CONNECTION);
             return
         }
 
         if (isExpired && isAuthRequired) {
             resetIdToken();
-            navigation.navigate(ROUTES.AUTH);
+            navigate(ROUTES.AUTH);
             return
         }
 
@@ -140,7 +140,7 @@ export default class Request {
             }
 
             if (response.status === 401) {
-                navigation.navigate(ROUTES.AUTH);
+                navigate(ROUTES.AUTH);
             }
 
             if (response.status === 403 || response.status === 404) {

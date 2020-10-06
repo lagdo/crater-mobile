@@ -4,6 +4,13 @@ import { BackHandler } from 'react-native';
 import Lng from '../../api/lang/i18n';
 import { alertMe } from '../../api/global';
 
+
+export const navigationRef = React.createRef();
+
+export const navigate = (name, params = {}) => {
+  navigationRef.current?.navigate(name, params);
+};
+
 let backHandler = null;
 
 // Get Value with translated
