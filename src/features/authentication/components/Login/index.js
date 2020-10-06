@@ -24,7 +24,6 @@ type IProps = {
     handleSubmit: Function,
     loading: Boolean,
     socialLoading: Boolean,
-    language: String,
     endpointApi: String,
     endpointURL: String,
 }

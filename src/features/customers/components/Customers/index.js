@@ -13,7 +13,6 @@ type IProps = {
     customers: Object,
     navigation: Object,
     loading: Boolean,
-    language: String,
 }
 
 let params = {

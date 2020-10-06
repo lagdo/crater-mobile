@@ -8,6 +8,7 @@ import { ROUTES } from './routes';
 import { resetIdToken } from '../features/authentication/actions'
 import Request from '../api/request';
 import { navigationRef } from './actions';
+import Lng from '../api/lang/i18n';
 
 const Stack = createStackNavigator();
 const navigationOptions = {
@@ -22,11 +23,16 @@ type IProps = {
 };
 
 const AppNavigatorComponent = (props: IProps) => {
-    const { idToken, expiresIn, endpointApi, company } = props;
+    const { idToken, expiresIn, endpointApi, company, language } = props;
 
     useEffect(() => {
         Request.setProps(props);
     }, [idToken, expiresIn, endpointApi, company]);
+
+    useEffect(() => {
+        // Save the language
+        Lng.locale = language;
+    }, [language]);
 
     return (
     <NavigationContainer ref={navigationRef}>
@@ -44,9 +50,9 @@ const AppNavigatorComponent = (props: IProps) => {
 const mapStateToProps = (state) => {
     const {
         auth: { idToken, expiresIn = null },
-        global: { endpointApi = null, company }
+        global: { endpointApi = null, company, language }
     } = state;
-    return { idToken, expiresIn, endpointApi, company };
+    return { idToken, expiresIn, endpointApi, company, language };
 };
 
 const mapDispatchToProps = { resetIdToken };

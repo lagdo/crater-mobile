@@ -26,7 +26,6 @@ type IProps = {
     valueStyle: Object,
     prefixProps: Object,
     loading: Boolean,
-    language: String,
     isRequired: Boolean,
     leftIconSolid: Boolean,
     disabled: Boolean,
@@ -208,9 +207,7 @@ export const FakeInputComponent = (props: IProps) => {
     );
 }
 
-const mapStateToProps = ({ global }) => ({
-    language: global.language,
-});
+const mapStateToProps = ({ global: { language } }) => ({ language });
 
 const mapDispatchToProps = {};
 

@@ -15,7 +15,6 @@ type Iprops = {
     headerTitle: String,
     hint: String,
     fieldName: String,
-    language: String,
     onToggle: Function,
     onRemove: Function,
     onSubmit: Function,

@@ -61,9 +61,7 @@ export const UpdateAppVersion = (props) => {
     );
 }
 
-const mapStateToProps = ({ global }) => ({
-    language: global.language,
-});
+const mapStateToProps = ({ global: { language } }) => ({ language });
 
 //  connect
 const UpdateAppVersionContainer = connect(

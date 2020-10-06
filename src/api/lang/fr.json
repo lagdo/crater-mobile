@@ -7,7 +7,7 @@
         "addEstimate": "Ajouter une estimation",
         "editEstimate": "Modifier l'estimation",
         "template": "Sélectionnez un modèle",
-        "customers": "Les clients",
+        "customers": "Clients",
         "addCustomer": "Ajouter un client",
         "editCustomer": "Modifier le client",
         "selectCurrency": "Sélectionnez la devise",
@@ -19,21 +19,21 @@
         "payments": "Paiements",
         "addPayment": "Ajouter un paiement",
         "editPayment": "Modifier le paiement",
-        "expenses": "les frais",
+        "expenses": "Dépenses",
         "addExpense": "Ajouter une dépense",
         "editExpense": "Modifier les dépenses",
         "more": "Plus",
         "expenseCategory": "Catégories de dépenses",
-        "addCategory": "ajouter une catégorie",
+        "addCategory": "Ajouter une catégorie",
         "editCategory": "Modifier la catégorie",
         "settings": "Paramètres",
         "notifications": "Notification",
         "setting": {
-            "company": "compagnie",
-            "account": "réglage du compte",
+            "company": "Compagnie",
+            "account": "Réglage du compte",
             "preferences": "Préférences",
             "LanguageAndCurrency": "Langue et devise",
-            "endpoint": "Point de terminaison de l'API"
+            "endpoint": "Point d'entrée de l'API"
         },
         "taxes": "Types de taxe",
         "addTaxes": "Ajouter une taxe",
@@ -43,23 +43,23 @@
         "items": "Articles",
         "units": "Unités",
         "reports": "Rapports",
-        "salesReport": "Rapport des ventes",
+        "salesReport": "Rapport de ventes",
         "profitAndLossReport": "Compte de résultat",
         "expensesReport": "Rapport de dépenses",
         "taxesReport": "Rapport de taxes",
         "customize": "Personnalisation",
-        "filter": "Les filtres",
+        "filter": "Filtres",
         "back": "Retour"
     },
     "tabNavigation": {
         "invoices": "Factures",
-        "customers": "Les clients",
+        "customers": "Clients",
         "payments": "Paiements",
-        "expenses": "les frais",
+        "expenses": "Dépenses",
         "more": "Plus"
     },
     "invoices": {
-        "title": "Sélectionnez facture",
+        "title": "Sélectionnez la facture",
         "tabs": {
             "DUE": "Dû",
             "DRAFT": "Brouillon",
@@ -67,7 +67,7 @@
         },
         "invoiceDate": "Date",
         "dueDate": "Date d'échéance",
-        "discount": "REMISE",
+        "discount": "Remise",
         "invoiceNumber": "Numéro de facture",
         "referenceNumber": "Numéro de réference",
         "template": "Modèle",
@@ -80,8 +80,8 @@
         "notes": "Remarques",
         "notePlaceholder": "Notes supplémentaires visibles sur la facture",
         "taxPlaceholder": "+ Ajouter une taxe",
-        "subtotal": "TOTAL",
-        "totalAmount": "MONTANT TOTAL",
+        "subtotal": "Total",
+        "totalAmount": "Montant total",
         "status": "Statut",
         "statusPlaceholder": "Sélectionnez un statut",
         "paidStatus": "Statut payé",
@@ -116,10 +116,10 @@
         },
         "actions": {
             "downloadPdf": "Télécharger le PDF",
-            "sendInvoice": "Envoyer une facture",
+            "sendInvoice": "Envoyer la facture",
             "editInvoice": "Modifier la facture",
             "delete": "Effacer",
-            "recordPayment": "Record de paiement",
+            "recordPayment": "Ajouter un paiement",
             "markAsSent": "Marquer comme envoyé",
             "clone": "Cloner la facture"
         }
@@ -173,7 +173,7 @@
     "payments": {
         "date": "Date",
         "number": "No de paiement",
-        "customer": "Cliente",
+        "customer": "Client",
         "customerPlaceholder": "Sélectionner un client",
         "mode": "Mode de paiement",
         "modes": "Modes de paiement",
@@ -203,7 +203,7 @@
         }
     },
     "expenses": {
-        "receipt": "Le reçu",
+        "receipt": "Reçu",
         "date": "Date de dépense",
         "fromDate": "Partir de la date",
         "toDate": "À ce jour",
@@ -225,15 +225,15 @@
     "items": {
         "title": "Sélectionner un article",
         "name": "Nom de l'article",
-        "description": "description (facultatif)",
+        "description": "Description (facultatif)",
         "quantity": "Quantité",
         "price": "Prix",
-        "subTotal": "TOTAL",
+        "subTotal": "Total",
         "discountType": "Type de remise",
         "discount": "Remise",
-        "finalDiscount": "REMISE",
-        "finalAmount": "MONTANT",
-        "taxes": "Les taxes",
+        "finalDiscount": "Remise",
+        "finalAmount": "Montant",
+        "taxes": "Taxes",
         "selectTax": "Sélectionnez les taxes",
         "unit": "Unité",
         "unitHint": "Nom de l'unité",
@@ -279,14 +279,14 @@
         "taxes": "Types de taxe",
         "expenseCategory": "Catégories de dépenses",
         "customize": "Personnalisation",
-        "endpoint": "point final api",
+        "endpoint": "Point d'entrée de l'api",
         "company": {
             "name": "Nom de la compagnie",
             "email": "Email",
             "phone": "Téléphone",
             "address": "Adresse",
             "street1": "Rue 1",
-            "street2": "Rue # 2",
+            "street2": "Rue 2",
             "zipcode": "Code postal",
             "website": "Site Internet",
             "logo": "Logo d'entreprise"
@@ -311,7 +311,7 @@
         "preferences": {
             "currency": "Devise",
             "currencyPlaceholder": "Sélectionnez la devise",
-            "language": "La langue",
+            "language": "Langue",
             "languagePlaceholder": "Choisir la langue",
             "timeZone": "Fuseau horaire",
             "timeZonePlaceholder": "Sélectionner le fuseau horaire",
@@ -354,7 +354,7 @@
     "endpoint": {
         "endpointURL": "URL du noeud final",
         "endpointDesc": "L'URL ci-dessus sera utilisé pour vous connecter à votre installation auto-hébergée de crater.",
-        "urlPlaceHolder": "p ex: https: //craterapp.com",
+        "urlPlaceHolder": "Ex: https: //craterapp.com",
         "alertInvalidUrl": "URL invalide"
     },
     "estimates": {
@@ -365,7 +365,7 @@
         },
         "estimateDate": "Date",
         "expiryDate": "Date d'expiration",
-        "discount": "REMISE",
+        "discount": "Remise",
         "estimateNumber": "Numéro d'estimation",
         "template": "Modèle",
         "templatePlaceholder": "Sélectionner ou ajouter un nouveau modèle",
@@ -381,9 +381,9 @@
         "toDate": "À ce jour",
         "status": "Statut",
         "statusPlaceholder": "Sélectionnez un statut",
-        "subtotal": "TOTAL",
-        "tax": "IMPÔT",
-        "totalAmount": "MONTANT TOTAL",
+        "subtotal": "Total",
+        "tax": "Impôt",
+        "totalAmount": "Montant total",
         "alert": {
             "convertToInvoiceDescription": "Êtes-vous sûr de vouloir convertir cette estimation en facture?",
             "removeDescription": "Vous ne pourrez pas récupérer cette estimation",
@@ -433,7 +433,7 @@
     "timeZones": {
         "title": "Sélectionnez le fuseau horaire",
         "empty": {
-            "title": "Pas encore de TimeZones!",
+            "title": "Pas encore de fuseau horaire!",
             "description": "Cette section contiendra la liste des fuseaux horaires."
         }
     },
@@ -459,8 +459,8 @@
     "reports": {
         "sales": "Ventes",
         "profitAndLoss": "Perte de profit",
-        "expenses": "Les dépenses",
-        "taxes": "Les taxes",
+        "expenses": "Dépenses",
+        "taxes": "Taxes",
         "dateRange": "Sélectionner une plage de dates",
         "fromDate": "Partir de la date",
         "toDate": "À ce jour",
@@ -483,7 +483,7 @@
         "custom": "Douane"
     },
     "taxes": {
-        "title": "Les taxes",
+        "title": "Taxes",
         "type": "Nom de la taxe",
         "description": "La description",
         "percentage": "Pourcentage dimpôt",
@@ -523,7 +523,7 @@
     },
     "alert": {
         "title": "Êtes-vous sûr?",
-        "exit": "Es tu sûr de vouloir partir?",
+        "exit": "Êtes-vous sûr de vouloir partir?",
         "alreadyInUse": "{{field}} déjà utilisé",
         "action": {
             "discard": "Jeter",
@@ -533,14 +533,14 @@
     },
     "button": {
         "remove": "Retirer",
-        "save": "sauver",
+        "save": "Enregistrer",
         "add": "Ajouter",
         "edit": "Modifier",
         "retry": "Recommencez",
         "done": "Terminé",
         "skip": "Sauter",
         "clear": "Clair",
-        "viewPdf": "Voir PDF",
+        "viewPdf": "Voir le PDF",
         "singIn": "se connecter",
         "singInGoogle": "Connectez-vous avec google",
         "forget": "Mot de passe oublié?",
@@ -569,11 +569,11 @@
         "choose": "Choisissez au moins un article",
         "email": "S'il vous plaît, mettez une adresse email valide",
         "passwordCompare": "Les mots de passe ne correspondent pas",
-        "minimumNumber": "doit être supérieur à 0",
-        "maximumNumber": "doit être inférieur à {{maxNumber}}",
+        "minimumNumber": "Doit être supérieur à 0",
+        "maximumNumber": "Doit être inférieur à {{maxNumber}}",
         "maximumCharacter": "{{fieldName}} doit être inférieur à {{maxCharacter}} personnages.",
         "character": "Caractères seulement",
-        "numeric": "doit être numérique",
+        "numeric": "Doit être numérique",
         "moreThanDue": "{{hint}} Ne devrait pas être plus que le montant dû.",
         "url": "URL invalide (p ex: https://craterapp.com)"
     }
