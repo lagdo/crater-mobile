@@ -33,13 +33,6 @@ export const MORE_MENU = () => {
             }
         },
         {
-            title: Lng.t("more.reports"),
-            leftIcon: 'signal',
-            fullItem: {
-                route: ROUTES.REPORTS
-            }
-        },
-        {
             title: Lng.t("settings.expenseCategory"),
             leftIcon: 'clipboard-list',
             iconSize: 24,
@@ -52,6 +45,13 @@ export const MORE_MENU = () => {
             leftIcon: 'percent',
             fullItem: {
                 route: ROUTES.TAXES
+            }
+        },
+        {
+            title: Lng.t("more.reports"),
+            leftIcon: 'signal',
+            fullItem: {
+                route: ROUTES.REPORTS
             }
         },
         {
