@@ -292,7 +292,7 @@ export const Customize = (props: IProps) =>  {
     return (
         <DefaultLayout
             headerProps={{
-                leftIconPress: () => navigation.navigate(ROUTES.CUSTOMIZES),
+                leftIconPress: navigation.goBack,
                 title: Lng.t(data.headerTitle),
                 titleStyle: headerTitle({ marginLeft: -26, marginRight: -50 }),
                 rightIconPress: null,

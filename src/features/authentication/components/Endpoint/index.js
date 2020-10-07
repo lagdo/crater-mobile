@@ -43,6 +43,8 @@ export const Endpoint = (props: IProps) => {
 
     const [isFocus, setFocus] = useState(false);
 
+    const goBack = navigation.goBack;
+
     const onSetEndpointApi = ({ endpointURL }) => {
 
         setFocus(false)
@@ -53,14 +55,10 @@ export const Endpoint = (props: IProps) => {
             endpointURL: !(URL.charAt(URL.length - 1) === '/') ? URL
                 : URL.slice(0, -1),
             onResult: (val) => {
-                !val ? alertMe({ title: Lng.t("endpoint.alertInvalidUrl") }) :
-                    navigation.navigate(ROUTES.LOGIN)
-
+                !val ? alertMe({ title: Lng.t("endpoint.alertInvalidUrl") }) : goBack();
             }
         })
     }
-
-    const onBack = () => navigation.navigate(ROUTES.SETTING_LIST);
 
     const toggleFocus = () => setFocus(!isFocus);
 
@@ -70,9 +68,9 @@ export const Endpoint = (props: IProps) => {
             {skipEndpoint ? (
                 <CtHeader
                     leftIcon="angle-left"
-                    leftIconPress={onBack}
+                    leftIconPress={goBack}
                     title={Lng.t("header.back")}
-                    titleOnPress={onBack}
+                    titleOnPress={goBack}
                     titleStyle={{ marginLeft: -10, marginTop: Platform.OS === 'ios' ? -1 : 2 }}
                     placement="left"
                     noBorder

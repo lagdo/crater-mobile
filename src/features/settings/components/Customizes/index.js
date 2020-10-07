@@ -37,7 +37,7 @@ export const Customizes = (props) =>  {
         <View style={styles.container}>
             <DefaultLayout
                 headerProps={{
-                    leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
+                    leftIconPress: navigation.goBack,
                     title: Lng.t("header.customize"),
                     leftIconStyle: { color: colors.dark2 }
                 }}

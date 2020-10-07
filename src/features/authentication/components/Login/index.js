@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Field } from 'redux-form';
 import styles from './styles';
-import { InputField, CtButton, AssetImage, CtDivider, CtGradientButton } from '../../../../components';
+import { InputField, AssetImage, CtGradientButton } from '../../../../components';
 // import * as Google from 'expo-google-app-auth';
 import { env, IMAGES } from '../../../../config';
 import { colors } from '../../../../styles/colors';
