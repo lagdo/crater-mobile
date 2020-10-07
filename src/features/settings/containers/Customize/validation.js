@@ -1,6 +1,6 @@
 
 // @flow
-import { getError } from "../../../../api/validation";
+import { getError, removeNullValues } from "../../../../api/validation";
 
 export const validate = (values) => {
     const errors = {};
@@ -29,5 +29,5 @@ export const validate = (values) => {
         options = { maxCharacter: 5 }
     );
 
-    return errors;
+    return removeNullValues(errors);
 };

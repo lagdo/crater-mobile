@@ -1,4 +1,4 @@
-import { getError } from "../../../../api/validation";
+import { getError, removeNullValues } from "../../../../api/validation";
 
 // @flow
 
@@ -14,5 +14,5 @@ export const validate = (values) => {
         options = { fieldName: 'Tax Percent', maxNumber: 100, minNumber: -1 }
     );
 
-    return errors;
+    return removeNullValues(errors);
 };

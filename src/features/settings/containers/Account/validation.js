@@ -1,4 +1,4 @@
-import { getError } from "../../../../api/validation";
+import { getError, removeNullValues } from "../../../../api/validation";
 
 // @flow
 
@@ -18,5 +18,5 @@ export const validate = (values) => {
     errors.password = getError(password, ['passwordCompared'], { fieldName: confirmPassword });
     errors.confirmPassword = getError(confirmPassword, ['passwordCompared'], { fieldName: password });
 
-    return errors;
+    return removeNullValues(errors);
 };
