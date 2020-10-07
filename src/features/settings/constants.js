@@ -130,13 +130,6 @@ export const SETTINGS_MENU = () => {
             }
         },
         {
-            title: Lng.t("settings.taxes"),
-            leftIcon: 'percent',
-            fullItem: {
-                route: ROUTES.TAXES
-            }
-        },
-        {
             title: Lng.t("settings.endpoint"),
             leftIcon: 'link',
             fullItem: {

@@ -48,6 +48,13 @@ export const MORE_MENU = () => {
             }
         },
         {
+            title: Lng.t("settings.taxes"),
+            leftIcon: 'percent',
+            fullItem: {
+                route: ROUTES.TAXES
+            }
+        },
+        {
             title: Lng.t("more.settings"),
             leftIcon: 'cogs',
             fullItem: {

@@ -6,9 +6,6 @@ import TaxContainer from "../../features/taxes/containers/Tax";
 import { ROUTES, navigationOptions } from "../routes";
 
 const Stack = createStackNavigator();
-import { ROUTES, navigationOptions } from "../routes";
-
-const Stack = createStackNavigator();
 
 export const TaxNavigator = () => {
     return (
