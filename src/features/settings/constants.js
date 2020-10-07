@@ -137,14 +137,6 @@ export const SETTINGS_MENU = () => {
             }
         },
         {
-            title: Lng.t("settings.expenseCategory"),
-            leftIcon: 'clipboard-list',
-            iconSize: 24,
-            fullItem: {
-                route: ROUTES.CATEGORIES
-            }
-        },
-        {
             title: Lng.t("settings.endpoint"),
             leftIcon: 'link',
             fullItem: {

@@ -40,6 +40,14 @@ export const MORE_MENU = () => {
             }
         },
         {
+            title: Lng.t("settings.expenseCategory"),
+            leftIcon: 'clipboard-list',
+            iconSize: 24,
+            fullItem: {
+                route: ROUTES.CATEGORIES
+            }
+        },
+        {
             title: Lng.t("more.settings"),
             leftIcon: 'cogs',
             fullItem: {
