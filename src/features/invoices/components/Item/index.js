@@ -136,9 +136,7 @@ export const InvoiceItem = (props) => {
     }
 
     const itemSubTotal = () => {
-        subTotal = (price * quantity)
-
-        return subTotal
+        return (price * quantity)
     }
 
     const subTotal = () => {

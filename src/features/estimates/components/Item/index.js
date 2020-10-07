@@ -136,9 +136,7 @@ export const EstimateItem = (props) => {
     }
 
     const itemSubTotal = () => {
-        subTotal = (price * quantity)
-
-        return subTotal
+        return (price * quantity)
     }
 
     const subTotal = () => {
