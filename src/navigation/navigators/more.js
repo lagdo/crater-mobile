@@ -4,6 +4,7 @@ import MoreContainer from "../../features/more/containers/More";
 import { EstimateNavigator } from './estimate';
 import { ItemNavigator } from './item';
 import { ReportNavigator } from './report';
+import { CategoryNavigator } from './category';
 import { SettingsNavigator } from './settings';
 import { ROUTES, navigationOptions } from "../routes";
 
@@ -19,6 +20,7 @@ export const MoreNavigator = ({ navigation, route }) => {
         <Stack.Screen name={ROUTES.ESTIMATE_LIST} component={EstimateNavigator} />
         <Stack.Screen name={ROUTES.GLOBAL_ITEMS} component={ItemNavigator} />
         <Stack.Screen name={ROUTES.REPORTS} component={ReportNavigator} />
+        <Stack.Screen name={ROUTES.CATEGORIES} component={CategoryNavigator} />
         <Stack.Screen name={ROUTES.SETTING_LIST} component={SettingsNavigator} />
     </Stack.Navigator>
     );
