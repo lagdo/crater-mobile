@@ -8,14 +8,11 @@ import { IMAGES } from '../../../../config';
 import { ROUTES } from '../../../../navigation/routes';
 import Lng from '../../../../api/lang/i18n';
 import { CUSTOMER_ADD, CUSTOMER_EDIT } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
-
 
 type IProps = {
     customers: Object,
     navigation: Object,
     loading: Boolean,
-    language: String,
 }
 
 let params = {
@@ -29,7 +26,6 @@ export const Customers = (props: IProps) => {
     const {
         navigation,
         loading,
-        language,
         handleSubmit,
         customers,
         filterCustomers,
@@ -39,6 +35,7 @@ export const Customers = (props: IProps) => {
             contact_name = '',
             phone = ''
         },
+        route: { params = {} },
     } = props;
 
     const [refreshing, setRefreshing] = useState(false);
@@ -52,10 +49,7 @@ export const Customers = (props: IProps) => {
     const [filter, setFilter] = useState(false);
 
     useEffect(() => {
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_INVOICES })
         getItems({ fresh: true });
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const getItems = ({ fresh = false, params, onResult, filter = false } = {}) => {
@@ -160,7 +154,7 @@ export const Customers = (props: IProps) => {
     let inputFields = [
         {
             name: 'name',
-            hint: Lng.t("customers.filterDisplayName", { locale: language }),
+            hint: Lng.t("customers.filterDisplayName"),
             inputProps: {
                 autoCorrect: true,
                 autoFocus: true,
@@ -171,7 +165,7 @@ export const Customers = (props: IProps) => {
         },
         {
             name: 'contact_name',
-            hint: Lng.t("customers.filterContactName", { locale: language }),
+            hint: Lng.t("customers.filterContactName"),
             inputProps: {
                 autoCorrect: true,
                 onSubmitEditing: () => {
@@ -184,7 +178,7 @@ export const Customers = (props: IProps) => {
         },
         {
             name: 'phone',
-            hint: Lng.t("customers.phone", { locale: language }),
+            hint: Lng.t("customers.phone"),
             inputProps: {
                 keyboardType: 'phone-pad'
             },
@@ -195,22 +189,22 @@ export const Customers = (props: IProps) => {
     ]
 
     let empty = (!filter && !search) ? {
-        description: Lng.t("customers.empty.description", { locale: language }),
-        buttonTitle: Lng.t("customers.empty.buttonTitle", { locale: language }),
+        description: Lng.t("customers.empty.description"),
+        buttonTitle: Lng.t("customers.empty.buttonTitle"),
         buttonPress: () => {
             navigation.navigate(ROUTES.CUSTOMER, { type: CUSTOMER_ADD })
             onResetFilter()
         }
     } : {}
 
-    let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
-        : (!filter) ? Lng.t("customers.empty.title", { locale: language }) :
-            Lng.t("filter.empty.filterTitle", { locale: language })
+    let emptyTitle = search ? Lng.t("search.noResult", { search })
+        : (!filter) ? Lng.t("customers.empty.title") :
+            Lng.t("filter.empty.filterTitle")
 
-    let isLoading = navigation.getParam('loading', false)
+    const { isLoading } = params;
 
     return (
-        <View style={styles.container} >
+        <View style={styles.container}>
             <MainLayout
                 headerProps={{
                     rightIcon: "plus",
@@ -218,14 +212,13 @@ export const Customers = (props: IProps) => {
                         navigation.navigate(ROUTES.CUSTOMER, { type: CUSTOMER_ADD })
                         onResetFilter()
                     },
-                    title: Lng.t("header.customers", { locale: language })
+                    title: Lng.t("header.customers")
                 }}
                 onSearch={onSearch}
                 filterProps={{
                     onSubmitFilter: handleSubmit(onSubmitFilter),
                     inputFields: inputFields,
                     clearFilter: props,
-                    language: language,
                     onResetFilter: () => onResetFilter()
                 }}
                 bottomDivider

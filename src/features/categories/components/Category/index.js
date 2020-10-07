@@ -10,7 +10,6 @@ import {
     DefaultLayout
 } from '../../../../components';
 import { BUTTON_COLOR } from '../../../../api/consts/core';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import Lng from '../../../../api/lang/i18n';
 import { CATEGORY_EDIT, CATEGORY_ADD, CATEGORY_FORM } from '../../constants';
 import { ROUTES } from '../../../../navigation/routes';
@@ -22,7 +21,6 @@ type IProps = {
     getEditCategory: Function,
     createCategory: Function,
     editCategory: Function,
-    language: String,
     type: String,
     getEditCategoryLoading: Boolean,
     categoryLoading: Boolean,
@@ -31,7 +29,7 @@ type IProps = {
 export const Category = (props: IProps) => {
     const {
         navigation,
-        language,
+        id,
         getEditCategory,
         type,
         onFirstTimeCreateExpense,
@@ -46,8 +44,6 @@ export const Category = (props: IProps) => {
 
     useEffect(() => {
         if (type === CATEGORY_EDIT) {
-
-            let id = navigation.getParam('categoryId', null)
             getEditCategory({
                 id,
                 onResult: (val) => {
@@ -57,12 +53,6 @@ export const Category = (props: IProps) => {
                 }
             });
         }
-
-        !onFirstTimeCreateExpense ?
-            goBack(MOUNT, navigation) :
-            goBack(MOUNT, navigation, { route: ROUTES.MAIN_EXPENSES })
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const setFormField = (field, value) => {
@@ -77,11 +67,10 @@ export const Category = (props: IProps) => {
                     onResult: (res) => {
                         onFirstTimeCreateExpense && onFirstTimeCreateExpense(res)
 
-                        navigation.goBack(null)
+                        navigation.goBack()
                     }
                 })
             else {
-                let id = navigation.getParam('categoryId', null);
                 editCategory({ id, params: values, navigation })
             }
         }
@@ -89,14 +78,14 @@ export const Category = (props: IProps) => {
 
     const onRemoveCategory = () => {
         alertMe({
-            title: Lng.t("alert.title", { locale: language }),
-            desc: Lng.t("categories.alertDescription", { locale: language }),
+            title: Lng.t("alert.title"),
+            desc: Lng.t("categories.alertDescription"),
             showCancel: true,
             okPress: () => removeCategory({
-                id: navigation.getParam('categoryId', null),
+                id,
                 navigation,
                 onResult: () => {
-                    alertMe({ title: `${name} ${Lng.t("categories.alreadyUsed", { locale: language })}` })
+                    alertMe({ title: `${name} ${Lng.t("categories.alreadyUsed")}` })
                 }
             })
         })
@@ -107,7 +96,7 @@ export const Category = (props: IProps) => {
             <View style={[styles.submitButton, type === CATEGORY_EDIT && styles.multipleButton]}>
                 <CtButton
                     onPress={handleSubmit(onSubmitCategory)}
-                    btnTitle={Lng.t("button.save", { locale: language })}
+                    btnTitle={Lng.t("button.save")}
                     buttonContainerStyle={type === CATEGORY_EDIT && styles.flex}
                     containerStyle={styles.btnContainerStyle}
                     loading={categoryLoading}
@@ -116,7 +105,7 @@ export const Category = (props: IProps) => {
                 {type === CATEGORY_EDIT &&
                     <CtButton
                         onPress={onRemoveCategory}
-                        btnTitle={Lng.t("button.remove", { locale: language })}
+                        btnTitle={Lng.t("button.remove")}
                         buttonColor={BUTTON_COLOR.DANGER}
                         containerStyle={styles.btnContainerStyle}
                         buttonContainerStyle={styles.flex}
@@ -132,13 +121,10 @@ export const Category = (props: IProps) => {
     return (
         <DefaultLayout
             headerProps={{
-                leftIconPress: () => {
-                    !onFirstTimeCreateExpense ? navigation.goBack(null) :
-                        navigation.navigate(ROUTES.MAIN_EXPENSES)
-                },
+                leftIconPress: navigation.goBack,
                 title: type === CATEGORY_EDIT ?
-                    Lng.t("header.editCategory", { locale: language }) :
-                    Lng.t("header.addCategory", { locale: language }),
+                    Lng.t("header.editCategory") :
+                    Lng.t("header.addCategory"),
                 placement: "center",
                 rightIcon: "save",
                 rightIconProps: {
@@ -157,7 +143,7 @@ export const Category = (props: IProps) => {
                     name="name"
                     component={InputField}
                     isRequired
-                    hint={Lng.t("categories.title", { locale: language })}
+                    hint={Lng.t("categories.title")}
                     inputFieldStyle={styles.inputFieldStyle}
                     inputProps={{
                         returnKeyType: 'next',
@@ -173,7 +159,7 @@ export const Category = (props: IProps) => {
                 <Field
                     name="description"
                     component={InputField}
-                    hint={Lng.t("categories.description", { locale: language })}
+                    hint={Lng.t("categories.description")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',

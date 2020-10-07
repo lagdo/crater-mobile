@@ -13,12 +13,10 @@ import {
 import { Field, change } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { EDIT_PREFERENCES } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { headerTitle } from '../../../../api/helper';
 
 type IProps = {
     navigation: Object,
-    language: String,
     handleSubmit: Function,
     handleSubmit: Function,
     formValues: Object,
@@ -31,7 +29,6 @@ type IProps = {
 export const Preferences = (props: IProps) => {
     const {
         navigation,
-        language,
         isLoading,
         getPreferences,
         getSettingItem,
@@ -77,10 +74,6 @@ export const Preferences = (props: IProps) => {
                 setTaxPerItem(val !== null ? val : 'NO')
             }
         })
-
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const setFormField = (field, value) => {
@@ -99,7 +92,7 @@ export const Preferences = (props: IProps) => {
             <View style={styles.submitButton}>
                 <CtButton
                     onPress={handleSubmit(onSubmitPreferences)}
-                    btnTitle={Lng.t("button.save", { locale: language })}
+                    btnTitle={Lng.t("button.save")}
                     loading={editPreferencesLoading}
                 />
             </View>
@@ -178,7 +171,7 @@ export const Preferences = (props: IProps) => {
         <DefaultLayout
             headerProps={{
                 leftIconPress: () => navigation.goBack(null),
-                title: Lng.t("header.setting.preferences", { locale: language }),
+                title: Lng.t("header.setting.preferences"),
                 placement: "center",
                 rightIcon: "save",
                 rightIconProps: {
@@ -193,7 +186,7 @@ export const Preferences = (props: IProps) => {
                     discountPerItem === null || taxPerItem === null
             }}
             toastProps={{
-                message: Lng.t("settings.preferences.settingUpdate", { locale: language }),
+                message: Lng.t("settings.preferences.settingUpdate"),
                 visible: visibleToast
             }}
         >
@@ -205,12 +198,12 @@ export const Preferences = (props: IProps) => {
                     items={timezoneList}
                     displayName="key"
                     component={SelectField}
-                    label={Lng.t("settings.preferences.timeZone", { locale: language })}
+                    label={Lng.t("settings.preferences.timeZone")}
                     icon='clock'
                     rightIcon='angle-right'
                     placeholder={time_zone ?
                         time_zone :
-                        Lng.t("settings.preferences.timeZonePlaceholder", { locale: language })
+                        Lng.t("settings.preferences.timeZonePlaceholder")
                     }
                     fakeInputProps={{
                         valueStyle: styles.selectedField,
@@ -223,7 +216,7 @@ export const Preferences = (props: IProps) => {
                         setFormField('time_zone', val.value)
                     }}
                     headerProps={{
-                        title: Lng.t("timeZones.title", { locale: language }),
+                        title: Lng.t("timeZones.title"),
                         titleStyle: headerTitle({ marginLeft: -23, marginRight: -40 }),
                         rightIconPress: null
                     }}
@@ -238,10 +231,10 @@ export const Preferences = (props: IProps) => {
                     items={dateFormatList}
                     displayName="display_date"
                     component={SelectField}
-                    label={Lng.t("settings.preferences.dateFormat", { locale: language })}
+                    label={Lng.t("settings.preferences.dateFormat")}
                     icon='calendar-alt'
                     rightIcon='angle-right'
-                    placeholder={Lng.t("settings.preferences.dateFormatPlaceholder", { locale: language })}
+                    placeholder={Lng.t("settings.preferences.dateFormatPlaceholder")}
                     fakeInputProps={{
                         valueStyle: styles.selectedField,
                         placeholderStyle: styles.selectedField,
@@ -255,7 +248,7 @@ export const Preferences = (props: IProps) => {
                         setFormField('date_format', val.carbon_format_value)
                     }}
                     headerProps={{
-                        title: Lng.t("dateFormats.title", { locale: language }),
+                        title: Lng.t("dateFormats.title"),
                         titleStyle: headerTitle({ marginLeft: -20, marginRight: -55 }),
                         rightIconPress: null
                     }}
@@ -270,10 +263,10 @@ export const Preferences = (props: IProps) => {
                     items={fiscalYearList}
                     displayName="key"
                     component={SelectField}
-                    label={Lng.t("settings.preferences.fiscalYear", { locale: language })}
+                    label={Lng.t("settings.preferences.fiscalYear")}
                     icon='calendar-alt'
                     rightIcon='angle-right'
-                    placeholder={Lng.t("settings.preferences.fiscalYearPlaceholder", { locale: language })}
+                    placeholder={Lng.t("settings.preferences.fiscalYearPlaceholder")}
                     fakeInputProps={{
                         valueStyle: styles.selectedField,
                         placeholderStyle: styles.selectedField,
@@ -285,7 +278,7 @@ export const Preferences = (props: IProps) => {
                         setFormField('fiscal_year', val.value)
                     }}
                     headerProps={{
-                        title: Lng.t("fiscalYears.title", { locale: language }),
+                        title: Lng.t("fiscalYears.title"),
                         titleStyle: headerTitle({ marginLeft: -15, marginRight: -35 }),
                         rightIconPress: null
                     }}
@@ -302,8 +295,8 @@ export const Preferences = (props: IProps) => {
                     name="discount_per_item"
                     component={ToggleSwitch}
                     status={discountPerItem === 'YES' ? true : false}
-                    hint={Lng.t("settings.preferences.discountPerItem", { locale: language })}
-                    description={Lng.t("settings.preferences.discountPerItemPlaceholder", { locale: language })}
+                    hint={Lng.t("settings.preferences.discountPerItem")}
+                    description={Lng.t("settings.preferences.discountPerItemPlaceholder")}
                     onChangeCallback={(val) => saveDiscountPerItem(val)
                     }
                 />
@@ -312,8 +305,8 @@ export const Preferences = (props: IProps) => {
                     name="tax_per_item"
                     component={ToggleSwitch}
                     status={taxPerItem === 'YES' ? true : false}
-                    hint={Lng.t("settings.preferences.taxPerItem", { locale: language })}
-                    description={Lng.t("settings.preferences.taxPerItemPlaceholder", { locale: language })}
+                    hint={Lng.t("settings.preferences.taxPerItem")}
+                    description={Lng.t("settings.preferences.taxPerItemPlaceholder")}
                     onChangeCallback={(val) => saveTaxPerItem(val)
                     }
                     mainContainerStyle={{ marginVertical: 12 }}

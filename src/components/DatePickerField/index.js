@@ -82,7 +82,7 @@ export const DatePickerComponent = (props: IProps) => {
         return null
     }
 
-    const dateValue = displayValue || value
+    const dateValue = displayValue || dateTimePickerValue;
 
     let pickerOption = {}
 
@@ -97,7 +97,7 @@ export const DatePickerComponent = (props: IProps) => {
                 label={label}
                 icon={'calendar-alt'}
                 values={
-                    (displayValue && getDate(displayValue)) || (input.value ? value : ' ')
+                    (displayValue && getDate(displayValue)) || (input.value ? dateTimePickerValue : ' ')
                 }
                 placeholder='  '
                 onChangeCallback={showHideDateTimePicker}

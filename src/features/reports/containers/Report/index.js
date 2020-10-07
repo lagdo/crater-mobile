@@ -6,13 +6,13 @@ import { validate } from './validation';
 import * as ReportAction from '../../actions';
 import { REPORT_FORM, DATE_RANGE } from '../../constants';
 
-const mapStateToProps = (state, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         more: { loading },
         global: { language, company, fiscalYear = '2-1', endpointURL },
     } = state;
 
-    const type = navigation.getParam('type');
+    const { type } = params;
 
     const isLoading = loading.reportsLoading || !type
 
@@ -46,9 +46,5 @@ const ReportContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(ReportReduxForm);
-
-ReportContainer.navigationOptions = () => ({
-    header: null,
-});
 
 export default ReportContainer;

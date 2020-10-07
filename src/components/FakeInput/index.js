@@ -26,7 +26,6 @@ type IProps = {
     valueStyle: Object,
     prefixProps: Object,
     loading: Boolean,
-    language: String,
     isRequired: Boolean,
     leftIconSolid: Boolean,
     disabled: Boolean,
@@ -50,7 +49,6 @@ export const FakeInputComponent = (props: IProps) => {
         loading = false,
         placeholderStyle,
         leftIconStyle,
-        language,
         isRequired = false,
         leftIconSolid = true,
         disabled = false,
@@ -201,7 +199,7 @@ export const FakeInputComponent = (props: IProps) => {
             {submitFailed && error && (
                 <View style={styles.validation}>
                     <Text numberOfLines={1} style={{ color: 'white', fontSize: 12 }}>
-                        {Lng.t(error, { locale: language, hint: label })}
+                        {Lng.t(error, { hint: label })}
                     </Text>
                 </View>
             )}
@@ -209,9 +207,7 @@ export const FakeInputComponent = (props: IProps) => {
     );
 }
 
-const mapStateToProps = ({ global }) => ({
-    language: global.language,
-});
+const mapStateToProps = ({ global: { language } }) => ({ language });
 
 const mapDispatchToProps = {};
 

@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { Field } from 'redux-form';
 import styles from './styles';
@@ -14,7 +14,6 @@ import {
 import { Text } from 'react-native-elements';
 import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 
 type IProps = {
     navigation: Object,
@@ -22,25 +21,17 @@ type IProps = {
     handleSubmit: Function,
     loading: Boolean,
     socialLoading: Boolean,
-    language: String,
 }
 export const ForgotPassword = (props: IProps) => {
     const {
         handleSubmit,
         navigation,
         loading,
-        language,
         sendForgotPasswordMail,
     } = props;
 
     const [lastEmail, setLastEmail] = useState('');
     const [isMailSent, setMailSent] = useState(false);
-
-    useEffect(() => {
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
-    }, []);
 
     const onSendMail = ({ email }) => {
         sendForgotPasswordMail({
@@ -67,7 +58,7 @@ export const ForgotPassword = (props: IProps) => {
                 <CtHeader
                     leftIcon="angle-left"
                     leftIconPress={() => navigation.goBack(null)}
-                    title={Lng.t("header.back", { locale: language })}
+                    title={Lng.t("header.back")}
                     titleOnPress={() => navigation.goBack(null)}
                     titleStyle={{ marginLeft: -10, marginTop: Platform.OS === 'ios' ? -1 : 2 }}
                     placement="left"
@@ -112,7 +103,7 @@ export const ForgotPassword = (props: IProps) => {
                                     inputProps={{
                                         returnKeyType: 'go',
                                         autoCapitalize: 'none',
-                                        placeholder: Lng.t("forgot.emailPlaceholder", { locale: language }),
+                                        placeholder: Lng.t("forgot.emailPlaceholder"),
                                         autoCorrect: true,
                                         keyboardType: 'email-address',
                                         onSubmitEditing: handleSubmit(onSendMail),
@@ -120,7 +111,7 @@ export const ForgotPassword = (props: IProps) => {
                                     inputContainerStyle={styles.inputField}
                                 />
                                 <Text style={styles.forgotTextTitle}>
-                                    {Lng.t("forgot.emailLabel", { locale: language })}
+                                    {Lng.t("forgot.emailLabel")}
                                 </Text>
                             </View>
                         ) : (
@@ -130,14 +121,14 @@ export const ForgotPassword = (props: IProps) => {
                                         imageStyle={styles.imgLogo}
                                     />
                                     <Text style={styles.emailSendDescription}>
-                                        {Lng.t("forgot.emailSendDescription", { locale: language })}
+                                        {Lng.t("forgot.emailSendDescription")}
                                     </Text>
                                 </View>
                             )}
                         {!isMailSent ? (
                             <CtGradientButton
                                 onPress={handleSubmit(onSendMail)}
-                                btnTitle={Lng.t("button.recoveryEmail", { locale: language })}
+                                btnTitle={Lng.t("button.recoveryEmail")}
                                 loading={loading}
                                 style={styles.buttonStyle}
                                 buttonContainerStyle={styles.buttonContainer}
@@ -145,7 +136,7 @@ export const ForgotPassword = (props: IProps) => {
                         ) : (
                                 <CtGradientButton
                                     onPress={resendMail}
-                                    btnTitle={Lng.t("button.recoveryEmailAgain", { locale: language })}
+                                    btnTitle={Lng.t("button.recoveryEmailAgain")}
                                     loading={loading}
                                     style={styles.buttonStyle}
                                     buttonContainerStyle={styles.buttonContainer}

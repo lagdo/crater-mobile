@@ -51,7 +51,7 @@ function* getItemUnits(payloadData = {}) {
         yield put(setItemUnits({ units: response.units }));
 
     } catch (error) {
-        console.log(error)
+        // console.log(error)
     } finally {
         yield put(settingsTriggerSpinner({ itemUnitsLoading: false }));
     }

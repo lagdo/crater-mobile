@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { ListView, DefaultLayout } from '../../../../components';
@@ -8,19 +8,11 @@ import { ROUTES } from '../../../../navigation/routes';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
 import { REPORTS_MENU } from '../../constants';
-import { MOUNT, goBack, UNMOUNT } from '../../../../navigation/actions';
 
 export const Reports = (props) => {
     const {
         navigation,
-        language,
     } = props;
-
-    useEffect(() => {
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_MORE })
-
-        return () => goBack(UNMOUNT)
-    }, []);
 
     const onSelectMenu = ({ route, type }) => {
         if (route) {
@@ -33,14 +25,14 @@ export const Reports = (props) => {
             <DefaultLayout
                 headerProps={{
                     leftIconPress: () => navigation.navigate(ROUTES.MAIN_MORE),
-                    title: Lng.t("header.reports", { locale: language }),
+                    title: Lng.t("header.reports"),
                     leftIconStyle: { color: colors.dark2 }
                 }}
                 hasSearchField={false}
             >
                 <View style={styles.listViewContainer}>
                     <ListView
-                        items={REPORTS_MENU(language, Lng)}
+                        items={REPORTS_MENU()}
                         onPress={onSelectMenu}
                         leftTitleStyle={styles.listViewTitle}
                         listItemProps={{

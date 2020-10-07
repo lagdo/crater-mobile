@@ -54,8 +54,4 @@ const CompanyContainer = connect(
     mapDispatchToProps,
 )(CompanyReduxForm);
 
-CompanyContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default CompanyContainer;

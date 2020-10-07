@@ -7,14 +7,12 @@ import { CtGradientButton } from '../Button';
 import { Text } from 'react-native-elements';
 import { IMAGES } from '../../config';
 import Lng from '../../api/lang/i18n';
-import { goBack, MOUNT, UNMOUNT } from '../../navigation/actions';
 import { checkConnection } from '../../api/helper';
 import { ROUTES } from '../../navigation/routes';
 
 export const LostConnection = (props) => {
     const {
         navigation,
-        language,
     } = props;
 
     const [loading, setLoading] = useState(false);
@@ -38,7 +36,7 @@ export const LostConnection = (props) => {
 
                 <View style={styles.bodyContainer}>
                     <Text style={styles.title}>
-                        {Lng.t("lostInternet.title", { locale: language })}
+                        {Lng.t("lostInternet.title")}
                     </Text>
 
                     <View style={styles.logoContainer}>
@@ -49,14 +47,14 @@ export const LostConnection = (props) => {
                     </View>
 
                     <Text h6 style={styles.description}>
-                        {Lng.t("lostInternet.description", { locale: language })}
+                        {Lng.t("lostInternet.description")}
                     </Text>
                 </View>
 
                 <View style={{ marginTop: 25 }}>
                     <CtGradientButton
                         onPress={onRetry}
-                        btnTitle={Lng.t("button.retry", { locale: language })}
+                        btnTitle={Lng.t("button.retry")}
                         loading={loading}
                     />
                 </View>
@@ -67,21 +65,11 @@ export const LostConnection = (props) => {
     );
 }
 
-const mapStateToProps = ({ global }) => ({
-    language: global.language,
-});
-
-const mapDispatchToProps = {};
+const mapStateToProps = ({ global: { language } }) => ({ language });
 
 //  connect
 const LostConnectionContainer = connect(
     mapStateToProps,
-    mapDispatchToProps,
 )(LostConnection);
-
-LostConnectionContainer.navigationOptions = () => ({
-    header: null,
-});
-
 
 export default LostConnectionContainer;

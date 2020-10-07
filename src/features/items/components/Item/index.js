@@ -18,7 +18,6 @@ import { ITEM_FORM, EDIT_ITEM, ADD_ITEM, ITEM_UNITS } from '../../constants';
 import { BUTTON_COLOR } from '../../../../api/consts/core';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
-import { goBack, UNMOUNT, MOUNT } from '../../../../navigation/actions';
 import { ADD_TAX } from '../../../settings/constants';
 import { MAX_LENGTH, alertMe, formatSelectPickerName, hasValue } from '../../../../api/global';
 
@@ -26,7 +25,7 @@ export const Item = (props) => {
     const {
         navigation,
         type,
-        language,
+        currency,
         loading,
         getEditItem,
         addItem,
@@ -44,8 +43,6 @@ export const Item = (props) => {
 
     const isCreateItem = (type === ADD_ITEM)
 
-    const currency = navigation.getParam('currency')
-
     const [isTaxPerItem, setTaxPerItem] = useState(true);
 
     useEffect(() => {
@@ -56,14 +53,11 @@ export const Item = (props) => {
             onResult: (res) => setTaxPerItem(res === 'YES')
         })
 
-        goBack(MOUNT, navigation)
-
         const isEdit = (type === EDIT_ITEM)
         isEdit && getEditItem({ id: itemId })
 
         return () => {
             clearItem()
-            goBack(UNMOUNT)
         }
     }, []);
 
@@ -73,7 +67,7 @@ export const Item = (props) => {
 
     const saveItem = (values) => {
         if (finalAmount() < 0) {
-            alert(Lng.t("items.lessAmount", { locale: language }))
+            alert(Lng.t("items.lessAmount"))
             return
         }
 
@@ -108,16 +102,16 @@ export const Item = (props) => {
 
     const onRemoveItem = () => {
         alertMe({
-            title: Lng.t("alert.title", { locale: language }),
-            desc: Lng.t("items.alertDescription", { locale: language }),
+            title: Lng.t("alert.title"),
+            desc: Lng.t("items.alertDescription"),
             showCancel: true,
             okPress: () => removeItem({
                 id: itemId,
                 onResult: (res) => {
                     res.error && res.error === 'item_attached' ?
                         alertMe({
-                            title: Lng.t("items.alreadyAttachTitle", { locale: language }),
-                            desc: Lng.t("items.alreadyAttachDescription", { locale: language })
+                            title: Lng.t("items.alreadyAttachTitle"),
+                            desc: Lng.t("items.alreadyAttachDescription")
                         })
                         : navigation.navigate(ROUTES.GLOBAL_ITEMS)
                 }
@@ -183,7 +177,7 @@ export const Item = (props) => {
                 <View style={styles.subContainer}>
                     <View>
                         <Text style={styles.label}>
-                            {Lng.t("items.subTotal", { locale: language })}
+                            {Lng.t("items.subTotal")}
                         </Text>
                     </View>
                     <View>
@@ -238,7 +232,7 @@ export const Item = (props) => {
                 <View style={styles.subContainer}>
                     <View>
                         <Text style={styles.label}>
-                            {Lng.t("items.finalAmount", { locale: language })}
+                            {Lng.t("items.finalAmount")}
                         </Text>
                     </View>
                     <View>
@@ -258,7 +252,7 @@ export const Item = (props) => {
             <View style={styles.submitButton}>
                 <CtButton
                     onPress={handleSubmit(saveItem)}
-                    btnTitle={Lng.t("button.save", { locale: language })}
+                    btnTitle={Lng.t("button.save")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
                     loading={loading}
@@ -266,7 +260,7 @@ export const Item = (props) => {
                 {!isCreateItem && (
                     <CtButton
                         onPress={onRemoveItem}
-                        btnTitle={Lng.t("button.remove", { locale: language })}
+                        btnTitle={Lng.t("button.remove")}
                         containerStyle={styles.handleBtn}
                         buttonContainerStyle={styles.buttonContainer}
                         buttonColor={BUTTON_COLOR.DANGER}
@@ -283,10 +277,10 @@ export const Item = (props) => {
                 name="taxes"
                 items={taxTypes}
                 displayName="name"
-                label={Lng.t("items.taxes", { locale: language })}
+                label={Lng.t("items.taxes")}
                 component={SelectField}
                 searchFields={['name', 'percent']}
-                placeholder={Lng.t("items.selectTax", { locale: language })}
+                placeholder={Lng.t("items.selectTax")}
                 onlyPlaceholder
                 fakeInputProps={{
                     icon: 'percent',
@@ -295,7 +289,6 @@ export const Item = (props) => {
                 }}
                 navigation={navigation}
                 isMultiSelect
-                language={language}
                 concurrentMultiSelect
                 isInternalSearch
                 compareField="id"
@@ -304,7 +297,7 @@ export const Item = (props) => {
                     contentContainerStyle: { flex: 2 }
                 }}
                 headerProps={{
-                    title: Lng.t("taxes.title", { locale: language }),
+                    title: Lng.t("taxes.title"),
                 }}
                 rightIconPress={
                     () => navigation.navigate(ROUTES.TAX, {
@@ -330,8 +323,8 @@ export const Item = (props) => {
             headerProps={{
                 leftIconPress: () => navigation.navigate(ROUTES.GLOBAL_ITEMS),
                 title: isCreateItem ?
-                    Lng.t("header.addItem", { locale: language }) :
-                    Lng.t("header.editItem", { locale: language }),
+                    Lng.t("header.addItem") :
+                    Lng.t("header.editItem"),
                 placement: "center",
                 rightIcon: 'save',
                 rightIconProps: {
@@ -347,7 +340,7 @@ export const Item = (props) => {
                     name="name"
                     component={InputField}
                     isRequired
-                    hint={Lng.t("items.name", { locale: language })}
+                    hint={Lng.t("items.name")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -363,7 +356,7 @@ export const Item = (props) => {
                     name="price"
                     component={InputField}
                     isRequired
-                    hint={Lng.t("items.price", { locale: language })}
+                    hint={Lng.t("items.price")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -379,12 +372,12 @@ export const Item = (props) => {
                 <Field
                     name="unit_id"
                     component={SelectPickerField}
-                    label={Lng.t("items.unit", { locale: language })}
+                    label={Lng.t("items.unit")}
                     items={formatSelectPickerName(units)}
                     fieldIcon={'balance-scale'}
                     containerStyle={styles.selectPicker}
                     defaultPickerOptions={{
-                        label: Lng.t("items.unitPlaceholder", { locale: language }),
+                        label: Lng.t("items.unitPlaceholder"),
                         value: '',
                     }}
                 />
@@ -396,7 +389,7 @@ export const Item = (props) => {
                 <Field
                     name="description"
                     component={InputField}
-                    hint={Lng.t("items.description", { locale: language })}
+                    hint={Lng.t("items.description")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',

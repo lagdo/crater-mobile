@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Field, change } from 'redux-form';
 import styles from './styles';
@@ -26,14 +26,12 @@ import moment from 'moment';
 import { Linking } from 'expo';
 import { env } from '../../../../config';
 import QueryString from 'qs';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { headerTitle } from '../../../../api/helper';
 import { store } from '../../../../store';
 
 type IProps = {
     navigation: Object,
     taxTypes: Object,
-    language: String,
     type: String,
     loading: Boolean,
     handleSubmit: Function,
@@ -44,7 +42,6 @@ export const Report = (props: IProps) => {
         navigation,
         handleSubmit,
         loading,
-        language,
         initialValues,
         type,
         taxTypes,
@@ -53,12 +50,6 @@ export const Report = (props: IProps) => {
     const [taxTypeList, setTaxTypeList] = useState(taxTypes);
     const [displayFromDate, setDisplayFromDate] = useState('');
     const [displayToDate, setDisplayToDate] = useState('');
-
-    useEffect(() => {
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT)
-    }, []);
 
     const setFormField = (field, value) => {
         props.dispatch(change(REPORT_FORM, field, value));
@@ -212,7 +203,7 @@ export const Report = (props: IProps) => {
                 <View style={{ flex: 1 }}>
                     <CtButton
                         onPress={handleSubmit(saveReport)}
-                        btnTitle={Lng.t("button.generateReport", { locale: language })}
+                        btnTitle={Lng.t("button.generateReport")}
                         containerStyle={styles.handleBtn}
                         loading={loading}
                     />
@@ -229,23 +220,23 @@ export const Report = (props: IProps) => {
                 const tp = (reportType === 'byCustomer')
 
                 data = isTitle ?
-                    Lng.t("header.salesReport", { locale: language }) :
+                    Lng.t("header.salesReport") :
                     (tp ? 'sales/customers/' : 'sales/items/')
                 break;
 
             case PROFIT_AND_LOSS:
                 data = isTitle ?
-                    Lng.t("header.profitAndLossReport", { locale: language }) : 'profit-loss/'
+                    Lng.t("header.profitAndLossReport") : 'profit-loss/'
                 break;
 
             case EXPENSES:
                 data = isTitle ?
-                    Lng.t("header.expensesReport", { locale: language }) : 'expenses/'
+                    Lng.t("header.expensesReport") : 'expenses/'
                 break;
 
             case TAXES:
                 data = isTitle ?
-                    Lng.t("header.taxesReport", { locale: language }) : 'tax-summary/'
+                    Lng.t("header.taxesReport") : 'tax-summary/'
                 break;
 
             default:
@@ -271,11 +262,11 @@ export const Report = (props: IProps) => {
             <View style={styles.bodyContainer}>
                 <Field
                     name="date_range"
-                    label={Lng.t("reports.dateRange", { locale: language })}
+                    label={Lng.t("reports.dateRange")}
                     component={SelectPickerField}
                     isRequired
                     fieldIcon='calendar-week'
-                    items={DATE_RANGE_OPTION(language, Lng)}
+                    items={DATE_RANGE_OPTION()}
                     onChangeCallback={onDateRangeChange}
                     fakeInputContainerStyle={styles.selectPickerField}
                 />
@@ -287,7 +278,7 @@ export const Report = (props: IProps) => {
                             component={DatePickerField}
                             isRequired
                             displayValue={displayFromDate}
-                            label={Lng.t("reports.fromDate", { locale: language })}
+                            label={Lng.t("reports.fromDate")}
                             onChangeCallback={(val) => {
                                 setFormField('date_range', 'custom')
                                 setDisplayFromDate('')
@@ -300,7 +291,7 @@ export const Report = (props: IProps) => {
                             component={DatePickerField}
                             isRequired
                             displayValue={displayToDate}
-                            label={Lng.t("reports.toDate", { locale: language })}
+                            label={Lng.t("reports.toDate")}
                             onChangeCallback={(val) => {
                                 setFormField('date_range', 'custom')
                                 setDisplayToDate('')
@@ -312,10 +303,10 @@ export const Report = (props: IProps) => {
                 {type === SALES && (
                     <Field
                         name="report_type"
-                        label={Lng.t("reports.reportType", { locale: language })}
+                        label={Lng.t("reports.reportType")}
                         component={SelectPickerField}
                         fieldIcon='vial'
-                        items={REPORT_TYPE_OPTION(language, Lng)}
+                        items={REPORT_TYPE_OPTION()}
                         onChangeCallback={(val) => {
                             setFormField('report_type', val)
                         }}

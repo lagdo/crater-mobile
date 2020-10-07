@@ -7,18 +7,19 @@ import { validate } from './validation';
 import * as ExpensesAction from '../../actions';
 import { EXPENSE_FORM, EXPENSE_EDIT, EXPENSE_ADD } from '../../constants';
 
-const mapStateToProps = (state, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
 
     const {
         global: { company, endpointURL, language },
         expenses: { loading, categories, expense } = {}
     } = state;
 
-    const type = navigation.getParam('type', EXPENSE_ADD)
+    const { id = null, type = EXPENSE_ADD } = params;
     const isLoading = loading.initExpenseLoading || (type === EXPENSE_EDIT && !expense)
         || !categories || categories.length <= 0
 
     return {
+        id,
         language,
         categories,
         company,
@@ -57,9 +58,5 @@ const ExpenseContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(addExpenseReduxForm);
-
-ExpenseContainer.navigationOptions = () => ({
-    header: null,
-});
 
 export default ExpenseContainer;

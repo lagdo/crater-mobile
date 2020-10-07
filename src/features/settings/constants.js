@@ -1,5 +1,6 @@
 import queryString from 'query-string';
 import { ROUTES } from "../../navigation/routes";
+import Lng from '../../api/lang/i18n';
 
 // Forms
 // -----------------------------------------
@@ -78,10 +79,10 @@ export const REMOVE_ITEM_UNIT = 'units/REMOVE_ITEM_UNIT';
 
 // Menus
 // -----------------------------------------
-export const SETTINGS_MENU = (language, Lng) => {
+export const SETTINGS_MENU = () => {
     return [
         {
-            title: Lng.t("settings.accountSettings", { locale: language }),
+            title: Lng.t("settings.accountSettings"),
             leftIcon: 'user',
             iconSize: 24,
             fullItem: {
@@ -89,7 +90,7 @@ export const SETTINGS_MENU = (language, Lng) => {
             }
         },
         {
-            title: Lng.t("settings.companyInformation", { locale: language }),
+            title: Lng.t("settings.companyInformation"),
             leftIcon: 'building',
             iconSize: 24,
             fullItem: {
@@ -97,7 +98,7 @@ export const SETTINGS_MENU = (language, Lng) => {
             }
         },
         {
-            title: Lng.t("settings.preference", { locale: language }),
+            title: Lng.t("settings.preference"),
             leftIcon: 'sun',
             leftIconSolid: true,
             fullItem: {
@@ -105,7 +106,7 @@ export const SETTINGS_MENU = (language, Lng) => {
             }
         },
         {
-            title: Lng.t("settings.notification", { locale: language }),
+            title: Lng.t("settings.notification"),
             leftIcon: 'bell',
             iconSize: 25,
             fullItem: {
@@ -113,7 +114,7 @@ export const SETTINGS_MENU = (language, Lng) => {
             }
         },
         {
-            title: Lng.t("settings.LanguageAndCurrency", { locale: language }),
+            title: Lng.t("settings.LanguageAndCurrency"),
             leftIcon: 'language',
             iconSize: 21,
             fullItem: {
@@ -121,7 +122,7 @@ export const SETTINGS_MENU = (language, Lng) => {
             }
         },
         {
-            title: Lng.t("settings.customize", { locale: language }),
+            title: Lng.t("settings.customize"),
             leftIcon: 'edit',
             iconSize: 22,
             fullItem: {
@@ -129,22 +130,7 @@ export const SETTINGS_MENU = (language, Lng) => {
             }
         },
         {
-            title: Lng.t("settings.taxes", { locale: language }),
-            leftIcon: 'percent',
-            fullItem: {
-                route: ROUTES.TAXES
-            }
-        },
-        {
-            title: Lng.t("settings.expenseCategory", { locale: language }),
-            leftIcon: 'clipboard-list',
-            iconSize: 24,
-            fullItem: {
-                route: ROUTES.CATEGORIES
-            }
-        },
-        {
-            title: Lng.t("settings.endpoint", { locale: language }),
+            title: Lng.t("settings.endpoint"),
             leftIcon: 'link',
             fullItem: {
                 route: ROUTES.ENDPOINTS_SETTINGS
@@ -164,31 +150,31 @@ export const CUSTOMIZE_TYPE = {
 
 // Customize Menu
 // -----------------------------------------
-export const CUSTOMIZES_MENU = (language, Lng) => {
+export const CUSTOMIZES_MENU = () => {
     return [
         {
-            title: Lng.t("header.invoices", { locale: language }),
+            title: Lng.t("header.invoices"),
             fullItem: {
                 route: ROUTES.CUSTOMIZE,
                 type: CUSTOMIZE_TYPE.INVOICES
             }
         },
         {
-            title: Lng.t("header.estimates", { locale: language }),
+            title: Lng.t("header.estimates"),
             fullItem: {
                 route: ROUTES.CUSTOMIZE,
                 type: CUSTOMIZE_TYPE.ESTIMATES
             }
         },
         {
-            title: Lng.t("header.payments", { locale: language }),
+            title: Lng.t("header.payments"),
             fullItem: {
                 route: ROUTES.CUSTOMIZE,
                 type: CUSTOMIZE_TYPE.PAYMENTS
             }
         },
         {
-            title: Lng.t("header.items", { locale: language }),
+            title: Lng.t("header.items"),
             fullItem: {
                 route: ROUTES.CUSTOMIZE,
                 type: CUSTOMIZE_TYPE.ITEMS

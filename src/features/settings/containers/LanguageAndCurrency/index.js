@@ -60,8 +60,4 @@ const LanguageAndCurrencyContainer = connect(
     mapDispatchToProps,
 )(LanguageandCurrencyReduxForm);
 
-LanguageAndCurrencyContainer.navigationOptions = () => ({
-    header: null,
-});
-
 export default LanguageAndCurrencyContainer;

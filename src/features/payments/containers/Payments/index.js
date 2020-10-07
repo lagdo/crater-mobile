@@ -2,15 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { reduxForm, getFormValues } from 'redux-form';
 import * as PaymentsAction from '../../actions';
-import { colors } from '../../../../styles/colors';
 import { Payments } from '../../components/Payments';
 import { PAYMENT_SEARCH } from '../../constants';
-import { SvgXml } from 'react-native-svg';
-import { PAYMETNS } from '../../../../assets/svg';
 import { getCustomers } from '../../../customers/actions';
-import { getTitleByLanguage, navigateToMainTabs } from '../../../../navigation/actions';
-import { ROUTES } from '../../../../navigation/routes';
-import { withNavigationFocus } from 'react-navigation';
 import { getPaymentModes } from '../../../settings/actions';
 
 
@@ -61,24 +55,4 @@ const PaymentsContainer = connect(
     mapDispatchToProps,
 )(paymentSearchReduxForm);
 
-PaymentsContainer.navigationOptions = ({ navigation }) => ({
-    gesturesEnabled: false,
-    tabBarLabel: getTitleByLanguage('tabNavigation.payments'),
-    tabBarIcon: ({ focused }: { focused: boolean }) => (
-        <SvgXml
-            xml={PAYMETNS}
-            fill={focused ? colors.primary : colors.darkGray}
-            width="22"
-            height="22"
-        />
-    ),
-    tabBarOnPress: () => {
-        if (navigation.isFocused()) {
-            return;
-        }
-
-        navigateToMainTabs(navigation, ROUTES.MAIN_PAYMENTS)
-    }
-});
-
-export default withNavigationFocus(PaymentsContainer);
+export default PaymentsContainer;

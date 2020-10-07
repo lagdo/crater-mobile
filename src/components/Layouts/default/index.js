@@ -5,7 +5,6 @@ import { View, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { styles } from './styles';
 import { Field } from 'redux-form';
 import { InputField, CtHeader, CtDivider } from '../..';
-import { NavigationEvents } from 'react-navigation';
 import { Content } from '../../Content';
 import Dropdown from '../../Dropdown';
 import Toast from '../../Toast';
@@ -34,12 +33,8 @@ export const DefaultLayout = ({
 }: IProps) => {
     return (
         <View style={styles.page}>
-
             {toastProps && (<Toast {...toastProps} />)}
 
-            <NavigationEvents
-                onWillFocus={onFocus}
-            />
             <View style={styles.headerContainer}>
                 <CtHeader
                     titleStyle={styles.headerTitleStyle}

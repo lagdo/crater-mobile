@@ -1,19 +1,16 @@
-
-import { ROUTES } from "../routes";
-import { generateStackNavigation } from "../actions";
+import React from "react";
+import { createStackNavigator } from '@react-navigation/stack';
 import ReportsContainer from "../../features/reports/containers/Reports";
 import ReportContainer from "../../features/reports/containers/Report";
+import { ROUTES, navigationOptions } from "../routes";
 
-export const ReportNavigator = {
-    // Reports
-    // -----------------------------------------
-    [ROUTES.REPORTS]: generateStackNavigation(
-        ROUTES.REPORTS,
-        ReportsContainer,
-    ),
+const Stack = createStackNavigator();
 
-    [ROUTES.GENERATE_REPORT]: generateStackNavigation(
-        ROUTES.GENERATE_REPORT,
-        ReportContainer,
-    ),
+export const ReportNavigator = () => {
+    return (
+    <Stack.Navigator screenOptions={navigationOptions}>
+        <Stack.Screen name={ROUTES.REPORTS} component={ReportsContainer} />
+        <Stack.Screen name={ROUTES.GENERATE_REPORT} component={ReportContainer} />
+    </Stack.Navigator>
+    );
 }

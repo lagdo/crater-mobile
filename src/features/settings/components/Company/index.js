@@ -7,7 +7,6 @@ import { DefaultLayout, CtButton, InputField, FilePicker, AssetImage, SelectFiel
 import { Field, change } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { EDIT_COMPANY } from '../../constants';
-import { goBack, UNMOUNT, MOUNT } from '../../../../navigation/actions';
 import { MAX_LENGTH, formatCountries } from '../../../../api/global';
 
 
@@ -17,7 +16,6 @@ type IProps = {
     getCountries: Function,
     editCompanyInformation: Function,
     handleSubmit: Function,
-    language: String,
     editCompanyLoading: Boolean,
     getCompanyInfoLoading: Boolean,
     countriesLoading: Boolean,
@@ -35,7 +33,6 @@ let companyField = [
 export const Company = (props: IProps) =>  {
     const {
         navigation,
-        language,
         handleSubmit,
         getCompanyInfoLoading,
         countriesLoading,
@@ -73,10 +70,6 @@ export const Company = (props: IProps) =>  {
                 }
             }
         });
-
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const setFormField = (field, value) => {
@@ -98,7 +91,7 @@ export const Company = (props: IProps) =>  {
             <View style={styles.submitButton}>
                 <CtButton
                     onPress={handleSubmit(onCompanyUpdate)}
-                    btnTitle={Lng.t("button.save", { locale: language })}
+                    btnTitle={Lng.t("button.save")}
                     loading={editCompanyLoading || fileLoading}
                 />
             </View>
@@ -111,7 +104,7 @@ export const Company = (props: IProps) =>  {
         <DefaultLayout
             headerProps={{
                 leftIconPress: () => navigation.goBack(null),
-                title: Lng.t("header.setting.company", { locale: language }),
+                title: Lng.t("header.setting.company"),
                 titleStyle: styles.titleStyle,
                 placement: "center",
                 rightIcon: "save",
@@ -130,7 +123,7 @@ export const Company = (props: IProps) =>  {
                 <Field
                     name={"logo"}
                     component={FilePicker}
-                    label={Lng.t("settings.company.logo", { locale: language })}
+                    label={Lng.t("settings.company.logo")}
                     navigation={navigation}
                     onChangeCallback={(val) => setLogo(val)}
                     imageUrl={image}
@@ -144,7 +137,7 @@ export const Company = (props: IProps) =>  {
                     name={"name"}
                     component={InputField}
                     isRequired
-                    hint={Lng.t("settings.company.name", { locale: language })}
+                    hint={Lng.t("settings.company.name")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCorrect: true,
@@ -159,7 +152,7 @@ export const Company = (props: IProps) =>  {
                 <Field
                     name={"phone"}
                     component={InputField}
-                    hint={Lng.t("settings.company.phone", { locale: language })}
+                    hint={Lng.t("settings.company.phone")}
                     inputProps={{
                         returnKeyType: 'next',
                         keyboardType: 'phone-pad'
@@ -174,7 +167,7 @@ export const Company = (props: IProps) =>  {
                     items={formatCountries(countries)}
                     displayName="name"
                     component={SelectField}
-                    label={Lng.t("customers.address.country", { locale: language })}
+                    label={Lng.t("customers.address.country")}
                     placeholder={" "}
                     rightIcon='angle-right'
                     navigation={navigation}
@@ -184,7 +177,7 @@ export const Company = (props: IProps) =>  {
                         setFormField("country_id", id)
                     }}
                     headerProps={{
-                        title: Lng.t("header.country", { locale: language }),
+                        title: Lng.t("header.country"),
                         rightIconPress: null
                     }}
                     listViewProps={{
@@ -199,7 +192,7 @@ export const Company = (props: IProps) =>  {
                 <Field
                     name={"state"}
                     component={InputField}
-                    hint={Lng.t("customers.address.state", { locale: language })}
+                    hint={Lng.t("customers.address.state")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -213,7 +206,7 @@ export const Company = (props: IProps) =>  {
                 <Field
                     name={"city"}
                     component={InputField}
-                    hint={Lng.t("customers.address.city", { locale: language })}
+                    hint={Lng.t("customers.address.city")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -230,10 +223,10 @@ export const Company = (props: IProps) =>  {
                 <Field
                     name={"address_street_1"}
                     component={InputField}
-                    hint={Lng.t("settings.company.address", { locale: language })}
+                    hint={Lng.t("settings.company.address")}
                     inputProps={{
                         returnKeyType: 'next',
-                        placeholder: Lng.t("settings.company.street1", { locale: language }),
+                        placeholder: Lng.t("settings.company.street1"),
                         autoCorrect: true,
                         multiline: true,
                         maxLength: MAX_LENGTH
@@ -251,7 +244,7 @@ export const Company = (props: IProps) =>  {
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
-                        placeholder: Lng.t("settings.company.street2", { locale: language }),
+                        placeholder: Lng.t("settings.company.street2"),
                         autoCorrect: true,
                         multiline: true,
                         maxLength: MAX_LENGTH
@@ -264,7 +257,7 @@ export const Company = (props: IProps) =>  {
                 <Field
                     name={"zip"}
                     component={InputField}
-                    hint={Lng.t("settings.company.zipcode", { locale: language })}
+                    hint={Lng.t("settings.company.zipcode")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',

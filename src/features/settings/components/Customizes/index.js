@@ -8,12 +8,10 @@ import { ROUTES } from '../../../../navigation/routes';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
 import { CUSTOMIZES_MENU } from '../../constants';
-import { MOUNT, goBack, UNMOUNT } from '../../../../navigation/actions';
 
 export const Customizes = (props) =>  {
     const {
         navigation,
-        language,
         getCustomizeSettings,
         getPaymentModes,
         getItemUnits,
@@ -25,10 +23,6 @@ export const Customizes = (props) =>  {
         getCustomizeSettings()
         getPaymentModes()
         getItemUnits()
-
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const onSelectMenu = ({ route, type }) => {
@@ -43,8 +37,8 @@ export const Customizes = (props) =>  {
         <View style={styles.container}>
             <DefaultLayout
                 headerProps={{
-                    leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
-                    title: Lng.t("header.customize", { locale: language }),
+                    leftIconPress: navigation.goBack,
+                    title: Lng.t("header.customize"),
                     leftIconStyle: { color: colors.dark2 }
                 }}
                 hasSearchField={false}
@@ -52,7 +46,7 @@ export const Customizes = (props) =>  {
             >
                 <View style={styles.listViewContainer}>
                     <ListView
-                        items={CUSTOMIZES_MENU(language, Lng)}
+                        items={CUSTOMIZES_MENU()}
                         onPress={onSelectMenu}
                         leftTitleStyle={styles.listViewTitle}
                         listItemProps={{

@@ -1,21 +1,18 @@
+import React from "react";
+import { createStackNavigator } from '@react-navigation/stack';
 import EstimatesContainer from '../../features/estimates/containers/Estimates';
 import EstimateContainer from '../../features/estimates/containers/Estimate';
 import EstimateItemContainer from '../../features/estimates/containers/Item';
-import { ROUTES } from "../routes";
-import { generateStackNavigation } from "../actions";
+import { ROUTES, navigationOptions } from "../routes";
 
-export const EstimateNavigator = {
+const Stack = createStackNavigator();
 
-    [ROUTES.ESTIMATE_LIST]: generateStackNavigation(
-        ROUTES.ESTIMATE_LIST,
-        EstimatesContainer,
-    ),
-    [ROUTES.ESTIMATE]: generateStackNavigation(
-        ROUTES.ESTIMATE,
-        EstimateContainer,
-    ),
-    [ROUTES.ESTIMATE_ITEM]: generateStackNavigation(
-        ROUTES.ESTIMATE_ITEM,
-        EstimateItemContainer,
-    ),
+export const EstimateNavigator = () => {
+    return (
+    <Stack.Navigator screenOptions={navigationOptions}>
+        <Stack.Screen name={ROUTES.ESTIMATE_LIST} component={EstimatesContainer} />
+        <Stack.Screen name={ROUTES.ESTIMATE} component={EstimateContainer} />
+        <Stack.Screen name={ROUTES.ESTIMATE_ITEM} component={EstimateItemContainer} />
+    </Stack.Navigator>
+    );
 }

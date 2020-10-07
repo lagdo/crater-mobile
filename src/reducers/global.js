@@ -6,7 +6,7 @@ import {
     SAVE_ENDPOINT_API,
     SET_APP_VERSION,
 } from "../api/consts";
-import { SET_TAX, SET_EDIT_TAX, SET_REMOVE_TAX, SET_TAXES, SET_COMPANY_INFO } from "../features/settings/constants";
+import { SET_TAX, SET_EDIT_TAX, SET_REMOVE_TAX, SET_TAXES, SET_COMPANY_INFO } from "../features/taxes/constants";
 import { formatTaxTypes } from "../api/global";
 
 const initialState = {

@@ -7,16 +7,15 @@ import * as AuthAction from '../../actions';
 import { env } from '../../../../config';
 import { validate } from './validation';
 
-const mapStateToProps = (state, { navigation }) => {
-
+const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { language, endpointURL },
         auth: { loading }
     } = state
 
-    let CRATER_URL = (typeof endpointURL !== 'undefined' && endpointURL !== null) ? endpointURL : ''
+    const CRATER_URL = (typeof endpointURL !== 'undefined' && endpointURL !== null) ? endpointURL : '';
 
-    let skipEndpoint = navigation.getParam('skipEndpoint', false)
+    const { skipEndpoint = false } = params;
 
     return {
         language,
@@ -46,10 +45,4 @@ const EndpointContainer = connect(
     mapDispatchToProps,
 )(EndpointReduxForm);
 
-EndpointContainer.navigationOptions = () => ({
-    header: null
-});
-
 export default EndpointContainer;
-
-

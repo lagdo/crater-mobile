@@ -6,19 +6,29 @@ import * as TaxAction from '../../actions';
 import { validate } from './validation';
 import { TAX_FORM, ADD_TAX } from '../../constants';
 
-const mapStateToProps = ({ settings, global }, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
+    const {
+        global: { language },
+        settings: {
+            loading: {
+                addTaxLoading,
+                editTaxLoading,
+                removeTaxLoading,
+            }
+        },
+    } = state;
 
-    const taxType = navigation.getParam('tax', {})
-    const type = navigation.getParam('type', ADD_TAX)
+    const { tax: taxType = {}, type = ADD_TAX, onSelect = null } = params;
 
-    const isLoading = settings.loading.editTaxLoading || settings.loading.addTaxLoading || settings.loading.removeTaxLoading
+    const isLoading = editTaxLoading || addTaxLoading || removeTaxLoading;
 
 
     return {
         loading: isLoading,
         type,
         taxId: taxType && taxType.id,
-        language: global.language,
+        language,
+        onSelect,
         initialValues: {
             collective_tax: 0,
             compound_tax: 0,
@@ -44,9 +54,5 @@ const TaxContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(TaxReduxForm);
-
-TaxContainer.navigationOptions = () => ({
-    header: null,
-});
 
 export default TaxContainer;

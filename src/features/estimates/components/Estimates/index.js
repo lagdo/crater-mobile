@@ -12,7 +12,6 @@ import All from '../Tab/All';
 import { ROUTES } from '../../../../navigation/routes';
 import { ESTIMATES_TABS, ESTIMATE_ADD, ESTIMATE_EDIT, ESTIMATE_SEARCH, FILTER_ESTIMATE_STATUS, TAB_NAME } from '../../constants';
 import Lng from '../../../../api/lang/i18n';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { IMAGES } from '../../../../config';
 
 let params = {
@@ -25,7 +24,6 @@ let params = {
 
 
 type IProps = {
-    language: String,
     navigation: Object,
     estimates: Object,
     customers: Object,
@@ -37,7 +35,6 @@ type IProps = {
 export const Estimates = (props: IProps) => {
     const {
         navigation,
-        language,
         loading,
         handleSubmit,
         estimates,
@@ -70,10 +67,6 @@ export const Estimates = (props: IProps) => {
 
     useEffect(() => {
         getItems({ fresh: true, q: '', type: 'DRAFT' });
-
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_MORE })
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const onSetActiveTab = (tab) => {
@@ -232,14 +225,14 @@ export const Estimates = (props: IProps) => {
             getItems: getCustomers,
             items: customers,
             displayName: "name",
-            label: Lng.t("estimates.customer", { locale: language }),
+            label: Lng.t("estimates.customer"),
             icon: 'user',
-            placeholder: Lng.t("customers.placeholder", { locale: language }),
+            placeholder: Lng.t("customers.placeholder"),
             navigation: navigation,
             compareField: "id",
             onSelect: (item) => setFormField('customer_id', item.id),
             headerProps: {
-                title: Lng.t("customers.title", { locale: language }),
+                title: Lng.t("customers.title"),
                 rightIconPress: null
             },
             listViewProps: {
@@ -255,7 +248,7 @@ export const Estimates = (props: IProps) => {
     let datePickerFields = [
         {
             name: "from_date",
-            label: Lng.t("estimates.fromDate", { locale: language }),
+            label: Lng.t("estimates.fromDate"),
             onChangeCallback: (formDate, displayDate) => {
                 setSelectedFromDate(displayDate);
                 setSelectedFromDateValue(formDate);
@@ -265,7 +258,7 @@ export const Estimates = (props: IProps) => {
         },
         {
             name: "to_date",
-            label: Lng.t("estimates.toDate", { locale: language }),
+            label: Lng.t("estimates.toDate"),
             onChangeCallback: (formDate, displayDate) => {
                 setSelectedToDate(displayDate);
                 setSelectedToDateValue(formDate);
@@ -277,7 +270,7 @@ export const Estimates = (props: IProps) => {
 
     let inputFields = [{
         name: 'estimate_number',
-        hint: Lng.t("estimates.estimateNumber", { locale: language }),
+        hint: Lng.t("estimates.estimateNumber"),
         inputProps: {
             autoCapitalize: 'none',
             autoCorrect: true,
@@ -286,14 +279,14 @@ export const Estimates = (props: IProps) => {
 
     let dropdownFields = [{
         name: "filterStatus",
-        label: Lng.t("estimates.status", { locale: language }),
+        label: Lng.t("estimates.status"),
         fieldIcon: 'align-center',
         items: FILTER_ESTIMATE_STATUS,
         onChangeCallback: (val) => {
             setFormField('filterStatus', val)
         },
         defaultPickerOptions: {
-            label: Lng.t("estimates.statusPlaceholder", { locale: language }),
+            label: Lng.t("estimates.statusPlaceholder"),
             value: '',
         },
         containerStyle: styles.selectPicker
@@ -303,10 +296,10 @@ export const Estimates = (props: IProps) => {
         <View style={styles.container}>
             <MainLayout
                 headerProps={{
-                    title: Lng.t("header.estimates", { locale: language }),
+                    title: Lng.t("header.estimates"),
                     leftIcon: "long-arrow-alt-left",
                     leftIconPress: () => navigation.navigate(ROUTES.MAIN_MORE),
-                    title: Lng.t("header.estimates", { locale: language }),
+                    title: Lng.t("header.estimates"),
                     titleStyle: styles.headerTitle,
                     placement: "center",
                     rightIcon: "plus",
@@ -332,7 +325,7 @@ export const Estimates = (props: IProps) => {
                     tabs={[
                         {
                             Title: ESTIMATES_TABS.DRAFT,
-                            tabName: TAB_NAME(ESTIMATES_TABS.DRAFT, language, Lng),
+                            tabName: TAB_NAME(ESTIMATES_TABS.DRAFT),
                             render: (
                                 <Draft
                                     estimates={estimateItem}
@@ -343,7 +336,6 @@ export const Estimates = (props: IProps) => {
                                     refreshing={refreshing}
                                     search={search}
                                     navigation={navigation}
-                                    language={language}
                                     loadMoreItems={loadMoreItems}
                                     onAddEstimate={onAddEstimate}
                                     fresh={fresh}
@@ -353,7 +345,7 @@ export const Estimates = (props: IProps) => {
                         },
                         {
                             Title: ESTIMATES_TABS.SENT,
-                            tabName: TAB_NAME(ESTIMATES_TABS.SENT, language, Lng),
+                            tabName: TAB_NAME(ESTIMATES_TABS.SENT),
                             render: (
                                 <Sent
                                     estimates={estimateItem}
@@ -365,7 +357,6 @@ export const Estimates = (props: IProps) => {
                                     fresh={fresh}
                                     search={search}
                                     navigation={navigation}
-                                    language={language}
                                     loadMoreItems={loadMoreItems}
                                     onAddEstimate={onAddEstimate}
                                     filter={filter}
@@ -374,7 +365,7 @@ export const Estimates = (props: IProps) => {
                         },
                         {
                             Title: ESTIMATES_TABS.ALL,
-                            tabName: TAB_NAME(ESTIMATES_TABS.ALL, language, Lng),
+                            tabName: TAB_NAME(ESTIMATES_TABS.ALL),
                             render: (
                                 <All
                                     estimates={estimateItem}
@@ -386,7 +377,6 @@ export const Estimates = (props: IProps) => {
                                     fresh={fresh}
                                     search={search}
                                     navigation={navigation}
-                                    language={language}
                                     loadMoreItems={loadMoreItems}
                                     onAddEstimate={onAddEstimate}
                                     filter={filter}

@@ -14,20 +14,16 @@ import { Field, change } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { NOTIFICATION } from '../../constants';
 import { colors } from '../../../../styles/colors';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
-
 
 type IProps = {
     navigation: Object,
     handleSubmit: Function,
-    language: String,
     getAccountLoading: Boolean,
 }
 export const Notification = (props: IProps) => {
     const {
         navigation,
         handleSubmit,
-        language,
         getSettingItemLoading,
         getSettingItem,
         editSettingItem,
@@ -36,6 +32,7 @@ export const Notification = (props: IProps) => {
     const [invoiceStatus, setInvoiceStatus] = useState(null);
     const [estimateStatus, setEstimateStatus] = useState(null);
     // const [email, setEmail] = useState(null);
+    const [toastMsg, setToastMsg] = useState(null);
 
     useEffect(() => {
         getSettingItem({
@@ -58,19 +55,10 @@ export const Notification = (props: IProps) => {
                 setFormField('notification_email', val)
             }
         })
-
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT);
     }, []);
 
-    const toastMsg = navigation.getParam('toastMsg', null)
-
     useEffect(() => {
-        toastMsg &&
-            setTimeout(() => {
-                navigation.setParams({ 'toastMsg': null })
-            }, 2500);
+        toastMsg && setTimeout(() => setToastMsg(null), 2500);
     }, [toastMsg]);
 
     const setFormField = (field, value) => {
@@ -108,17 +96,15 @@ export const Notification = (props: IProps) => {
         })
     }
 
-    const toggleToast = (msg) => {
-        navigation.setParams({ "toastMsg": msg })
-    }
+    const toggleToast = (msg) => setToastMsg(msg);
 
-    let toastMessage = navigation.getParam('toastMsg', '')
+    let toastMessage = toastMsg || '';
 
     return (
         <DefaultLayout
             headerProps={{
                 leftIconPress: () => navigation.goBack(null),
-                title: Lng.t("header.notifications", { locale: language }),
+                title: Lng.t("header.notifications"),
                 placement: "center",
                 rightIcon: "save",
                 rightIconProps: {
@@ -131,7 +117,7 @@ export const Notification = (props: IProps) => {
                 is: getSettingItemLoading || invoiceStatus === null || estimateStatus === null
             }}
             toastProps={{
-                message: Lng.t(toastMessage, { locale: language }),
+                message: Lng.t(toastMessage),
                 visible: toastMessage,
                 containerStyle: styles.toastContainer
             }}
@@ -141,7 +127,7 @@ export const Notification = (props: IProps) => {
                 <Field
                     name={"notification_email"}
                     component={InputField}
-                    hint={Lng.t("settings.notifications.send", { locale: language })}
+                    hint={Lng.t("settings.notifications.send")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -160,8 +146,8 @@ export const Notification = (props: IProps) => {
                     name="notify_invoice_viewed"
                     component={ToggleSwitch}
                     status={invoiceStatus === 'YES' ? true : false}
-                    hint={Lng.t("settings.notifications.invoiceViewed", { locale: language })}
-                    description={Lng.t("settings.notifications.invoiceViewedDescription", { locale: language })}
+                    hint={Lng.t("settings.notifications.invoiceViewed")}
+                    description={Lng.t("settings.notifications.invoiceViewedDescription")}
                     onChangeCallback={onInvoiceStatusChange}
                 />
 
@@ -169,8 +155,8 @@ export const Notification = (props: IProps) => {
                     name="notify_estimate_viewed"
                     component={ToggleSwitch}
                     status={estimateStatus === 'YES' ? true : false}
-                    hint={Lng.t("settings.notifications.estimateViewed", { locale: language })}
-                    description={Lng.t("settings.notifications.estimateViewedDescription", { locale: language })}
+                    hint={Lng.t("settings.notifications.estimateViewed")}
+                    description={Lng.t("settings.notifications.estimateViewedDescription")}
                     onChangeCallback={onEstimateStatusChange}
                     mainContainerStyle={{ marginTop: 12 }}
                 />

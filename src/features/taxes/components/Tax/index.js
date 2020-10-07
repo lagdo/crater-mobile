@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import styles from './styles';
 import { DefaultLayout, CtButton, InputField, ToggleSwitch } from '../../../../components';
@@ -9,13 +9,11 @@ import { BUTTON_COLOR } from '../../../../api/consts/core';
 import { Field } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { ADD_TAX } from '../../constants';
-import { UNMOUNT, MOUNT, goBack } from '../../../../navigation/actions';
 import { MAX_LENGTH, alertMe } from '../../../../api/global';
 
 export const Tax = (props) => {
     const {
         navigation,
-        language,
         addTax,
         editTax,
         removeTax,
@@ -23,17 +21,12 @@ export const Tax = (props) => {
         initialValues,
         initialValues: { name },
         handleSubmit,
+        onSelect,
         type,
         loading,
     } = props
 
     const isCreate = (type === ADD_TAX)
-
-    useEffect(() => {
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT)
-    }, []);
 
     const onSave = (tax) => {
         if (!loading) {
@@ -41,7 +34,6 @@ export const Tax = (props) => {
                 addTax({
                     tax,
                     onResult: (res) => {
-                        const onSelect = navigation.getParam('onSelect', null)
                         onSelect && onSelect([{ ...res, tax_type_id: res.id }])
                         navigation.goBack(null)
                     }
@@ -54,14 +46,14 @@ export const Tax = (props) => {
 
     const onRemoveTax = () => {
         alertMe({
-            title: Lng.t("alert.title", { locale: language }),
-            desc: Lng.t("taxes.alertDescription", { locale: language }),
+            title: Lng.t("alert.title"),
+            desc: Lng.t("taxes.alertDescription"),
             showCancel: true,
             okPress: () => removeTax({
                 id: taxId,
                 onResult: (val) => {
                     val ? navigation.navigate(ROUTES.TAXES) :
-                        alertMe({ title: `${name} ${Lng.t("taxes.alreadyUsed", { locale: language })}` })
+                        alertMe({ title: `${name} ${Lng.t("taxes.alreadyUsed")}` })
                 }
             })
         })
@@ -72,7 +64,7 @@ export const Tax = (props) => {
             <View style={[styles.submitButton, !isCreate && styles.multipleButton]}>
                 <CtButton
                     onPress={handleSubmit(onSave)}
-                    btnTitle={Lng.t("button.save", { locale: language })}
+                    btnTitle={Lng.t("button.save")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={!isCreate && styles.buttonContainer}
                     loading={loading}
@@ -80,7 +72,7 @@ export const Tax = (props) => {
                 {!isCreate &&
                     <CtButton
                         onPress={onRemoveTax}
-                        btnTitle={Lng.t("button.remove", { locale: language })}
+                        btnTitle={Lng.t("button.remove")}
                         containerStyle={styles.handleBtn}
                         buttonContainerStyle={styles.buttonContainer}
                         buttonColor={BUTTON_COLOR.DANGER}
@@ -98,8 +90,8 @@ export const Tax = (props) => {
             headerProps={{
                 leftIconPress: () => navigation.goBack(null),
                 title: isCreate ?
-                    Lng.t("header.addTaxes", { locale: language }) :
-                    Lng.t("header.editTaxes", { locale: language }),
+                    Lng.t("header.addTaxes") :
+                    Lng.t("header.editTaxes"),
                 placement: "center",
                 rightIcon: "save",
                 rightIconProps: {
@@ -114,7 +106,7 @@ export const Tax = (props) => {
                     name="name"
                     component={InputField}
                     isRequired
-                    hint={Lng.t("taxes.type", { locale: language })}
+                    hint={Lng.t("taxes.type")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -130,7 +122,7 @@ export const Tax = (props) => {
                     name="percent"
                     isRequired
                     component={InputField}
-                    hint={Lng.t("taxes.percentage", { locale: language }) + ' (%)'}
+                    hint={Lng.t("taxes.percentage") + ' (%)'}
                     inputProps={{
                         returnKeyType: 'next',
                         keyboardType: 'numeric',
@@ -147,7 +139,7 @@ export const Tax = (props) => {
                 <Field
                     name="description"
                     component={InputField}
-                    hint={Lng.t("taxes.description", { locale: language })}
+                    hint={Lng.t("taxes.description")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -164,7 +156,7 @@ export const Tax = (props) => {
                 <Field
                     name="compound_tax"
                     component={ToggleSwitch}
-                    hint={Lng.t("taxes.compoundTax", { locale: language })}
+                    hint={Lng.t("taxes.compoundTax")}
                 />
 
             </View>

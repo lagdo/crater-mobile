@@ -1,4 +1,11 @@
+export const navigationOptions = {
+    headerShown: false,
+    headerTransparent: true,
+};
+
 export const ROUTES = {
+    HOME: 'HOME',
+    MAIN: 'MAIN',
     AUTH: 'AUTH',
     LOGIN: 'LOGIN',
     FORGOT_PASSWORD: 'FORGOT_PASSWORD',

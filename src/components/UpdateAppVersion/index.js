@@ -7,19 +7,9 @@ import { CtGradientButton } from '../Button';
 import { Text } from 'react-native-elements';
 import { IMAGES } from '../../config';
 import Lng from '../../api/lang/i18n';
-import { goBack, MOUNT, UNMOUNT } from '../../navigation/actions';
-import { ROUTES } from '../../navigation/routes';
 
 export const UpdateAppVersion = (props) => {
     const [loading, setLoading] = useState(false);
-    const { language } = props;
-
-    useEffect(() => {
-        const { navigation } = this.props
-        goBack(MOUNT, navigation, { route: ROUTES.UPDATE_APP_VERSION })
-
-        return () => goBack(UNMOUNT);
-    }, []);
 
     const onUpdateApp = () => {
 
@@ -49,11 +39,11 @@ export const UpdateAppVersion = (props) => {
                 <View style={styles.bodyContainer}>
 
                     <Text h4 style={styles.title}>
-                        {Lng.t("updateApp.title", { locale: language })}
+                        {Lng.t("updateApp.title")}
                     </Text>
 
                     <Text h6 style={styles.description}>
-                        {Lng.t("updateApp.description", { locale: language })}
+                        {Lng.t("updateApp.description")}
                     </Text>
 
                 </View>
@@ -61,7 +51,7 @@ export const UpdateAppVersion = (props) => {
                 <View style={{ marginTop: 25 }}>
                     <CtGradientButton
                         onPress={onUpdateApp}
-                        btnTitle={Lng.t("button.updateCapital", { locale: language })}
+                        btnTitle={Lng.t("button.updateCapital")}
                         loading={loading}
                     />
                 </View>
@@ -71,24 +61,11 @@ export const UpdateAppVersion = (props) => {
     );
 }
 
-const mapStateToProps = ({ global }) => ({
-    language: global.language,
-});
-
-const mapDispatchToProps = {
-
-};
-
+const mapStateToProps = ({ global: { language } }) => ({ language });
 
 //  connect
 const UpdateAppVersionContainer = connect(
     mapStateToProps,
-    mapDispatchToProps,
 )(UpdateAppVersion);
-
-UpdateAppVersionContainer.navigationOptions = () => ({
-    header: null,
-});
-
 
 export default UpdateAppVersionContainer;

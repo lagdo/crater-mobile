@@ -30,11 +30,10 @@ const All = ({
     getInvoices,
     fresh,
     search,
-    language,
-    navigation,
     loadMoreItems,
     onAddInvoice,
-    filter
+    filter,
+    isLoading,
 }: IProps) => {
     let items = [];
 
@@ -66,16 +65,14 @@ const All = ({
 
 
     let empty = (!filter && !search) ? {
-        description: Lng.t("invoices.empty.description", { locale: language }),
-        buttonTitle: Lng.t("invoices.empty.buttonTitle", { locale: language }),
+        description: Lng.t("invoices.empty.description"),
+        buttonTitle: Lng.t("invoices.empty.buttonTitle"),
         buttonPress: () => onAddInvoice(),
     } : {}
 
-    let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
-        : (!filter) ? Lng.t("invoices.empty.all.title", { locale: language }) :
-            Lng.t("filter.empty.filterTitle", { locale: language })
-
-    let isLoading = navigation.getParam('loading', false)
+    let emptyTitle = search ? Lng.t("search.noResult", { search })
+        : (!filter) ? Lng.t("invoices.empty.all.title") :
+            Lng.t("filter.empty.filterTitle")
 
     return (
         <View style={styles.content}>

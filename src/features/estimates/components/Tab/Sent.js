@@ -30,7 +30,6 @@ const Sent = ({
     getEstimates,
     fresh,
     search,
-    language,
     navigation,
     onAddEstimate,
     loadMoreItems,
@@ -65,14 +64,14 @@ const Sent = ({
     }
 
     let empty = (!filter && !search) ? {
-        description: Lng.t("estimates.empty.sent.description", { locale: language }),
-        buttonTitle: Lng.t("estimates.empty.buttonTitle", { locale: language }),
+        description: Lng.t("estimates.empty.sent.description"),
+        buttonTitle: Lng.t("estimates.empty.buttonTitle"),
         buttonPress: () => onAddEstimate(),
     } : {}
 
-    let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
-        : (!filter) ? Lng.t("estimates.empty.sent.title", { locale: language }) :
-            Lng.t("filter.empty.filterTitle", { locale: language })
+    let emptyTitle = search ? Lng.t("search.noResult", { search })
+        : (!filter) ? Lng.t("estimates.empty.sent.title") :
+            Lng.t("filter.empty.filterTitle")
 
     return (
         <View style={styles.content}>

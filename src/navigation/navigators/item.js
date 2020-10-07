@@ -1,20 +1,16 @@
-
-import { ROUTES } from "../routes";
-import { generateStackNavigation } from "../actions";
+import React from "react";
+import { createStackNavigator } from '@react-navigation/stack';
 import ItemsContainer from "../../features/items/containers/Items";
 import ItemContainer from "../../features/items/containers/Item";
+import { ROUTES, navigationOptions } from "../routes";
 
-export const ItemNavigator = {
+const Stack = createStackNavigator();
 
-    // Items
-    // -----------------------------------------
-    [ROUTES.GLOBAL_ITEMS]: generateStackNavigation(
-        ROUTES.GLOBAL_ITEMS,
-        ItemsContainer,
-    ),
-
-    [ROUTES.GLOBAL_ITEM]: generateStackNavigation(
-        ROUTES.GLOBAL_ITEM,
-        ItemContainer,
-    ),
+export const ItemNavigator = () => {
+    return (
+    <Stack.Navigator screenOptions={navigationOptions}>
+        <Stack.Screen name={ROUTES.GLOBAL_ITEMS} component={ItemsContainer} />
+        <Stack.Screen name={ROUTES.GLOBAL_ITEM} component={ItemContainer} />
+    </Stack.Navigator>
+    );
 }

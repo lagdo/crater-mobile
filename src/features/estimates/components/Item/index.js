@@ -26,14 +26,13 @@ import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
 import { ADD_TAX } from '../../../settings/constants';
 import { MAX_LENGTH, formatSelectPickerName, alertMe } from '../../../../api/global';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 
 export const EstimateItem = (props) => {
     const {
         navigation,
-        language,
         loading,
         type,
+        currency,
         handleSubmit,
         initialValues,
         discountPerItem,
@@ -52,10 +51,6 @@ export const EstimateItem = (props) => {
 
     useEffect(() => {
         !itemId && getItemUnits && getItemUnits()
-
-        goBack(MOUNT, navigation)
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const setFormField = (field, value) => {
@@ -64,7 +59,7 @@ export const EstimateItem = (props) => {
 
     const saveItem = (values) => {
         if (finalAmount() < 0) {
-            alert(Lng.t("items.lessAmount", { locale: language }))
+            alert(Lng.t("items.lessAmount"))
 
             return
         }
@@ -111,7 +106,7 @@ export const EstimateItem = (props) => {
 
     const removeItem = () => {
         alertMe({
-            title: Lng.t("alert.title", { locale: language }),
+            title: Lng.t("alert.title"),
             showCancel: true,
             okPress: () => {
                 navigation.navigate(ROUTES.ESTIMATE)
@@ -141,9 +136,7 @@ export const EstimateItem = (props) => {
     }
 
     const itemSubTotal = () => {
-        subTotal = (price * quantity)
-
-        return subTotal
+        return (price * quantity)
     }
 
     const subTotal = () => {
@@ -198,8 +191,6 @@ export const EstimateItem = (props) => {
     }
 
     const FINAL_AMOUNT = () => {
-        const currency = navigation.getParam('currency')
-
         return (
             <View style={styles.amountContainer}>
                 <View style={styles.subContainer}>
@@ -223,7 +214,7 @@ export const EstimateItem = (props) => {
                     <View style={styles.subContainer}>
                         <View>
                             <Text style={styles.label}>
-                                {Lng.t("items.finalDiscount", { locale: language })}
+                                {Lng.t("items.finalDiscount")}
                             </Text>
                         </View>
                         <View>
@@ -282,7 +273,7 @@ export const EstimateItem = (props) => {
                 <View style={styles.subContainer}>
                     <View>
                         <Text style={styles.label}>
-                            {Lng.t("items.finalAmount", { locale: language })}
+                            {Lng.t("items.finalAmount")}
                         </Text>
                     </View>
                     <View>
@@ -303,7 +294,7 @@ export const EstimateItem = (props) => {
             <View style={styles.submitButton}>
                 <CtButton
                     onPress={handleSubmit(saveItem)}
-                    btnTitle={Lng.t("button.save", { locale: language })}
+                    btnTitle={Lng.t("button.save")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
                     loading={loading}
@@ -311,7 +302,7 @@ export const EstimateItem = (props) => {
                 {!isCreateItem && (
                     <CtButton
                         onPress={removeItem}
-                        btnTitle={Lng.t("button.remove", { locale: language })}
+                        btnTitle={Lng.t("button.remove")}
                         containerStyle={styles.handleBtn}
                         buttonColor={BUTTON_COLOR.DANGER}
                         buttonContainerStyle={styles.buttonContainer}
@@ -330,8 +321,8 @@ export const EstimateItem = (props) => {
             headerProps={{
                 leftIconPress: () => navigation.navigate(ROUTES.ESTIMATE),
                 title: isCreateItem ?
-                    Lng.t("header.addItem", { locale: language }) :
-                    Lng.t("header.editItem", { locale: language }),
+                    Lng.t("header.addItem") :
+                    Lng.t("header.editItem"),
                 placement: "center",
                 rightIcon: 'save',
                 rightIconProps: {
@@ -349,7 +340,7 @@ export const EstimateItem = (props) => {
                     name="name"
                     component={InputField}
                     isRequired
-                    hint={Lng.t("items.name", { locale: language })}
+                    hint={Lng.t("items.name")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
@@ -366,7 +357,7 @@ export const EstimateItem = (props) => {
                             name={'quantity'}
                             isRequired
                             component={InputField}
-                            hint={Lng.t("items.quantity", { locale: language })}
+                            hint={Lng.t("items.quantity")}
                             inputProps={{
                                 returnKeyType: 'next',
                                 keyboardType: 'numeric',
@@ -384,7 +375,7 @@ export const EstimateItem = (props) => {
                             name="price"
                             isRequired
                             component={InputField}
-                            hint={Lng.t("items.price", { locale: language })}
+                            hint={Lng.t("items.price")}
                             inputProps={{
                                 returnKeyType: 'next',
                                 keyboardType: 'numeric'
@@ -400,11 +391,11 @@ export const EstimateItem = (props) => {
                 {(initialValues.unit || !itemId) && (
                     <Field
                         name="unit_id"
-                        label={Lng.t("items.unit", { locale: language })}
+                        label={Lng.t("items.unit")}
                         component={SelectPickerField}
                         items={formatSelectPickerName(units)}
                         defaultPickerOptions={{
-                            label: Lng.t("items.unitPlaceholder", { locale: language }),
+                            label: Lng.t("items.unitPlaceholder"),
                             value: '',
                         }}
                         disabled={itemId ? true : false}
@@ -417,7 +408,7 @@ export const EstimateItem = (props) => {
                         <Field
                             name="discount_type"
                             component={RadioButtonGroup}
-                            hint={Lng.t("items.discountType", { locale: language })}
+                            hint={Lng.t("items.discountType")}
                             options={ITEM_DISCOUNT_OPTION}
                             initialValue={initialValues.discount_type}
                         />
@@ -425,7 +416,7 @@ export const EstimateItem = (props) => {
                         <Field
                             name="discount"
                             component={InputField}
-                            hint={Lng.t("items.discount", { locale: language })}
+                            hint={Lng.t("items.discount")}
                             inputProps={{
                                 returnKeyType: 'next',
                                 autoCapitalize: 'none',
@@ -442,10 +433,10 @@ export const EstimateItem = (props) => {
                         name="taxes"
                         items={taxTypes}
                         displayName="name"
-                        label={Lng.t("items.taxes", { locale: language })}
+                        label={Lng.t("items.taxes")}
                         component={SelectField}
                         searchFields={['name', 'percent']}
-                        placeholder={Lng.t("items.selectTax", { locale: language })}
+                        placeholder={Lng.t("items.selectTax")}
                         onlyPlaceholder
                         fakeInputProps={{
                             icon: 'percent',
@@ -455,7 +446,6 @@ export const EstimateItem = (props) => {
                         navigation={navigation}
                         isMultiSelect
                         isInternalSearch
-                        language={language}
                         concurrentMultiSelect
                         compareField="id"
                         valueCompareField="tax_type_id"
@@ -463,7 +453,7 @@ export const EstimateItem = (props) => {
                             contentContainerStyle: { flex: 2 }
                         }}
                         headerProps={{
-                            title: Lng.t("taxes.title", { locale: language })
+                            title: Lng.t("taxes.title")
                         }}
                         rightIconPress={
                             () => navigation.navigate(ROUTES.TAX, {
@@ -486,7 +476,7 @@ export const EstimateItem = (props) => {
                 <Field
                     name="description"
                     component={InputField}
-                    hint={Lng.t("items.description", { locale: language })}
+                    hint={Lng.t("items.description")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',

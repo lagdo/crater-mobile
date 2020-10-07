@@ -4,7 +4,6 @@ import React from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
 import { Field } from 'redux-form';
-import { NavigationEvents } from 'react-navigation';
 import { styles } from './styles';
 import { InputField, CtHeader, CtDivider } from '../..';
 import { Content } from '../../Content';
@@ -35,16 +34,12 @@ const MainLayoutComponent = ({
     inputProps,
     dividerStyle,
     loadingProps,
-    language
 }: IProps) => {
 
     let hasFilter = filterProps ? { ...filterProps } : null
 
     return (
         <View style={styles.page}>
-            <NavigationEvents
-                onWillFocus={onFocus && onFocus}
-            />
             <View style={styles.content}>
                 <CtHeader
                     titleStyle={styles.headerTitleStyle}
@@ -64,7 +59,7 @@ const MainLayoutComponent = ({
                             inputProps={{
                                 returnKeyType: 'next',
                                 autoCapitalize: 'none',
-                                placeholder: Lng.t("search.title", { locale: language }),
+                                placeholder: Lng.t("search.title"),
                                 autoCorrect: true,
                                 ...inputProps
                             }}
@@ -95,9 +90,7 @@ const MainLayoutComponent = ({
     );
 };
 
-const mapStateToProps = ({ global }) => ({
-    language: global.language,
-});
+const mapStateToProps = ({ global: { language } }) => ({ language });
 
 const mapDispatchToProps = {};
 

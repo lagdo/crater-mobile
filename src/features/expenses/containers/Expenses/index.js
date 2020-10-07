@@ -3,15 +3,8 @@ import { connect } from 'react-redux';
 import { reduxForm, getFormValues } from 'redux-form';
 import * as ExpensesAction from '../../actions'
 import * as CategoriesAction from '../../../categories/actions';
-import { colors } from '../../../../styles/colors';
 import { Expenses } from '../../components/Expenses';
 import { EXPENSE_SEARCH } from '../../constants';
-import { EXPENSES } from '../../../../assets/svg';
-import { SvgXml } from 'react-native-svg';
-import { getTitleByLanguage, navigateToMainTabs } from '../../../../navigation/actions';
-import { ROUTES } from '../../../../navigation/routes';
-import { withNavigationFocus } from 'react-navigation';
-
 
 const mapStateToProps = (state) => {
 
@@ -52,26 +45,4 @@ const ExpensesContainer = connect(
     mapDispatchToProps,
 )(ExpensesSearchReduxForm);
 
-ExpensesContainer.navigationOptions = ({ navigation }) => ({
-
-    gesturesEnabled: false,
-    tabBarLabel: getTitleByLanguage('tabNavigation.expenses'),
-    tabBarIcon: ({ focused }: { focused: boolean }) => (
-        <SvgXml
-            xml={EXPENSES}
-            fill={focused ? colors.primary : colors.darkGray}
-            width="22"
-            height="22"
-        />
-    ),
-    tabBarOnPress: () => {
-
-        if (navigation.isFocused()) {
-            return;
-        }
-
-        navigateToMainTabs(navigation, ROUTES.MAIN_EXPENSES)
-    }
-});
-
-export default withNavigationFocus(ExpensesContainer);
+export default ExpensesContainer;

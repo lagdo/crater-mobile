@@ -216,9 +216,7 @@ export const InputFieldComponent = (props: IInputField) => {
     );
 }
 
-const mapStateToProps = ({ global }) => ({
-    language: global.language,
-});
+const mapStateToProps = ({ global: { language } }) => ({ language });
 
 const mapDispatchToProps = {};
 

@@ -30,15 +30,15 @@ export const ACTIONS_VALUE = {
     REMOVE: 'remove',
 }
 
-export const PAYMENT_ACTIONS = (Lng, language) => {
+export const PAYMENT_ACTIONS = (Lng) => {
     return [
         {
-            label: Lng.t("payments.sendReceipt", { locale: language })
+            label: Lng.t("payments.sendReceipt")
             ,
             value: ACTIONS_VALUE.SEND
         },
         {
-            label: Lng.t("payments.removePayment", { locale: language })
+            label: Lng.t("payments.removePayment")
             ,
             value: ACTIONS_VALUE.REMOVE
         }

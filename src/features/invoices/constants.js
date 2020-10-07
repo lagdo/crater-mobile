@@ -76,8 +76,8 @@ export const INVOICES_TABS = {
     ALL: 'ALL',
 };
 
-export const TAB_NAME = (name, language, Lng) => {
-    return Lng.t(`invoices.tabs.${name}`, { locale: language })
+export const TAB_NAME = (name) => {
+    return Lng.t(`invoices.tabs.${name}`)
 };
 
 // Filter Invoice Mode
@@ -137,31 +137,31 @@ export const INVOICE_ACTIONS = {
     CLONE: 'clone',
 }
 
-export const EDIT_INVOICE_ACTIONS = (language, SentStatus = false, completeStatus = false) => {
+export const EDIT_INVOICE_ACTIONS = (SentStatus = false, completeStatus = false) => {
 
     const markActions = [
         {
-            label: Lng.t("invoices.actions.sendInvoice", { locale: language }),
+            label: Lng.t("invoices.actions.sendInvoice"),
             value: INVOICE_ACTIONS.SEND
         },
         {
-            label: Lng.t("invoices.actions.markAsSent", { locale: language }),
+            label: Lng.t("invoices.actions.markAsSent"),
             value: INVOICE_ACTIONS.MARK_AS_SENT
         }
     ]
 
     const paymentAction = [{
-        label: Lng.t("invoices.actions.recordPayment", { locale: language }),
+        label: Lng.t("invoices.actions.recordPayment"),
         value: INVOICE_ACTIONS.RECORD_PAYMENT
     }]
 
     const deleteAction = [{
-        label: Lng.t("invoices.actions.delete", { locale: language }),
+        label: Lng.t("invoices.actions.delete"),
         value: INVOICE_ACTIONS.DELETE
     }]
 
     const cloneAction = [{
-        label: Lng.t("invoices.actions.clone", { locale: language }),
+        label: Lng.t("invoices.actions.clone"),
         value: INVOICE_ACTIONS.CLONE
     }]
 

@@ -16,7 +16,6 @@ import {
 } from '../../../../components';
 import { ROUTES } from '../../../../navigation/routes';
 import { DATE_FORMAT } from '../../../../api/consts/core';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { PAYMENT_ADD, PAYMENT_EDIT, PAYMENT_FORM, PAYMENT_ACTIONS, ACTIONS_VALUE } from '../../constants';
 import Lng from '../../../../api/lang/i18n';
 import { IMAGES } from '../../../../config';
@@ -36,7 +35,6 @@ type IProps = {
     editPayment: Function,
     handleSubmit: Function,
     type: String,
-    language: String,
     paymentLoading: Boolean,
     initPaymentLoading: Boolean,
     getUnpaidInvoicesLoading: Boolean,
@@ -56,8 +54,8 @@ let editPaymentData = [
 
 export const Payment = (props: IProps) => {
     const {
-        language,
         navigation,
+        id,
         type,
         handleSubmit,
         customers,
@@ -86,8 +84,6 @@ export const Payment = (props: IProps) => {
 
     useEffect(() => {
         if (type === PAYMENT_EDIT) {
-
-            let id = navigation.getParam('paymentId', null)
             setFormField('id', id)
 
             getEditPayment({
@@ -146,11 +142,10 @@ export const Payment = (props: IProps) => {
                 }
             });
         }
-
-        goBack(MOUNT, navigation, { route: hasRecordPayment ? null : ROUTES.MAIN_PAYMENTS })
-
-        return () => goBack(UNMOUNT)
     }, []);
+
+    const onBack = () => hasRecordPayment ?
+        navigation.navigate(ROUTES.MAIN_INVOICES) : navigation.goBack();
 
     const setRecordPaymentField = () => {
         const {
@@ -224,12 +219,12 @@ export const Payment = (props: IProps) => {
                 hasRecordPayment,
                 onResult: (val) => {
                     val === 'invalid_amount' &&
-                        alertMe({ title: Lng.t("payments.alertAmount", { locale: language }) })
+                        alertMe({ title: Lng.t("payments.alertAmount") })
                 }
             })
             :
             editPayment({
-                id: navigation.getParam('paymentId'),
+                id,
                 params,
                 navigation
             })
@@ -272,11 +267,11 @@ export const Payment = (props: IProps) => {
 
     const onRemovePayment = () => {
         alertMe({
-            title: Lng.t("alert.title", { locale: language }),
-            desc: Lng.t("payments.alertDescription", { locale: language }),
+            title: Lng.t("alert.title"),
+            desc: Lng.t("payments.alertDescription"),
             showCancel: true,
             okPress: () => removePayment({
-                id: navigation.getParam('paymentId', null),
+                id,
                 navigation
             })
         })
@@ -287,18 +282,18 @@ export const Payment = (props: IProps) => {
             onRemovePayment()
         else if (action == ACTIONS_VALUE.SEND)
             alertMe({
-                title: Lng.t("alert.title", { locale: language }),
-                desc: Lng.t("payments.alertSendDescription", { locale: language }),
+                title: Lng.t("alert.title"),
+                desc: Lng.t("payments.alertSendDescription"),
                 showCancel: true,
                 okPress: () => sendPaymentReceipt({
-                    params: { id: navigation.getParam('paymentId', null) }
+                    params: { id }
                 })
             })
 
     }
 
     const BOTTOM_ACTION = () => {
-        let buttonTitle = Lng.t("button.save", { locale: language })
+        let buttonTitle = Lng.t("button.save")
 
         return (
             <View style={styles.submitButton}>
@@ -312,7 +307,7 @@ export const Payment = (props: IProps) => {
     }
 
     let drownDownProps = (type === PAYMENT_EDIT && !isLoading) ? {
-        options: PAYMENT_ACTIONS(Lng, language),
+        options: PAYMENT_ACTIONS(Lng),
         onSelect: onOptionSelect,
         cancelButtonIndex: 2,
         destructiveButtonIndex: 1
@@ -322,10 +317,10 @@ export const Payment = (props: IProps) => {
     return (
         <DefaultLayout
             headerProps={{
-                leftIconPress: () => navigation.goBack(null),
+                leftIconPress: onBack,
                 title: type === PAYMENT_EDIT ?
-                    Lng.t("header.editPayment", { locale: language }) :
-                    Lng.t("header.addPayment", { locale: language }),
+                    Lng.t("header.editPayment") :
+                    Lng.t("header.addPayment"),
                 placement: "center",
                 rightIcon: type !== PAYMENT_EDIT ? "save" : null,
                 rightIconProps: {
@@ -348,7 +343,7 @@ export const Payment = (props: IProps) => {
                             name="payment_date"
                             component={DatePickerField}
                             dateTimeFormat={DATE_FORMAT}
-                            label={Lng.t("payments.date", { locale: language })}
+                            label={Lng.t("payments.date")}
                             icon={'calendar-alt'}
                             onChangeCallback={(val) => {
                                 setFormField('payment_date', val)
@@ -361,7 +356,7 @@ export const Payment = (props: IProps) => {
                         <Field
                             name="payment_number"
                             component={FakeInput}
-                            label={Lng.t("payments.number", { locale: language })}
+                            label={Lng.t("payments.number")}
                             isRequired
                             prefixProps={{
                                 fieldName: "payment_number",
@@ -379,9 +374,9 @@ export const Payment = (props: IProps) => {
                     items={customers}
                     displayName="name"
                     component={SelectField}
-                    label={Lng.t("payments.customer", { locale: language })}
+                    label={Lng.t("payments.customer")}
                     icon={'user'}
-                    placeholder={selectedCustomer ? selectedCustomer.name : Lng.t("payments.customerPlaceholder", { locale: language })}
+                    placeholder={selectedCustomer ? selectedCustomer.name : Lng.t("payments.customerPlaceholder")}
                     navigation={navigation}
                     compareField="id"
                     onSelect={(item) => {
@@ -398,7 +393,7 @@ export const Payment = (props: IProps) => {
                         })
                     }
                     headerProps={{
-                        title: Lng.t("customers.title", { locale: language }),
+                        title: Lng.t("customers.title"),
                     }}
                     listViewProps={{
                         hasAvatar: true,
@@ -418,7 +413,7 @@ export const Payment = (props: IProps) => {
                     name="amount"
                     component={InputField}
                     leftIcon={'dollar-sign'}
-                    hint={Lng.t("payments.amount", { locale: language })}
+                    hint={Lng.t("payments.amount")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCorrect: true,
@@ -436,9 +431,9 @@ export const Payment = (props: IProps) => {
                     items={getInvoicesList(invoices)}
                     displayName="invoice_number"
                     component={SelectField}
-                    label={Lng.t("payments.invoice", { locale: language })}
+                    label={Lng.t("payments.invoice")}
                     icon={'file-invoice'}
-                    placeholder={selectedInvoice ? selectedInvoice : Lng.t("payments.invoicePlaceholder", { locale: language })}
+                    placeholder={selectedInvoice ? selectedInvoice : Lng.t("payments.invoicePlaceholder")}
                     navigation={navigation}
                     fakeInputProps={{
                         loading: getUnpaidInvoicesLoading
@@ -458,7 +453,7 @@ export const Payment = (props: IProps) => {
                         paymentRefs.amount.focus();
                     }}
                     headerProps={{
-                        title: Lng.t("invoices.title", { locale: language }),
+                        title: Lng.t("invoices.title"),
                         rightIconPress: null
                     }}
                     listViewProps={{
@@ -480,7 +475,7 @@ export const Payment = (props: IProps) => {
                 <Field
                     name="payment_method_id"
                     component={SelectPickerField}
-                    label={Lng.t("payments.mode", { locale: language })}
+                    label={Lng.t("payments.mode")}
                     fieldIcon='align-center'
                     items={formatSelectPickerName(methods)}
                     selectedItem={selectedPaymentMode}
@@ -489,7 +484,7 @@ export const Payment = (props: IProps) => {
                     }}
                     onDonePress={() => paymentRefs.notes.focus()}
                     defaultPickerOptions={{
-                        label: Lng.t("payments.modePlaceholder", { locale: language }),
+                        label: Lng.t("payments.modePlaceholder"),
                         value: '',
                     }}
                     refLinkFn={(ref) => {
@@ -501,11 +496,11 @@ export const Payment = (props: IProps) => {
                 <Field
                     name="notes"
                     component={InputField}
-                    hint={Lng.t("payments.notes", { locale: language })}
+                    hint={Lng.t("payments.notes")}
                     inputProps={{
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
-                        placeholder: Lng.t("payments.notesPlaceholder", { locale: language }),
+                        placeholder: Lng.t("payments.notesPlaceholder"),
                         autoCorrect: true,
                         multiline: true,
                         maxLength: MAX_LENGTH

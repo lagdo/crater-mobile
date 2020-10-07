@@ -7,23 +7,21 @@ import * as ItemAction from '../../actions';
 import { ITEM_FORM, EDIT_ITEM } from '../../constants';
 import { getItemUnits, getSettingItem } from '../../../settings/actions';
 
-const mapStateToProps = (state, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         more: { loading },
         items: { item },
         settings: {
             taxByItems,
             units,
-            loading: { itemUnitsLoading }
+            loading: { itemUnitsLoading, itemLoading }
         },
         global: { language, currency, taxTypes },
     } = state;
 
-    const itemId = navigation.getParam('id', {});
+    const { id: itemId = {}, type } = params;
 
-    const type = navigation.getParam('type');
-
-    const isLoading = loading.itemLoading || itemUnitsLoading || (type === EDIT_ITEM && !item)
+    const isLoading = itemLoading || itemUnitsLoading || (type === EDIT_ITEM && !item)
 
     return {
         loading: isLoading,
@@ -64,9 +62,5 @@ const ItemContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(ItemReduxForm);
-
-ItemContainer.navigationOptions = () => ({
-    header: null,
-});
 
 export default ItemContainer;

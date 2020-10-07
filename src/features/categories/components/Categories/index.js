@@ -10,21 +10,18 @@ import {
 import { ROUTES } from '../../../../navigation/routes';
 import Lng from '../../../../api/lang/i18n';
 import { CATEGORY_ADD, CATEGORY_EDIT } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 
 type IProps = {
     navigation: Object,
     getPayments: Function,
     payments: Object,
     loading: Boolean,
-    language: String,
 }
 
 export const Categories = (props: IProps) => {
     const {
         navigation,
         loading,
-        language,
         categories,
         getExpenseCategories,
     } = props;
@@ -36,16 +33,10 @@ export const Categories = (props: IProps) => {
 
     useEffect(() => {
         getExpenseCategories();
-
-        goBack(MOUNT, navigation);
-
-        return () => goBack(UNMOUNT);
     }, []);
 
     const onSelectCategory = (category) => {
-        navigation.navigate(ROUTES.CATEGORY,
-            { type: CATEGORY_EDIT, categoryId: category.id }
-        )
+        navigation.navigate(ROUTES.CATEGORY, { type: CATEGORY_EDIT, categoryId: category.id });
     }
 
     const onSearch = (keywords) => {
@@ -107,8 +98,8 @@ export const Categories = (props: IProps) => {
     let categoriesList = itemList(categories)
 
     let empty = (!search) ? {
-        description: Lng.t("categories.empty.description", { locale: language }),
-        buttonTitle: Lng.t("categories.empty.buttonTitle", { locale: language }),
+        description: Lng.t("categories.empty.description"),
+        buttonTitle: Lng.t("categories.empty.buttonTitle"),
         buttonPress: () => navigation.navigate(ROUTES.CATEGORY, { type: CATEGORY_ADD }),
     } : {}
 
@@ -117,8 +108,8 @@ export const Categories = (props: IProps) => {
             <MainLayout
                 headerProps={{
                     leftIcon: "long-arrow-alt-left",
-                    leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
-                    title: Lng.t("header.expenseCategory", { locale: language }),
+                    leftIconPress: navigation.goBack,
+                    title: Lng.t("header.expenseCategory"),
                     titleStyle: styles.titleStyle,
                     placement: "center",
                     rightIcon: "plus",
@@ -135,17 +126,15 @@ export const Categories = (props: IProps) => {
                             categoriesFilter : found ? categoriesList : []
                         }
                         refreshing={refreshing}
-                        getFreshItems={(onHide) => {
-                            getFreshItems(onHide)
-                        }}
+                        getFreshItems={(onHide) =>  getFreshItems(onHide)}
                         onPress={onSelectCategory}
                         loading={loading}
                         isEmpty={found ? categoriesList.length <= 0 : true}
                         bottomDivider
                         emptyContentProps={{
                             title: found ?
-                                Lng.t("categories.empty.title", { locale: language }) :
-                                Lng.t("search.noResult", { locale: language, search }),
+                                Lng.t("categories.empty.title") :
+                                Lng.t("search.noResult", { search }),
                             ...empty
                         }}
                     />

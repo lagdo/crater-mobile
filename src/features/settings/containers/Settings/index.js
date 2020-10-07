@@ -27,8 +27,4 @@ const SettingContainer = connect(
     mapDispatchToProps,
 )(settingSearchReduxForm);
 
-SettingContainer.navigationOptions = () => ({
-    header: null
-});
-
 export default SettingContainer;

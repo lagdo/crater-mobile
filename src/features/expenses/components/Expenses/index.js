@@ -9,7 +9,6 @@ import { ROUTES } from '../../../../navigation/routes';
 import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
 import { EXPENSE_ADD, EXPENSE_EDIT, EXPENSE_SEARCH } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 
 let params = {
     search: '',
@@ -23,7 +22,6 @@ type IProps = {
     getExpenses: Function,
     expenses: Object,
     loading: Boolean,
-    language: String,
 }
 
 export const Expenses = (props: IProps) => {
@@ -32,7 +30,6 @@ export const Expenses = (props: IProps) => {
         expenses,
         filterExpenses,
         loading,
-        language,
         currency,
         handleSubmit,
         categories,
@@ -42,6 +39,7 @@ export const Expenses = (props: IProps) => {
             to_date = '',
             expense_category_id = ''
         },
+        route: { params = {} },
     } = props
 
     const [refreshing, setRefreshing] = useState(false);
@@ -65,10 +63,6 @@ export const Expenses = (props: IProps) => {
         getCategories()
 
         getItems({ fresh: true });
-
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_INVOICES })
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const onExpenseSelect = ({ id }) => {
@@ -217,14 +211,14 @@ export const Expenses = (props: IProps) => {
     let CategoriesList = getCategoriesList(categories)
     let dropdownFields = [{
         name: "expense_category_id",
-        label: Lng.t("expenses.category", { locale: language }),
+        label: Lng.t("expenses.category"),
         fieldIcon: 'align-center',
         items: CategoriesList,
         onChangeCallback: (val) => {
             setFormField('expense_category_id', val)
         },
         defaultPickerOptions: {
-            label: Lng.t("expenses.categoryPlaceholder", { locale: language }),
+            label: Lng.t("expenses.categoryPlaceholder"),
             value: '',
         },
         selectedItem: selectedCategory,
@@ -234,7 +228,7 @@ export const Expenses = (props: IProps) => {
     let datePickerFields = [
         {
             name: "from_date",
-            label: Lng.t("expenses.fromDate", { locale: language }),
+            label: Lng.t("expenses.fromDate"),
             onChangeCallback: (formDate, displayDate) => {
                 setSelectedFromDate(displayDate);
                 setSelectedFromDateValue(formDate);
@@ -244,7 +238,7 @@ export const Expenses = (props: IProps) => {
         },
         {
             name: "to_date",
-            label: Lng.t("expenses.toDate", { locale: language }),
+            label: Lng.t("expenses.toDate"),
             onChangeCallback: (formDate, displayDate) => {
                 setSelectedToDate(displayDate);
                 setSelectedToDateValue(formDate);
@@ -255,19 +249,19 @@ export const Expenses = (props: IProps) => {
     ]
 
     let empty = (!filter && !search) ? {
-        description: Lng.t("expenses.empty.description", { locale: language }),
-        buttonTitle: Lng.t("expenses.empty.buttonTitle", { locale: language }),
+        description: Lng.t("expenses.empty.description"),
+        buttonTitle: Lng.t("expenses.empty.buttonTitle"),
         buttonPress: () => {
             navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_ADD })
             onResetFilter()
         }
     } : {}
 
-    let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
-        : (!filter) ? Lng.t("expenses.empty.title", { locale: language }) :
-            Lng.t("filter.empty.filterTitle", { locale: language })
+    let emptyTitle = search ? Lng.t("search.noResult", { search })
+        : (!filter) ? Lng.t("expenses.empty.title") :
+            Lng.t("filter.empty.filterTitle")
 
-    let isLoading = navigation.getParam('loading', false)
+    const { isLoading } = params;
 
     return (
         <View style={styles.container}>
@@ -278,7 +272,7 @@ export const Expenses = (props: IProps) => {
                         navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_ADD })
                         onResetFilter()
                     },
-                    title: Lng.t("header.expenses", { locale: language })
+                    title: Lng.t("header.expenses")
                 }}
                 onSearch={onSearch}
                 bottomDivider
@@ -287,7 +281,6 @@ export const Expenses = (props: IProps) => {
                     datePickerFields: datePickerFields,
                     dropdownFields: dropdownFields,
                     clearFilter: props,
-                    language: language,
                     onResetFilter: () => onResetFilter()
                 }}
                 loadingProps={{ is: isLoading || (loading && fresh) }}

@@ -7,13 +7,15 @@ import { LOGIN_FORM } from "../../constants";
 
 const mapStateToProps = ({
     auth,
-    global,
+    global: { language, endpointApi, endpointURL },
     settings: { account }
 
 }) => ({
     loading: auth.loading && auth.loading.loginLoading,
     socialLoading: auth.loading && auth.loading.socialLoginLoading,
-    language: global.language,
+    language,
+    endpointApi,
+    endpointURL,
     initialValues: {
         username: (typeof account !== 'undefined' && account !== null) ? account.email ? account.email : '' : '',
     }
@@ -21,7 +23,7 @@ const mapStateToProps = ({
 
 const mapDispatchToProps = {
     login: AuthAction.login,
-    socialLogin: AuthAction.socialLogin,
+    // socialLogin: AuthAction.socialLogin,
 };
 
 //  Redux Forms
@@ -36,9 +38,4 @@ const LoginContainer = connect(
     mapDispatchToProps,
 )(loginReduxForm);
 
-LoginContainer.navigationOptions = {
-    header: null,
-};
-
 export default LoginContainer;
-

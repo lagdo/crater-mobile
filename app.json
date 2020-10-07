@@ -25,11 +25,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.craterapp.app",
-      "buildNumber": "5"
+      "buildNumber": "10"
     },
     "android": {
       "package": "com.craterapp.app",
-      "versionCode": 9
+      "versionCode": 10
     },
     "description": "",
     "androidStatusBar": {

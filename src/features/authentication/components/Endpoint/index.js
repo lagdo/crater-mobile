@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     KeyboardAvoidingView,
@@ -15,7 +15,6 @@ import { InputField, CtButton, AssetImage, CtGradientButton, CtHeader } from '..
 import Lng from '../../../../api/lang/i18n';
 import { ROUTES } from '../../../../navigation/routes';
 import { IMAGES } from '../../../../config';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { alertMe } from '../../../../api/global';
 
 type IProps = {
@@ -36,7 +35,6 @@ type IProps = {
 export const Endpoint = (props: IProps) => {
     const {
         handleSubmit,
-        language,
         loading,
         navigation,
         skipEndpoint = false,
@@ -45,11 +43,7 @@ export const Endpoint = (props: IProps) => {
 
     const [isFocus, setFocus] = useState(false);
 
-    useEffect(() => {
-        skipEndpoint && goBack(MOUNT, navigation, { route: ROUTES.SETTING_LIST })
-
-        return () => skipEndpoint && goBack(UNMOUNT);
-    }, []);
+    const goBack = navigation.goBack;
 
     const onSetEndpointApi = ({ endpointURL }) => {
 
@@ -61,14 +55,10 @@ export const Endpoint = (props: IProps) => {
             endpointURL: !(URL.charAt(URL.length - 1) === '/') ? URL
                 : URL.slice(0, -1),
             onResult: (val) => {
-                !val ? alertMe({ title: Lng.t("endpoint.alertInvalidUrl", { locale: language }) }) :
-                    navigation.navigate(ROUTES.LOGIN)
-
+                !val ? alertMe({ title: Lng.t("endpoint.alertInvalidUrl") }) : goBack();
             }
         })
     }
-
-    const onBack = () => navigation.navigate(ROUTES.SETTING_LIST);
 
     const toggleFocus = () => setFocus(!isFocus);
 
@@ -78,9 +68,9 @@ export const Endpoint = (props: IProps) => {
             {skipEndpoint ? (
                 <CtHeader
                     leftIcon="angle-left"
-                    leftIconPress={onBack}
-                    title={Lng.t("header.back", { locale: language })}
-                    titleOnPress={onBack}
+                    leftIconPress={goBack}
+                    title={Lng.t("header.back")}
+                    titleOnPress={goBack}
                     titleStyle={{ marginLeft: -10, marginTop: Platform.OS === 'ios' ? -1 : 2 }}
                     placement="left"
                     noBorder
@@ -118,10 +108,10 @@ export const Endpoint = (props: IProps) => {
                             <Field
                                 name="endpointURL"
                                 component={InputField}
-                                hint={Lng.t("endpoint.endpointURL", { locale: language })}
+                                hint={Lng.t("endpoint.endpointURL")}
                                 inputProps={{
                                     autoCapitalize: 'none',
-                                    placeholder: Lng.t("endpoint.urlPlaceHolder", { locale: language }),
+                                    placeholder: Lng.t("endpoint.urlPlaceHolder"),
                                     autoCorrect: true,
                                     keyboardType: "url",
                                     onSubmitEditing: toggleFocus
@@ -130,13 +120,13 @@ export const Endpoint = (props: IProps) => {
                                 inputContainerStyle={styles.inputField}
                             />
                             <Text style={styles.endpointTextTitle}>
-                                {Lng.t("endpoint.endpointDesc", { locale: language })}
+                                {Lng.t("endpoint.endpointDesc")}
                             </Text>
                         </View>
 
                         <CtGradientButton
                             onPress={handleSubmit(onSetEndpointApi)}
-                            btnTitle={Lng.t("button.save", { locale: language })}
+                            btnTitle={Lng.t("button.save")}
                             loading={isFocus ? false : loading}
                             style={styles.buttonStyle}
                             buttonContainerStyle={styles.buttonContainer}

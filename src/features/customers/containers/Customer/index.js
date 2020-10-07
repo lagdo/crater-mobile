@@ -7,7 +7,7 @@ import * as customerAction from '../../actions'
 import { Customer } from '../../components/Customer';
 
 
-const mapStateToProps = (state, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { language, currencies, currency },
         customers: {
@@ -18,11 +18,13 @@ const mapStateToProps = (state, { navigation }) => {
                 countriesLoading
             }
         }
-    } = state
-    let customerId = navigation.getParam('customerId', null);
-    let type = navigation.getParam('type', CUSTOMER_ADD)
+    } = state;
+
+    const { customerId = null, type = CUSTOMER_ADD, onSelect = null } = params;
 
     return {
+        id: customerId,
+        onSelect,
         formValues: getFormValues(CUSTOMER_FORM)(state) || {},
         type,
         language,
@@ -60,10 +62,5 @@ const AddEditCustomerContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(addEditCustomerReduxForm);
-
-AddEditCustomerContainer.navigationOptions = () => ({
-    header: null,
-});
-
 
 export default AddEditCustomerContainer;

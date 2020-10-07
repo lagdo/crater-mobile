@@ -51,7 +51,7 @@ function* getPaymentModes(payloadData = {}) {
         yield put(setPaymentModes({ paymentMethods: response.paymentMethods }));
 
     } catch (error) {
-        console.log(error)
+        // console.log(error)
     } finally {
         yield put(settingsTriggerSpinner({ paymentModesLoading: false }));
     }

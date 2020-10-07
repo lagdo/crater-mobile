@@ -7,31 +7,33 @@ import * as InvoicesAction from '../../actions';
 import { ITEM_FORM } from '../../constants';
 import { getItemUnits } from '../../../settings/actions';
 
-const mapStateToProps = (state, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         invoices: { loading },
         global: { language, taxTypes },
         settings: {
             units,
-            loading: { itemUnitsLoading }
+            loading: { itemUnitsLoading, editItemLoading, removeItemLoading }
         }
     } = state;
 
-    const item = navigation.getParam('item', {});
+    const {
+        item = {},
+        type,
+        currency,
+        discount_per_item: discountPerItem,
+        tax_per_item: taxPerItem,
+    } = params;
 
-    const type = navigation.getParam('type');
-    const discountPerItem = navigation.getParam('discount_per_item');
-    const taxPerItem = navigation.getParam('tax_per_item');
-
-    const isLoading = loading.editItemLoading || loading.removeItemLoading || itemUnitsLoading
+    const isLoading = editItemLoading || removeItemLoading || itemUnitsLoading
 
     return {
         loading: isLoading,
         formValues: getFormValues(ITEM_FORM)(state) || {},
         itemId: item && (item.item_id || item.id),
         taxTypes,
-        currency: navigation.getParam('currency'),
-        language: language,
+        currency,
+        language,
         discountPerItem,
         taxPerItem,
         type,
@@ -66,9 +68,5 @@ const InvoiceItemContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(addItemReduxForm);
-
-InvoiceItemContainer.navigationOptions = () => ({
-    header: null,
-});
 
 export default InvoiceItemContainer;

@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     StatusBar,
     ScrollView,
@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Field } from 'redux-form';
 import styles from './styles';
-import { InputField, CtButton, AssetImage, CtDivider, CtGradientButton } from '../../../../components';
+import { InputField, AssetImage, CtGradientButton } from '../../../../components';
 // import * as Google from 'expo-google-app-auth';
 import { env, IMAGES } from '../../../../config';
 import { colors } from '../../../../styles/colors';
@@ -24,7 +24,8 @@ type IProps = {
     handleSubmit: Function,
     loading: Boolean,
     socialLoading: Boolean,
-    language: String,
+    endpointApi: String,
+    endpointURL: String,
 }
 
 export const Login = (props: IProps) => {
@@ -32,11 +33,17 @@ export const Login = (props: IProps) => {
         loading,
         // socialLoading,
         navigation,
-        language,
         login,
         // socialLogin,
         handleSubmit,
     } = props;
+
+    useEffect(() => {
+        const { endpointApi, endpointURL } = props;
+        if (!endpointApi || !endpointURL) {
+            navigation.navigate(ROUTES.ENDPOINTS);
+        }
+    }, []);
 
     /*
      * Sign in with google
@@ -68,13 +75,10 @@ export const Login = (props: IProps) => {
         });
     };
 
-    let passwordInput = {};
     let loginRefs = {}
 
     return (
-
         <View style={styles.container}>
-
             <StatusBar
                 barStyle="dark-content"
                 hidden={false}
@@ -108,7 +112,7 @@ export const Login = (props: IProps) => {
                                 inputProps={{
                                     returnKeyType: 'next',
                                     autoCapitalize: 'none',
-                                    placeholder: Lng.t("login.email", { locale: language }),
+                                    placeholder: Lng.t("login.email"),
                                     autoCorrect: true,
                                     keyboardType: 'email-address',
                                     onSubmitEditing: () => {
@@ -127,7 +131,7 @@ export const Login = (props: IProps) => {
                                 inputProps={{
                                     returnKeyType: 'go',
                                     autoCapitalize: 'none',
-                                    placeholder: Lng.t("login.password", { locale: language }),
+                                    placeholder: Lng.t("login.password"),
                                     autoCorrect: true,
                                     onSubmitEditing: handleSubmit(onLogin),
                                 }}
@@ -143,7 +147,7 @@ export const Login = (props: IProps) => {
                                     onPress={() => navigation.navigate(ROUTES.FORGOT_PASSWORD)}
                                 >
                                     <Text style={styles.forgetPassword}>
-                                        {Lng.t("button.forget", { locale: language })}
+                                        {Lng.t("button.forget")}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -152,7 +156,7 @@ export const Login = (props: IProps) => {
                         <View style={{ marginTop: 25 }}>
                             <CtGradientButton
                                 onPress={handleSubmit(onLogin)}
-                                btnTitle={Lng.t("button.singIn", { locale: language })}
+                                btnTitle={Lng.t("button.singIn")}
                                 loading={loading}
                             />
                         </View>
@@ -170,14 +174,13 @@ export const Login = (props: IProps) => {
                                 imageSource={IMAGES.GOOGLE_ICON}
                                 imageIcon
                                 onPress={() => onSocialLogin()}
-                                btnTitle={Lng.t("button.singInGoogle", { locale: language })}
+                                btnTitle={Lng.t("button.singInGoogle")}
                                 loading={socialLoading}
                                 buttonType={BUTTON_COLOR.WHITE}
                                 color={colors.dark3}
                             />
                         </View>
                     */}
-
                     </View>
                 </KeyboardAvoidingView>
             </ScrollView>

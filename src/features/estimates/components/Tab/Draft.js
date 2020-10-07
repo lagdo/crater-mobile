@@ -30,7 +30,6 @@ const Draft = ({
     getEstimates,
     fresh,
     search,
-    language,
     navigation,
     onAddEstimate,
     loadMoreItems,
@@ -65,14 +64,14 @@ const Draft = ({
     }
 
     let empty = (!filter && !search) ? {
-        description: Lng.t("estimates.empty.draft.description", { locale: language }),
-        buttonTitle: Lng.t("estimates.empty.buttonTitle", { locale: language }),
+        description: Lng.t("estimates.empty.draft.description"),
+        buttonTitle: Lng.t("estimates.empty.buttonTitle"),
         buttonPress: () => onAddEstimate(),
     } : {}
 
-    let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
-        : (!filter) ? Lng.t("estimates.empty.draft.title", { locale: language }) :
-            Lng.t("filter.empty.filterTitle", { locale: language })
+    let emptyTitle = search ? Lng.t("search.noResult", { search })
+        : (!filter) ? Lng.t("estimates.empty.draft.title") :
+            Lng.t("filter.empty.filterTitle")
 
     return (
         <View style={styles.content}>

@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { View, Text } from 'react-native';
 import styles from './styles';
 import { ListView, InputModal, CtDivider } from '../../../../components';
 import { formatListByName, alertMe } from '../../../../api/global';
 import Lng from '../../../../api/lang/i18n';
 
-export const Units = (props) => {
+export const Units = forwardRef((props, ref) => {
     const {
         navigation,
-        language,
         units,
         setFormField,
         itemUnitLoading = false,
-        formValues: { unitName = "", unitId = null },
+        formValues: { unitName = "", unitId = null } = {},
         createItemUnit,
         editItemUnit,
         removeItemUnit,
@@ -20,6 +19,9 @@ export const Units = (props) => {
 
     const [visible, setVisible] = useState(false);
     const [isCreateMethod, setCreateMethod] = useState(true);
+
+    // Make the openModal() function available to the parent component using the ref.
+    useImperativeHandle(ref, () => ({ openModal }));
 
     const onToggle = () => setVisible(!visible);
 
@@ -39,8 +41,8 @@ export const Units = (props) => {
 
     const onRemove = () => {
         alertMe({
-            title: Lng.t("alert.title", { locale: language }),
-            desc: Lng.t("items.alertUnit", { locale: language }),
+            title: Lng.t("alert.title"),
+            desc: Lng.t("items.alertUnit"),
             showCancel: true,
             okPress: () => {
                 onToggle()
@@ -55,12 +57,11 @@ export const Units = (props) => {
                 visible={visible}
                 onToggle={onToggle}
                 navigation={navigation}
-                language={language}
                 headerTitle={isCreateMethod ?
-                    Lng.t("items.addUnit", { locale: language }) :
-                    Lng.t("items.editUnit", { locale: language })
+                    Lng.t("items.addUnit") :
+                    Lng.t("items.editUnit")
                 }
-                hint={Lng.t("items.unitHint", { locale: language })}
+                hint={Lng.t("items.unitHint")}
                 fieldName="unitName"
                 onSubmit={onSave}
                 onRemove={onRemove}
@@ -97,7 +98,7 @@ export const Units = (props) => {
                     bottomDivider
                     contentContainerStyle={{ flex: 3 }}
                     emptyContentProps={{
-                        title: Lng.t("payments.empty.modeTitle", { locale: language }),
+                        title: Lng.t("payments.empty.modeTitle"),
                     }}
                     itemContainer={{
                         paddingVertical: 8
@@ -106,4 +107,4 @@ export const Units = (props) => {
             </View>
         </View>
     );
-}
+})

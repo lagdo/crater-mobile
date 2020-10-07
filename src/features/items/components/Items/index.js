@@ -12,7 +12,6 @@ import { ROUTES } from '../../../../navigation/routes';
 import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
 import { ADD_ITEM, EDIT_ITEM, ITEM_SEARCH } from '../../constants';
-import { goBack, MOUNT, UNMOUNT } from '../../../../navigation/actions';
 import { itemsDescriptionStyle } from '../../../invoices/components/Invoice/styles';
 import { formatSelectPickerName } from '../../../../api/global';
 
@@ -21,7 +20,6 @@ type IProps = {
     getItems: Function,
     items: Object,
     loading: Boolean,
-    language: String,
 }
 
 
@@ -35,7 +33,6 @@ export const Items = (props: IProps) => {
     const {
         navigation,
         loading,
-        language,
         currency,
         handleSubmit,
         items,
@@ -65,10 +62,6 @@ export const Items = (props: IProps) => {
     useEffect(() => {
         getItems({ fresh: true });
         getItemUnits()
-
-        goBack(MOUNT, navigation, { route: ROUTES.MAIN_MORE })
-
-        return () => goBack(UNMOUNT)
     }, []);
 
     const onItemSelect = ({ id }) => {
@@ -200,7 +193,7 @@ export const Items = (props: IProps) => {
     let inputFields = [
         {
             name: 'name',
-            hint: Lng.t("items.name", { locale: language }),
+            hint: Lng.t("items.name"),
             inputProps: {
                 returnKeyType: 'next',
                 autoCorrect: true,
@@ -215,7 +208,7 @@ export const Items = (props: IProps) => {
         },
         {
             name: 'price',
-            hint: Lng.t("items.price", { locale: language }),
+            hint: Lng.t("items.price"),
             inputProps: {
                 returnKeyType: 'next',
                 keyboardType: 'numeric'
@@ -229,14 +222,14 @@ export const Items = (props: IProps) => {
 
     let dropdownFields = [{
         name: "unit_id",
-        label: Lng.t("items.unit", { locale: language }),
+        label: Lng.t("items.unit"),
         fieldIcon: 'align-center',
         items: formatSelectPickerName(units),
         onChangeCallback: (val) => {
             setFormField('unit_id', val)
         },
         defaultPickerOptions: {
-            label: Lng.t("items.unitPlaceholder", { locale: language }),
+            label: Lng.t("items.unitPlaceholder"),
             value: '',
 
         },
@@ -246,26 +239,26 @@ export const Items = (props: IProps) => {
     }]
 
     let empty = (!filter && !search) ? {
-        description: Lng.t("items.empty.description", { locale: language }),
-        buttonTitle: Lng.t("items.empty.buttonTitle", { locale: language }),
+        description: Lng.t("items.empty.description"),
+        buttonTitle: Lng.t("items.empty.buttonTitle"),
         buttonPress: () => {
             navigation.navigate(ROUTES.GLOBAL_ITEM, { type: ADD_ITEM })
             onResetFilter()
         }
     } : {}
 
-    let emptyTitle = search ? Lng.t("search.noResult", { locale: language, search })
-        : (!filter) ? Lng.t("items.empty.title", { locale: language }) :
-            Lng.t("filter.empty.filterTitle", { locale: language })
+    let emptyTitle = search ? Lng.t("search.noResult", { search })
+        : (!filter) ? Lng.t("items.empty.title") :
+            Lng.t("filter.empty.filterTitle")
 
     return (
         <View style={styles.container}>
             <MainLayout
                 headerProps={{
-                    title: Lng.t("header.items", { locale: language }),
+                    title: Lng.t("header.items"),
                     leftIcon: "long-arrow-alt-left",
                     leftIconPress: () => navigation.navigate(ROUTES.MAIN_MORE),
-                    title: Lng.t("header.items", { locale: language }),
+                    title: Lng.t("header.items"),
                     titleStyle: styles.headerTitle,
                     rightIcon: "plus",
                     placement: "center",

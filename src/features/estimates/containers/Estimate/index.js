@@ -8,7 +8,7 @@ import { ESTIMATE_FORM, ESTIMATE_EDIT } from '../../constants';
 import moment from 'moment';
 import * as CustomersAction from '../../../customers/actions';
 
-const mapStateToProps = (state, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { language, taxTypes },
         estimates: { loading, estimateItems, estimateData, items },
@@ -22,12 +22,13 @@ const mapStateToProps = (state, { navigation }) => {
         estimateTemplates
     } = estimateData;
 
-    let type = navigation.getParam('type')
+    const { id = null, type } = params;
 
     let isLoading = loading.initEstimateLoading || (type === ESTIMATE_EDIT && !estimate)
         || !nextEstimateNumber
 
     return {
+        id,
         initLoading: isLoading,
         loading: loading.estimateLoading,
         estimateItems,
@@ -80,9 +81,5 @@ const EstimateContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(addEstimateReduxForm);
-
-EstimateContainer.navigationOptions = () => ({
-    header: null,
-});
 
 export default EstimateContainer;

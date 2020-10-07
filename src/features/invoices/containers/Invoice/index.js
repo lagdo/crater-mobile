@@ -8,11 +8,14 @@ import { INVOICE_FORM, INVOICE_EDIT } from '../../constants';
 import moment from 'moment';
 import * as CustomersAction from '../../../customers/actions';
 
-const mapStateToProps = (state, { navigation }) => {
+const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { language, taxTypes },
         invoices: { loading, invoiceItems, invoiceData, items },
-        customers: { customers, loading: { customersLoading } },
+        customers: {
+            customers,
+            loading: { customersLoading, initInvoiceLoading, invoiceLoading, itemsLoading },
+        },
     } = state;
 
     const {
@@ -22,21 +25,21 @@ const mapStateToProps = (state, { navigation }) => {
         nextInvoiceNumberAttribute
     } = invoiceData;
 
-    let type = navigation.getParam('type')
+    const { id = null, type } = params;
 
-    let isLoading = loading.initInvoiceLoading || (type === INVOICE_EDIT && !invoice)
-        || !nextInvoiceNumber
+    let isLoading = initInvoiceLoading || (type === INVOICE_EDIT && !invoice) || !nextInvoiceNumber;
 
     return {
+        id,
         initLoading: isLoading,
         customersLoading,
-        loading: loading.invoiceLoading,
+        loading: invoiceLoading,
         invoiceItems,
         invoiceData,
         items,
         type,
         customers,
-        itemsLoading: loading.itemsLoading,
+        itemsLoading,
         language,
         formValues: getFormValues(INVOICE_FORM)(state) || {},
         taxTypes,
@@ -79,9 +82,5 @@ const InvoiceContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
 )(addInvoiceReduxForm);
-
-InvoiceContainer.navigationOptions = () => ({
-    header: null,
-});
 
 export default InvoiceContainer;
