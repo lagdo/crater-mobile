@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { View, Text } from 'react-native';
 import styles from './styles';
 import { ListView, InputModal, CtDivider } from '../../../../components';
 import { formatListByName, alertMe } from '../../../../api/global';
 import Lng from '../../../../api/lang/i18n';
 
-export const Units = (props) => {
+export const Units = forwardRef((props, ref) => {
     const {
         navigation,
         units,
         setFormField,
         itemUnitLoading = false,
-        formValues: { unitName = "", unitId = null },
+        formValues: { unitName = "", unitId = null } = {},
         createItemUnit,
         editItemUnit,
         removeItemUnit,
@@ -19,6 +19,9 @@ export const Units = (props) => {
 
     const [visible, setVisible] = useState(false);
     const [isCreateMethod, setCreateMethod] = useState(true);
+
+    // Make the openModal() function available to the parent component using the ref.
+    useImperativeHandle(ref, () => ({ openModal }));
 
     const onToggle = () => setVisible(!visible);
 
@@ -104,4 +107,4 @@ export const Units = (props) => {
             </View>
         </View>
     );
-}
+})

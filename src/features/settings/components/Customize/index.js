@@ -185,12 +185,13 @@ export const Customize = (props: IProps) =>  {
             <View style={styles.submitButton}>
                 <View style={{ flex: 1 }}>
                     <CtButton
-                        onPress={() => isPaymentMode ?
+                        onPress={() => {
+                        isPaymentMode ?
                             paymentChild.current.openModal() :
                             isItemScreen ?
                                 itemChild.current.openModal()
                                 : handleSubmit(onSave)()
-                        }
+                        }}
                         btnTitle={Lng.t(title)}
                         containerStyle={styles.handleBtn}
                         loading={loading}
@@ -257,9 +258,9 @@ export const Customize = (props: IProps) =>  {
                         render: (
                             <ScrollView keyboardShouldPersistTaps='handled'>
                                 <PaymentModes
+                                    {...props}
                                     ref={paymentChild}
-                                    props={props}
-                                    setFormField={(field, value) => setFormField(field, value)}
+                                    setFormField={setFormField}
                                 />
                             </ScrollView>
                         )
@@ -312,9 +313,9 @@ export const Customize = (props: IProps) =>  {
             {isItemsScreen && (
                 <ScrollView keyboardShouldPersistTaps='handled'>
                     <Units
+                        {...props}
                         ref={itemChild}
-                        props={props}
-                        setFormField={(field, value) => setFormField(field, value)}
+                        setFormField={setFormField}
                     />
                 </ScrollView>
             )}

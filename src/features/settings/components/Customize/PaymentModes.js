@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { View, ScrollView } from 'react-native';
 import styles from './styles';
 import { ListView, InputModal } from '../../../../components';
 import { formatListByName, alertMe } from '../../../../api/global';
 import Lng from '../../../../api/lang/i18n';
 
-export const PaymentModes = (props) => {
+export const PaymentModes = forwardRef((props, ref) => {
     const {
         navigation,
-        formValues: { methodName = "", methodId = null },
+        formValues: { methodName = "", methodId = null } = {},
         createPaymentMode,
         editPaymentMode,
         removePaymentMode,
@@ -19,6 +19,9 @@ export const PaymentModes = (props) => {
 
     const [visible, setVisible] = useState(false);
     const [isCreateMethod, setCreateMethod] = useState(false);
+
+    // Make the openModal() function available to the parent component using the ref.
+    useImperativeHandle(ref, () => ({ openModal }));
 
     const onToggle = () => setVisible(!visible);
 
@@ -101,4 +104,4 @@ export const PaymentModes = (props) => {
             </View>
         </View>
     );
-}
+})
