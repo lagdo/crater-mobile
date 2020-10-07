@@ -36,9 +36,7 @@ export const Categories = (props: IProps) => {
     }, []);
 
     const onSelectCategory = (category) => {
-        navigation.navigate(ROUTES.CATEGORY,
-            { type: CATEGORY_EDIT, categoryId: category.id }
-        )
+        navigation.navigate(ROUTES.CATEGORY, { type: CATEGORY_EDIT, categoryId: category.id });
     }
 
     const onSearch = (keywords) => {
@@ -110,7 +108,7 @@ export const Categories = (props: IProps) => {
             <MainLayout
                 headerProps={{
                     leftIcon: "long-arrow-alt-left",
-                    leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
+                    leftIconPress: navigation.goBack,
                     title: Lng.t("header.expenseCategory"),
                     titleStyle: styles.titleStyle,
                     placement: "center",
@@ -128,9 +126,7 @@ export const Categories = (props: IProps) => {
                             categoriesFilter : found ? categoriesList : []
                         }
                         refreshing={refreshing}
-                        getFreshItems={(onHide) => {
-                            getFreshItems(onHide)
-                        }}
+                        getFreshItems={(onHide) =>  getFreshItems(onHide)}
                         onPress={onSelectCategory}
                         loading={loading}
                         isEmpty={found ? categoriesList.length <= 0 : true}

@@ -10,7 +10,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
 
     const {
         global: { language },
-        categories: {
+        settings: {
             loading: {
                 expenseCategoryLoading,
                 initExpenseCategoryLoading,
@@ -18,7 +18,11 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         }
     } = state;
 
-    const { id = NULL, type = CATEGORY_ADD, onSelect: onFirstTimeCreateExpense = null } = params;
+    const {
+        categoryId: id = null,
+        type = CATEGORY_ADD,
+        onSelect: onFirstTimeCreateExpense = null,
+    } = params;
 
     return {
         id,
