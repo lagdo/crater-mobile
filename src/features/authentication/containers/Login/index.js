@@ -1,9 +1,6 @@
 import { connect } from "react-redux";
-import { validate } from './validation';
-import { reduxForm } from 'redux-form';
 import { Login } from "../../components/Login"; //imports the feature's login component.
 import * as AuthAction from '../../actions';
-import { LOGIN_FORM } from "../../constants";
 
 const mapStateToProps = ({
     auth,
@@ -26,16 +23,10 @@ const mapDispatchToProps = {
     // socialLogin: AuthAction.socialLogin,
 };
 
-//  Redux Forms
-const loginReduxForm = reduxForm({
-    form: LOGIN_FORM,
-    validate,
-})(Login);
-
 // Connects the login-component.
 const LoginContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(loginReduxForm);
+)(Login);
 
 export default LoginContainer;
