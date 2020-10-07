@@ -72,7 +72,7 @@ export const Taxes = (props) => {
             <MainLayout
                 headerProps={{
                     leftIcon: "long-arrow-alt-left",
-                    leftIconPress: () => navigation.navigate(ROUTES.SETTING_LIST),
+                    leftIconPress: navigation.goBack,
                     title: Lng.t("header.taxes"),
                     titleStyle: styles.headerTitle,
                     placement: "center",
