@@ -1,9 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as CategoriesAction from '../../actions';
-import { reduxForm } from 'redux-form';
 import { Categories } from '../../components/Categories';
-import { CATEGORY_SEARCH } from '../../constants';
 
 const mapStateToProps = ({ global, settings, categories }) => ({
     language: global.language,
@@ -15,15 +13,10 @@ const mapDispatchToProps = {
     getExpenseCategories: CategoriesAction.getExpenseCategories,
 };
 
-//  Redux Forms
-const categoriesSearchReduxForm = reduxForm({
-    form: CATEGORY_SEARCH,
-})(Categories);
-
 //  connect
 const CategoriesContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(categoriesSearchReduxForm);
+)(Categories);
 
 export default CategoriesContainer;
