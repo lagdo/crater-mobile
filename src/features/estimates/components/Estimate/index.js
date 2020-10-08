@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, Linking } from 'react-native';
-import { change } from 'redux-form';
-import { Field } from 'redux-form';
+import { change, Field } from 'redux-form';
 import styles from './styles';
 import {
     InputField,

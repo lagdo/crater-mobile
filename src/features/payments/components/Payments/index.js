@@ -110,7 +110,7 @@ export const Payments = (props: IProps) => {
 
     const onSubmitFilter = ({ customer_id = '', payment_method_id = '', payment_number = '' }) => {
         if (customer_id || payment_method_id || payment_number) {
-            setFilter(false)
+            setFilter(true);
 
             getItems({
                 fresh: true,

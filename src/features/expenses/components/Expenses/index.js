@@ -117,13 +117,11 @@ export const Expenses = (props: IProps) => {
         getItems({ fresh: true, params: { ...params, search: keywords } })
     };
 
-    const onResetFilter = () => {
-        setFilter(false)
-    }
+    const onResetFilter = () => setFilter(false);
 
     const onSubmitFilter = ({ from_date, to_date, expense_category_id }) => {
         if (from_date || to_date || expense_category_id) {
-            setFilter(false)
+            setFilter(true);
 
             getItems({
                 fresh: true,

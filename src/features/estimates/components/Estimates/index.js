@@ -163,7 +163,7 @@ export const Estimates = (props: IProps) => {
             else
                 setActiveTab(ESTIMATES_TABS.ALL);
 
-            setFilter(false)
+            setFilter(true);
 
             getItems({
                 fresh: true,

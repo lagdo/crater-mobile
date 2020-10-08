@@ -73,7 +73,7 @@ export const Filter = (props: IProps) => {
                         {...field}
                         onSelect={(item) => {
                             form.change(name, item[compareField]);
-                            onSelect(item);
+                            onSelect && onSelect(item);
                         }}
                     />
                 </View>

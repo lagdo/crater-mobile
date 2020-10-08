@@ -166,7 +166,7 @@ export const Invoices = (props: IProps) => {
     }
 
     const onResetFilter = (tab = '') => {
-        setFilter(false)
+        setFilter(false);
 
         if (filter && !tab) {
             getItems({ fresh: true, q: '', type: getActiveTab() });
@@ -183,7 +183,7 @@ export const Invoices = (props: IProps) => {
             else
                 setActiveTab(INVOICES_TABS.ALL);
 
-            setFilter(false)
+            setFilter(true);
 
             getItems({
                 fresh: true,

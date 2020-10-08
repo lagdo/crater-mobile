@@ -80,7 +80,7 @@ export const Expense = (props) => {
                                 onSelect: onSelectCategory
                             }),
                             showCancel: true,
-                            cancelPress: () => navigation.goBack(null)
+                            cancelPress: navigation.goBack
                         })
                     }
                     else {

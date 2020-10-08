@@ -94,13 +94,11 @@ export const Items = (props: IProps) => {
         });
     };
 
-    const onResetFilter = () => {
-        setFilter(false)
-    }
+    const onResetFilter = () => setFilter(false);
 
     const onSubmitFilter = ({ unit_id = '', name = '', price = '' }) => {
         if (unit_id || name || price) {
-            setFilter(false)
+            setFilter(true);
 
             getItems({
                 fresh: true,
