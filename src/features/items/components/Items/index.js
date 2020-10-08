@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
-import { change } from 'redux-form';
 import styles from './styles';
 import {
     MainLayout,
@@ -11,7 +10,7 @@ import {
 import { ROUTES } from '../../../../navigation/routes';
 import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
-import { ADD_ITEM, EDIT_ITEM, ITEM_SEARCH } from '../../constants';
+import { ADD_ITEM, EDIT_ITEM } from '../../constants';
 import { itemsDescriptionStyle } from '../../../invoices/components/Invoice/styles';
 import { formatSelectPickerName } from '../../../../api/global';
 
@@ -21,7 +20,6 @@ type IProps = {
     items: Object,
     loading: Boolean,
 }
-
 
 let params = {
     search: '',
@@ -34,30 +32,23 @@ export const Items = (props: IProps) => {
         navigation,
         loading,
         currency,
-        handleSubmit,
         items,
         filterItems,
         getItems: getProducts,
         units,
         itemUnitsLoading = false,
         getItemUnits,
-        formValues: {
-            unit_id = '',
-            name = '',
-            price = ''
-        },
     } = props;
 
     const [refreshing, setRefreshing] = useState(false);
     const [fresh, setFresh] = useState(true);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        limit: 10,
-        lastPage: 1,
-    });
+    const [pagination, setPagination] = useState({ page: 1, limit: 10, lastPage: 1 });
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(false);
-    const [selectedUnit, setSelectedUnit] = useState('');
+
+    const [unit_id, setUnitId] = useState('');
+    const [name, setName] = useState('');
+    const [price, setPrice] = useState('');
 
     useEffect(() => {
         getItems({ fresh: true });
@@ -127,13 +118,6 @@ export const Items = (props: IProps) => {
         onResetFilter();
     }
 
-    const setFormField = (field, value) => {
-        props.dispatch(change(ITEM_SEARCH, field, value));
-
-        if (field === 'unit_id')
-            setSelectedUnit(value)
-    };
-
     const onSearch = (keywords) => {
         onResetFilter()
         setSearch(keywords)
@@ -198,25 +182,21 @@ export const Items = (props: IProps) => {
                 returnKeyType: 'next',
                 autoCorrect: true,
                 autoFocus: true,
-                onSubmitEditing: () => {
-                    filterRefs.price.focus();
-                }
+                onSubmitEditing: () => filterRefs.price.focus(),
+                onChangeText: setName,
             },
-            refLinkFn: (ref) => {
-                filterRefs.name = ref;
-            }
+            refLinkFn: (ref) => filterRefs.name = ref,
         },
         {
             name: 'price',
             hint: Lng.t("items.price"),
             inputProps: {
                 returnKeyType: 'next',
-                keyboardType: 'numeric'
+                keyboardType: 'numeric',
+                onChangeText: setPrice,
             },
             isCurrencyInput: true,
-            refLinkFn: (ref) => {
-                filterRefs.price = ref;
-            }
+            refLinkFn: (ref) => filterRefs.price = ref,
         }
     ]
 
@@ -225,15 +205,13 @@ export const Items = (props: IProps) => {
         label: Lng.t("items.unit"),
         fieldIcon: 'align-center',
         items: formatSelectPickerName(units),
-        onChangeCallback: (val) => {
-            setFormField('unit_id', val)
-        },
+        onChangeCallback: setUnitId,
         defaultPickerOptions: {
             label: Lng.t("items.unitPlaceholder"),
             value: '',
 
         },
-        selectedItem: selectedUnit,
+        selectedItem: unit_id,
         onDonePress: () => filterRefs.name.focus(),
         containerStyle: styles.selectPicker
     }]
@@ -272,7 +250,7 @@ export const Items = (props: IProps) => {
                 bottomDivider
                 onFocus={() => { }}
                 filterProps={{
-                    onSubmitFilter: handleSubmit(onSubmitFilter),
+                    onSubmitFilter: onSubmitFilter,
                     inputFields: inputFields,
                     dropdownFields: dropdownFields,
                     clearFilter: props,
