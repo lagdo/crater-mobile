@@ -2,20 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
-import { change } from 'redux-form';
 import styles from './styles';
 import { MainLayout, ListView } from '../../../../components';
 import { ROUTES } from '../../../../navigation/routes';
 import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
-import { EXPENSE_ADD, EXPENSE_EDIT, EXPENSE_SEARCH } from '../../constants';
+import { EXPENSE_ADD, EXPENSE_EDIT } from '../../constants';
 
-let params = {
+const params = {
     search: '',
     expense_category_id: '',
     from_date: '',
     to_date: '',
-}
+};
 
 type IProps = {
     navigation: Object,
@@ -31,26 +30,16 @@ export const Expenses = (props: IProps) => {
         filterExpenses,
         loading,
         currency,
-        handleSubmit,
         categories,
         getExpenses,
-        formValues: {
-            from_date = '',
-            to_date = '',
-            expense_category_id = ''
-        },
-        route: { params = {} },
     } = props
 
     const [refreshing, setRefreshing] = useState(false);
     const [fresh, setFresh] = useState(true);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        limit: 10,
-        lastPage: 1,
-    });
+    const [pagination, setPagination] = useState({ page: 1, limit: 10, lastPage: 1 });
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(false);
+
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedFromDate, setSelectedFromDate] = useState('');
     const [selectedToDate, setSelectedToDate] = useState('');
@@ -58,17 +47,22 @@ export const Expenses = (props: IProps) => {
     const [selectedToDateValue, setSelectedToDateValue] = useState('');
 
     useEffect(() => {
-        const { getCategories, navigation } = props
+        const { getCategories } = props;
 
-        getCategories()
+        getCategories();
 
         getItems({ fresh: true });
     }, []);
 
+    const onAddExpense = () => {
+        navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_ADD });
+        onResetFilter();
+    };
+
     const onExpenseSelect = ({ id }) => {
-        navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_EDIT, id })
-        onResetFilter()
-    }
+        navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_EDIT, id });
+        onResetFilter();
+    };
 
     const getItems = ({ fresh = false, onResult, filter = false, params } = {}) => {
         if (refreshing) {
@@ -104,17 +98,10 @@ export const Expenses = (props: IProps) => {
         });
     };
 
-    const setFormField = (field, value) => {
-        props.dispatch(change(EXPENSE_SEARCH, field, value));
-
-        if (field === 'expense_category_id')
-            setSelectedCategory(value)
-    };
-
     const onSearch = (keywords) => {
-        onResetFilter()
-        setSearch(keywords)
-        getItems({ fresh: true, params: { ...params, search: keywords } })
+        onResetFilter();
+        setSearch(keywords);
+        getItems({ fresh: true, params: { ...params, search: keywords } });
     };
 
     const onResetFilter = () => setFilter(false);
@@ -148,9 +135,9 @@ export const Expenses = (props: IProps) => {
         getItems({
             params: {
                 ...params,
-                expense_category_id,
-                from_date,
-                to_date,
+                expense_category_id: selectedCategory,
+                from_date: selectedFromDate,
+                to_date: selectedToDate,
             },
             filter: true
         });
@@ -206,23 +193,23 @@ export const Expenses = (props: IProps) => {
 
     let expensesItem = getExpensesList(expenses);
     let filterExpensesItem = getExpensesList(filterExpenses);
-    let CategoriesList = getCategoriesList(categories)
-    let dropdownFields = [{
-        name: "expense_category_id",
-        label: Lng.t("expenses.category"),
-        fieldIcon: 'align-center',
-        items: CategoriesList,
-        onChangeCallback: (val) => {
-            setFormField('expense_category_id', val)
-        },
-        defaultPickerOptions: {
-            label: Lng.t("expenses.categoryPlaceholder"),
-            value: '',
-        },
-        selectedItem: selectedCategory,
-        containerStyle: styles.selectPicker
-    }]
+    let CategoriesList = getCategoriesList(categories);
 
+    let dropdownFields = [
+        {
+            name: "expense_category_id",
+            label: Lng.t("expenses.category"),
+            fieldIcon: 'align-center',
+            items: CategoriesList,
+            onChangeCallback: setSelectedCategory,
+            defaultPickerOptions: {
+                label: Lng.t("expenses.categoryPlaceholder"),
+                value: '',
+            },
+            selectedItem: selectedCategory,
+            containerStyle: styles.selectPicker
+        }
+    ];
     let datePickerFields = [
         {
             name: "from_date",
@@ -244,38 +231,33 @@ export const Expenses = (props: IProps) => {
             selectedDate: selectedToDate,
             selectedDateValue: selectedToDateValue
         }
-    ]
+    ];
 
-    let empty = (!filter && !search) ? {
+    const empty = (!filter && !search) ? {
         description: Lng.t("expenses.empty.description"),
         buttonTitle: Lng.t("expenses.empty.buttonTitle"),
-        buttonPress: () => {
-            navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_ADD })
-            onResetFilter()
-        }
-    } : {}
+        buttonPress: onAddExpense,
+    } : {};
 
-    let emptyTitle = search ? Lng.t("search.noResult", { search })
+    const emptyTitle = search ? Lng.t("search.noResult", { search })
         : (!filter) ? Lng.t("expenses.empty.title") :
             Lng.t("filter.empty.filterTitle")
 
     const { isLoading } = params;
 
+    console.log(expenses);
     return (
         <View style={styles.container}>
             <MainLayout
                 headerProps={{
                     rightIcon: "plus",
-                    rightIconPress: () => {
-                        navigation.navigate(ROUTES.EXPENSE, { type: EXPENSE_ADD })
-                        onResetFilter()
-                    },
+                    rightIconPress: onAddExpense,
                     title: Lng.t("header.expenses")
                 }}
                 onSearch={onSearch}
                 bottomDivider
                 filterProps={{
-                    onSubmitFilter: handleSubmit(onSubmitFilter),
+                    onSubmitFilter: onSubmitFilter,
                     datePickerFields: datePickerFields,
                     dropdownFields: dropdownFields,
                     clearFilter: props,
@@ -283,7 +265,6 @@ export const Expenses = (props: IProps) => {
                 }}
                 loadingProps={{ is: isLoading || (loading && fresh) }}
             >
-
                 <View style={styles.listViewContainer} >
                     <ListView
                         items={!filter ? expensesItem : filterExpensesItem}
@@ -313,7 +294,6 @@ export const Expenses = (props: IProps) => {
                         leftSubTitleStyle={{ textAlign: "justify" }}
                     />
                 </View>
-
             </MainLayout>
         </View>
     );

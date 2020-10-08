@@ -1,14 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { reduxForm, getFormValues } from 'redux-form';
 import moment from 'moment';
 import { Expense } from '../../components/Expense';
-import { validate } from './validation';
 import * as ExpensesAction from '../../actions';
-import { EXPENSE_FORM, EXPENSE_EDIT, EXPENSE_ADD } from '../../constants';
+import { EXPENSE_EDIT, EXPENSE_ADD } from '../../constants';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
-
     const {
         global: { company, endpointURL, language },
         expenses: { loading, categories, expense } = {}
@@ -27,8 +24,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         initLoading: isLoading,
         loading: loading.expenseLoading,
         type,
-        formValues: getFormValues(EXPENSE_FORM)(state) || {},
-
         initialValues: !isLoading && {
             expense_date: moment(),
             ...expense
@@ -47,16 +42,10 @@ const mapDispatchToProps = {
     getReceipt: ExpensesAction.getReceipt,
 };
 
-//  Redux Forms
-const addExpenseReduxForm = reduxForm({
-    form: EXPENSE_FORM,
-    validate,
-})(Expense);
-
 //  connect
 const ExpenseContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(addExpenseReduxForm);
+)(Expense);
 
 export default ExpenseContainer;

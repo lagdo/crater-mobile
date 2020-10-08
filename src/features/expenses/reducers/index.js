@@ -13,7 +13,6 @@ const initialState = {
     filterExpenses: [],
     categories: [],
     errors: null,
-    expense: null,
     customers: null,
     loading: {
         expensesLoading: false,
@@ -57,13 +56,6 @@ export default function expensesReducer(state = initialState, action) {
 
         case CREATE_EXPENSE:
             return { ...state, ...payload };
-
-        case CLEAR_EXPENSE:
-            return { ...state, expense: null };
-
-        case SET_EXPENSE:
-            const { expense, customers, categories } = payload
-            return { ...state, expense, customers, categories };
 
         default:
             return state;
