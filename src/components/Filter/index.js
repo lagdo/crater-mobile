@@ -38,7 +38,7 @@ export const Filter = (props: IProps) => {
     const [visible, setVisible] = useState(false);
     const [counter, setCounter] = useState(0);
 
-    const inputField = (fields) => {
+    const inputField = (fields, form) => {
         return fields.map((field, index) => {
             const { name, hint, inputProps } = field
             return (
@@ -59,9 +59,9 @@ export const Filter = (props: IProps) => {
         })
     }
 
-    const selectField = (fields) => {
+    const selectField = (fields, form) => {
         return fields.map((field, index) => {
-            const { name, items } = field
+            const { name, items, onSelect, compareField = 'id' } = field;
 
             return (
                 <View key={index}>
@@ -71,15 +71,19 @@ export const Filter = (props: IProps) => {
                         component={SelectField}
                         hasFirstItem={counter > 0 ? false : true}
                         {...field}
+                        onSelect={(item) => {
+                            form.change(name, item[compareField]);
+                            onSelect(item);
+                        }}
                     />
                 </View>
             )
         })
     }
 
-    const dropdownField = (fields) => {
+    const dropdownField = (fields, form) => {
         return fields.map((field, index) => {
-            const { name, items } = field
+            const { name, items } = field;
 
             return (
                 <View key={index}>
@@ -143,7 +147,6 @@ export const Filter = (props: IProps) => {
         onResetFilter && onResetFilter();
     }
 
-
     const BOTTOM_ACTION = (handleSubmit, form) => {
         return (
             <View style={styles.submitButton}>
@@ -187,7 +190,6 @@ export const Filter = (props: IProps) => {
                             </Text>
                         </View>
                     )}
-
                 </TouchableOpacity>
 
                 <Modal
@@ -203,7 +205,6 @@ export const Filter = (props: IProps) => {
                     />
 
                     <View style={styles.modalContainer}>
-
                         <DefaultLayout
                             headerProps={{
                                 leftIcon: 'long-arrow-alt-left',
@@ -221,28 +222,15 @@ export const Filter = (props: IProps) => {
                             bottomAction={BOTTOM_ACTION(handleSubmit, form)}
                         >
                             <View style={styles.bodyContainer}>
+                                {selectFields && selectField(selectFields, form)}
 
-                                {selectFields &&
-                                    selectField(selectFields)
-                                }
-
-                                <View
-                                    style={styles.dateFieldContainer}
-                                >
-
-                                    {datePickerFields &&
-                                        datePickerField(datePickerFields)
-                                    }
+                                <View style={styles.dateFieldContainer}>
+                                    {datePickerFields && datePickerField(datePickerFields, form)}
                                 </View>
 
-                                {dropdownFields &&
-                                    dropdownField(dropdownFields)
-                                }
+                                {dropdownFields && dropdownField(dropdownFields, form)}
 
-                                {inputFields &&
-                                    inputField(inputFields)
-                                }
-
+                                {inputFields && inputField(inputFields, form)}
                             </View>
                         </DefaultLayout>
                     </View>

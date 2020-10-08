@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
-import { Field, change } from 'redux-form';
+import { Form, Field } from 'react-final-form';
 import moment from 'moment';
 import styles from './styles';
 import {
@@ -16,12 +16,13 @@ import {
 } from '../../../../components';
 import { ROUTES } from '../../../../navigation/routes';
 import { DATE_FORMAT } from '../../../../api/consts/core';
-import { PAYMENT_ADD, PAYMENT_EDIT, PAYMENT_FORM, PAYMENT_ACTIONS, ACTIONS_VALUE } from '../../constants';
+import { PAYMENT_ADD, PAYMENT_EDIT, PAYMENT_ACTIONS, ACTIONS_VALUE } from '../../constants';
 import Lng from '../../../../api/lang/i18n';
 import { IMAGES } from '../../../../config';
 import { CUSTOMER_ADD } from '../../../customers/constants';
 import { INVOICES_STATUS_BG_COLOR, INVOICES_STATUS_TEXT_COLOR } from '../../../invoices/constants';
-import { MAX_LENGTH, alertMe, hasValue, hasLength, formatSelectPickerName } from '../../../../api/global';
+import { MAX_LENGTH, alertMe, formatSelectPickerName } from '../../../../api/global';
+import { validate } from '../../containers/Payment/validation';
 
 let paymentRefs = {}
 
@@ -57,13 +58,11 @@ export const Payment = (props: IProps) => {
         navigation,
         id,
         type,
-        handleSubmit,
         customers,
         paymentLoading,
         initPaymentLoading,
         getUnpaidInvoicesLoading,
         getCustomers,
-        formValues: { due = '', amount = 0, payment_prefix = '' },
         submitFailed = false,
         createPayment,
         editPayment,
@@ -73,6 +72,7 @@ export const Payment = (props: IProps) => {
         hasRecordPayment,
         getCreatePayment,
         getEditPayment,
+        initialValues,
     } = props;
 
     const [invoices, setInvoices] = useState([]);
@@ -80,7 +80,15 @@ export const Payment = (props: IProps) => {
     const [selectedInvoice, setSelectedInvoice] = useState('');
     const [selectedCustomer, setSelectedCustomer] = useState('');
     const [selectedPaymentMode, setSelectedPaymentMode] = useState('');
-    const [isLoading, setLoading] = useState(true);
+    const [isLoading, setLoading] = useState(false);
+
+    const setFormField = (field, value) => {
+        paymentRefs.form.change(field, value);
+
+        if (field === 'payment_method_id') {
+            setSelectedPaymentMode(value)
+        }
+    };
 
     useEffect(() => {
         if (type === PAYMENT_EDIT) {
@@ -95,7 +103,6 @@ export const Payment = (props: IProps) => {
                     payment_prefix,
                     paymentMethods
                 }) => {
-
                     let { user_id, payment_method_id, invoice_id, invoice, amount } = payment
 
                     editPaymentData.map((field) => {
@@ -175,14 +182,6 @@ export const Payment = (props: IProps) => {
         })
     }
 
-    const setFormField = (field, value) => {
-        props.dispatch(change(PAYMENT_FORM, field, value));
-
-        if (field === 'payment_method_id') {
-            setSelectedPaymentMode(value)
-        }
-    };
-
     const onCustomerSelect = (customer) => {
         let { id } = customer
         setFormField('user_id', id)
@@ -234,8 +233,7 @@ export const Payment = (props: IProps) => {
         let invoicesList = []
         if (typeof items !== 'undefined' && items.length != 0) {
 
-            const { selectedCustomer } = state
-            const { name = '', currency = null } = selectedCustomer
+            const { name = '', currency = null } = selectedCustomer;
 
             invoicesList = items.map((item) => {
                 const {
@@ -292,13 +290,13 @@ export const Payment = (props: IProps) => {
 
     }
 
-    const BOTTOM_ACTION = () => {
+    const BOTTOM_ACTION = (handleSubmit) => {
         let buttonTitle = Lng.t("button.save")
 
         return (
             <View style={styles.submitButton}>
                 <CtButton
-                    onPress={handleSubmit(onPaymentSubmit)}
+                    onPress={handleSubmit}
                     btnTitle={buttonTitle}
                     loading={paymentLoading}
                 />
@@ -313,206 +311,196 @@ export const Payment = (props: IProps) => {
         destructiveButtonIndex: 1
     } : null
 
-
     return (
-        <DefaultLayout
-            headerProps={{
-                leftIconPress: onBack,
-                title: type === PAYMENT_EDIT ?
-                    Lng.t("header.editPayment") :
-                    Lng.t("header.addPayment"),
-                placement: "center",
-                rightIcon: type !== PAYMENT_EDIT ? "save" : null,
-                rightIconProps: {
-                    solid: true,
-                },
-                rightIconPress: handleSubmit(onPaymentSubmit),
-            }}
-            bottomAction={BOTTOM_ACTION()}
-            loadingProps={{
-                is: isLoading || initPaymentLoading
-            }}
-            dropdownProps={drownDownProps}
-        >
+        <Form validate={validate} initialValues={initialValues} onSubmit={onPaymentSubmit}>
+        { ({ handleSubmit, form }) => {
+            paymentRefs.form = form;
+            const formValues = form.getState().values || {};
+            const { due = 0, amount = 0, payment_prefix = '' } = formValues;
 
-            <View style={styles.bodyContainer}>
+            return (
+            <DefaultLayout
+                headerProps={{
+                    leftIconPress: onBack,
+                    title: type === PAYMENT_EDIT ?
+                        Lng.t("header.editPayment") :
+                        Lng.t("header.addPayment"),
+                    placement: "center",
+                    rightIcon: type !== PAYMENT_EDIT ? "save" : null,
+                    rightIconProps: {
+                        solid: true,
+                    },
+                    rightIconPress: handleSubmit,
+                }}
+                bottomAction={BOTTOM_ACTION(handleSubmit)}
+                loadingProps={{ is: isLoading || initPaymentLoading }}
+                dropdownProps={drownDownProps}
+            >
+                <View style={styles.bodyContainer}>
+                    <View style={styles.numberDateFieldContainer}>
+                        <View style={styles.numberDateField}>
+                            <Field
+                                name="payment_date"
+                                component={DatePickerField}
+                                dateTimeFormat={DATE_FORMAT}
+                                label={Lng.t("payments.date")}
+                                icon={'calendar-alt'}
+                                onChangeCallback={(val) => {
+                                    setFormField('payment_date', val)
+                                }}
+                                isRequired
+                            />
+                        </View>
 
-                <View style={styles.numberDateFieldContainer}>
-                    <View style={styles.numberDateField}>
-                        <Field
-                            name="payment_date"
-                            component={DatePickerField}
-                            dateTimeFormat={DATE_FORMAT}
-                            label={Lng.t("payments.date")}
-                            icon={'calendar-alt'}
-                            onChangeCallback={(val) => {
-                                setFormField('payment_date', val)
-                            }}
-                            isRequired
-                        />
+                        <View style={styles.numberDateField}>
+                            <Field
+                                name="payment_number"
+                                component={FakeInput}
+                                label={Lng.t("payments.number")}
+                                isRequired
+                                prefixProps={{
+                                    fieldName: "payment_number",
+                                    prefix: payment_prefix,
+                                }}
+                            />
+                        </View>
                     </View>
 
-                    <View style={styles.numberDateField}>
-                        <Field
-                            name="payment_number"
-                            component={FakeInput}
-                            label={Lng.t("payments.number")}
-                            isRequired
-                            prefixProps={{
-                                fieldName: "payment_number",
-                                prefix: payment_prefix,
-                            }}
-                        />
-                    </View>
-                </View>
-
-                <Field
-                    name="user_id"
-                    apiSearch
-                    hasPagination
-                    getItems={getCustomers}
-                    items={customers}
-                    displayName="name"
-                    component={SelectField}
-                    label={Lng.t("payments.customer")}
-                    icon={'user'}
-                    placeholder={selectedCustomer ? selectedCustomer.name : Lng.t("payments.customerPlaceholder")}
-                    navigation={navigation}
-                    compareField="id"
-                    onSelect={(item) => {
-                        onCustomerSelect(item)
-                        setFormField('due', '')
-                    }}
-                    rightIconPress={
-                        () => navigation.navigate(ROUTES.CUSTOMER, {
-                            type: CUSTOMER_ADD,
-                            onSelect: (val) => {
-                                onCustomerSelect(val)
-                                setFormField('due', '')
-                            }
-                        })
-                    }
-                    headerProps={{
-                        title: Lng.t("customers.title"),
-                    }}
-                    listViewProps={{
-                        hasAvatar: true,
-                    }}
-                    emptyContentProps={{
-                        contentType: "customers",
-                        image: IMAGES.EMPTY_CUSTOMERS,
-                    }}
-                    isRequired
-                    isEditable={type === PAYMENT_ADD}
-                    fakeInputProps={{
-                        disabled: type !== PAYMENT_ADD
-                    }}
-                />
-
-                <Field
-                    name="amount"
-                    component={InputField}
-                    leftIcon={'dollar-sign'}
-                    hint={Lng.t("payments.amount")}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        autoCorrect: true,
-                        keyboardType: 'numeric',
-                    }}
-                    isCurrencyInput
-                    refLinkFn={(ref) => {
-                        paymentRefs.amount = ref;
-                    }}
-                    isRequired
-                />
-
-                <Field
-                    name="invoice_id"
-                    items={getInvoicesList(invoices)}
-                    displayName="invoice_number"
-                    component={SelectField}
-                    label={Lng.t("payments.invoice")}
-                    icon={'file-invoice'}
-                    placeholder={selectedInvoice ? selectedInvoice : Lng.t("payments.invoicePlaceholder")}
-                    navigation={navigation}
-                    fakeInputProps={{
-                        loading: getUnpaidInvoicesLoading
-                    }}
-                    isInternalSearch
-                    searchFields={['invoice_number', 'due_amount']}
-                    compareField="id"
-                    onSearch={
-                        ({ searchItems, hasAll }) => {
-                            // setCustomerList(hasAll ? customers : searchItems)
+                    <Field
+                        name="user_id"
+                        apiSearch
+                        hasPagination
+                        getItems={getCustomers}
+                        items={customers}
+                        displayName="name"
+                        component={SelectField}
+                        label={Lng.t("payments.customer")}
+                        icon={'user'}
+                        placeholder={selectedCustomer ? selectedCustomer.name : Lng.t("payments.customerPlaceholder")}
+                        navigation={navigation}
+                        compareField="id"
+                        onSelect={(item) => {
+                            onCustomerSelect(item)
+                            setFormField('due', '')
+                        }}
+                        rightIconPress={
+                            () => navigation.navigate(ROUTES.CUSTOMER, {
+                                type: CUSTOMER_ADD,
+                                onSelect: (val) => {
+                                    onCustomerSelect(val)
+                                    setFormField('due', '')
+                                }
+                            })
                         }
-                    }
-                    onSelect={({ id, due_amount }) => {
-                        setFormField('invoice_id', id)
-                        setFormField('amount', due_amount)
-                        setFormField('due', due_amount)
-                        paymentRefs.amount.focus();
-                    }}
-                    headerProps={{
-                        title: Lng.t("invoices.title"),
-                        rightIconPress: null
-                    }}
-                    listViewProps={{
-                    }}
-                    emptyContentProps={{
-                        contentType: "invoices",
-                        image: IMAGES.EMPTY_INVOICES,
-                    }}
-                    containerStyle={
-                        due && submitFailed && amount > due &&
-                        { marginTop: 22 }
-                    }
-                    isEditable={type === PAYMENT_ADD}
-                    fakeInputProps={{
-                        disabled: type !== PAYMENT_ADD
-                    }}
-                />
+                        headerProps={{
+                            title: Lng.t("customers.title"),
+                        }}
+                        listViewProps={{
+                            hasAvatar: true,
+                        }}
+                        emptyContentProps={{
+                            contentType: "customers",
+                            image: IMAGES.EMPTY_CUSTOMERS,
+                        }}
+                        isRequired
+                        isEditable={type === PAYMENT_ADD}
+                        fakeInputProps={{ disabled: type !== PAYMENT_ADD }}
+                    />
 
-                <Field
-                    name="payment_method_id"
-                    component={SelectPickerField}
-                    label={Lng.t("payments.mode")}
-                    fieldIcon='align-center'
-                    items={formatSelectPickerName(methods)}
-                    selectedItem={selectedPaymentMode}
-                    onChangeCallback={(val) => {
-                        setFormField('payment_method_id', val)
-                    }}
-                    onDonePress={() => paymentRefs.notes.focus()}
-                    defaultPickerOptions={{
-                        label: Lng.t("payments.modePlaceholder"),
-                        value: '',
-                    }}
-                    refLinkFn={(ref) => {
-                        paymentRefs.mode = ref;
-                    }}
-                    containerStyle={styles.selectPicker}
-                />
+                    <Field
+                        name="invoice_id"
+                        items={getInvoicesList(invoices)}
+                        displayName="invoice_number"
+                        component={SelectField}
+                        label={Lng.t("payments.invoice")}
+                        icon={'file-invoice'}
+                        placeholder={selectedInvoice ? selectedInvoice : Lng.t("payments.invoicePlaceholder")}
+                        navigation={navigation}
+                        fakeInputProps={{ loading: getUnpaidInvoicesLoading }}
+                        isInternalSearch
+                        searchFields={['invoice_number', 'due_amount']}
+                        compareField="id"
+                        onSearch={
+                            ({ searchItems, hasAll }) => {
+                                // setCustomerList(hasAll ? customers : searchItems)
+                            }
+                        }
+                        onSelect={({ id, due_amount }) => {
+                            setFormField('invoice_id', id)
+                            setFormField('amount', due_amount)
+                            setFormField('due', due_amount)
+                            paymentRefs.amount.focus();
+                        }}
+                        headerProps={{
+                            title: Lng.t("invoices.title"),
+                            rightIconPress: null
+                        }}
+                        listViewProps={{}}
+                        emptyContentProps={{
+                            contentType: "invoices",
+                            image: IMAGES.EMPTY_INVOICES,
+                        }}
+                        containerStyle={
+                            due && submitFailed && amount > due && { marginTop: 22 }
+                        }
+                        isEditable={type === PAYMENT_ADD}
+                        fakeInputProps={{ disabled: type !== PAYMENT_ADD }}
+                    />
 
-                <Field
-                    name="notes"
-                    component={InputField}
-                    hint={Lng.t("payments.notes")}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        autoCapitalize: 'none',
-                        placeholder: Lng.t("payments.notesPlaceholder"),
-                        autoCorrect: true,
-                        multiline: true,
-                        maxLength: MAX_LENGTH
-                    }}
-                    height={80}
-                    autoCorrect={true}
-                    refLinkFn={(ref) => {
-                        paymentRefs.notes = ref;
-                    }}
-                />
+                    <Field
+                        name="amount"
+                        component={InputField}
+                        leftIcon={'dollar-sign'}
+                        hint={Lng.t("payments.amount")}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCorrect: true,
+                            keyboardType: 'numeric',
+                        }}
+                        isCurrencyInput
+                        refLinkFn={(ref) => paymentRefs.amount = ref}
+                        isRequired
+                    />
 
-            </View>
-        </DefaultLayout >
+                    <Field
+                        name="payment_method_id"
+                        component={SelectPickerField}
+                        label={Lng.t("payments.mode")}
+                        fieldIcon='align-center'
+                        items={formatSelectPickerName(methods)}
+                        selectedItem={selectedPaymentMode}
+                        onChangeCallback={(val) => {
+                            setFormField('payment_method_id', val)
+                        }}
+                        onDonePress={() => paymentRefs.notes.focus()}
+                        defaultPickerOptions={{
+                            label: Lng.t("payments.modePlaceholder"),
+                            value: '',
+                        }}
+                        refLinkFn={(ref) => paymentRefs.mode = ref}
+                        containerStyle={styles.selectPicker}
+                    />
+
+                    <Field
+                        name="notes"
+                        component={InputField}
+                        hint={Lng.t("payments.notes")}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCapitalize: 'none',
+                            placeholder: Lng.t("payments.notesPlaceholder"),
+                            autoCorrect: true,
+                            multiline: true,
+                            maxLength: MAX_LENGTH
+                        }}
+                        height={80}
+                        autoCorrect={true}
+                        refLinkFn={(ref) => paymentRefs.notes = ref}
+                    />
+                </View>
+            </DefaultLayout >
+            );
+        }}
+        </Form>
     );
 }
