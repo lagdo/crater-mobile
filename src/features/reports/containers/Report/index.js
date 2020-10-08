@@ -1,10 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Report } from '../../components/Report';
-import { reduxForm, getFormValues } from 'redux-form';
-import { validate } from './validation';
 import * as ReportAction from '../../actions';
-import { REPORT_FORM, DATE_RANGE } from '../../constants';
+import { DATE_RANGE } from '../../constants';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
@@ -13,12 +11,10 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
     } = state;
 
     const { type } = params;
-
-    const isLoading = loading.reportsLoading || !type
+    const isLoading = loading.reportsLoading || !type;
 
     return {
         loading: isLoading,
-        formValues: getFormValues(REPORT_FORM)(state) || {},
         language,
         type,
         company,
@@ -35,16 +31,10 @@ const mapDispatchToProps = {
     generateReport: ReportAction.generateReport,
 };
 
-//  Redux Forms
-const ReportReduxForm = reduxForm({
-    form: REPORT_FORM,
-    validate,
-})(Report);
-
 //  connect
 const ReportContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(ReportReduxForm);
+)(Report);
 
 export default ReportContainer;
