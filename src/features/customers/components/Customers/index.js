@@ -26,15 +26,9 @@ export const Customers = (props: IProps) => {
     const {
         navigation,
         loading,
-        handleSubmit,
         customers,
         filterCustomers,
         getCustomer,
-        formValues: {
-            name = '',
-            contact_name = '',
-            phone = ''
-        },
         route: { params = {} },
     } = props;
 
@@ -47,6 +41,10 @@ export const Customers = (props: IProps) => {
     });
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(false);
+
+    const [name, setName] = useState('');
+    const [contact_name, setContactName] = useState('');
+    const [phone, setPhone] = useState('');
 
     useEffect(() => {
         getItems({ fresh: true });
@@ -87,18 +85,24 @@ export const Customers = (props: IProps) => {
     };
 
     const onSearch = (keywords) => {
-        onResetFilter()
-        setSearch(keywords)
-        getItems({ fresh: true, params: { ...params, search: keywords } })
+        onResetFilter();
+        setSearch(keywords);
+        getItems({ fresh: true, params: { ...params, search: keywords } });
     };
 
     const onResetFilter = () => {
-        setFilter(false)
-    }
+        setFilter(false);
+        setName('');
+        setContactName('');
+        setPhone('');
+}
 
     const onSubmitFilter = ({ name = '', contact_name = '', phone = '' }) => {
         if (name || contact_name || phone) {
-            setFilter(false)
+            setFilter(true);
+            setName(name);
+            setContactName(contact_name);
+            setPhone(phone);
 
             getItems({
                 fresh: true,
@@ -114,14 +118,17 @@ export const Customers = (props: IProps) => {
         }
 
         onResetFilter();
-    }
+    };
+
+    const onAddCustomer = () => {
+        navigation.navigate(ROUTES.CUSTOMER, { type: CUSTOMER_ADD });
+        onResetFilter();
+    };
 
     const onCustomerSelect = (customer) => {
-        navigation.navigate(ROUTES.CUSTOMER,
-            { customerId: customer.id, type: CUSTOMER_EDIT }
-        )
-        onResetFilter()
-    }
+        navigation.navigate(ROUTES.CUSTOMER, { customerId: customer.id, type: CUSTOMER_EDIT });
+        onResetFilter();
+    };
 
     const loadMoreItems = () => {
         if (!filter) {
@@ -151,16 +158,14 @@ export const Customers = (props: IProps) => {
     let filterRefs = {}
     const canLoadMore = lastPage >= page;
 
-    let inputFields = [
+    const inputFields = [
         {
             name: 'name',
             hint: Lng.t("customers.filterDisplayName"),
             inputProps: {
                 autoCorrect: true,
                 autoFocus: true,
-                onSubmitEditing: () => {
-                    filterRefs.contactName.focus();
-                }
+                onSubmitEditing: () => filterRefs.contactName.focus(),
             }
         },
         {
@@ -168,38 +173,29 @@ export const Customers = (props: IProps) => {
             hint: Lng.t("customers.filterContactName"),
             inputProps: {
                 autoCorrect: true,
-                onSubmitEditing: () => {
-                    filterRefs.phone.focus();
-                }
+                onSubmitEditing: () => filterRefs.phone.focus(),
             },
-            refLinkFn: (ref) => {
-                filterRefs.contactName = ref;
-            }
+            refLinkFn: (ref) => filterRefs.contactName = ref
         },
         {
             name: 'phone',
             hint: Lng.t("customers.phone"),
             inputProps: {
-                keyboardType: 'phone-pad'
+                keyboardType: 'phone-pad',
             },
-            refLinkFn: (ref) => {
-                filterRefs.phone = ref;
-            }
+            refLinkFn: (ref) => filterRefs.phone = ref
         }
     ]
 
-    let empty = (!filter && !search) ? {
+    const empty = (!filter && !search) ? {
         description: Lng.t("customers.empty.description"),
         buttonTitle: Lng.t("customers.empty.buttonTitle"),
-        buttonPress: () => {
-            navigation.navigate(ROUTES.CUSTOMER, { type: CUSTOMER_ADD })
-            onResetFilter()
-        }
-    } : {}
+        buttonPress: onAddCustomer,
+    } : {};
 
-    let emptyTitle = search ? Lng.t("search.noResult", { search })
+    const emptyTitle = search ? Lng.t("search.noResult", { search })
         : (!filter) ? Lng.t("customers.empty.title") :
-            Lng.t("filter.empty.filterTitle")
+            Lng.t("filter.empty.filterTitle");
 
     const { isLoading } = params;
 
@@ -208,23 +204,19 @@ export const Customers = (props: IProps) => {
             <MainLayout
                 headerProps={{
                     rightIcon: "plus",
-                    rightIconPress: () => {
-                        navigation.navigate(ROUTES.CUSTOMER, { type: CUSTOMER_ADD })
-                        onResetFilter()
-                    },
+                    rightIconPress: onAddCustomer,
                     title: Lng.t("header.customers")
                 }}
                 onSearch={onSearch}
                 filterProps={{
-                    onSubmitFilter: handleSubmit(onSubmitFilter),
+                    onSubmitFilter: onSubmitFilter,
                     inputFields: inputFields,
                     clearFilter: props,
-                    onResetFilter: () => onResetFilter()
+                    onResetFilter: onResetFilter
                 }}
                 bottomDivider
                 loadingProps={{ is: isLoading || (loading && fresh) }}
             >
-
                 <View style={styles.listViewContainer}>
                     <ListView
                         items={!filter ? customers : filterCustomers}
@@ -243,9 +235,7 @@ export const Customers = (props: IProps) => {
                                 params: { ...params, search }
                             });
                         }}
-                        getItems={() => {
-                            loadMoreItems()
-                        }}
+                        getItems={loadMoreItems}
                         bottomDivider
                         hasAvatar
                         emptyContentProps={{
