@@ -3,7 +3,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
-import { Field } from 'redux-form';
+import { Form, Field } from 'react-final-form';
 import { styles } from './styles';
 import { InputField, CtHeader, CtDivider } from '../..';
 import { Content } from '../../Content';
@@ -52,23 +52,27 @@ const MainLayoutComponent = ({
                 />
 
                 {hasSearchField && (
-                    <View style={styles.searchFieldContainer}>
-                        <Field
-                            name="search"
-                            component={InputField}
-                            inputProps={{
-                                returnKeyType: 'next',
-                                autoCapitalize: 'none',
-                                placeholder: Lng.t("search.title"),
-                                autoCorrect: true,
-                                ...inputProps
-                            }}
-                            onChangeText={onSearch}
-                            height={40}
-                            rounded
-                            fieldStyle={styles.inputField}
-                        />
-                    </View>
+                    <Form onSubmit={() => {}}>
+                    {() => (
+                        <View style={styles.searchFieldContainer}>
+                            <Field
+                                name="search"
+                                component={InputField}
+                                inputProps={{
+                                    returnKeyType: 'next',
+                                    autoCapitalize: 'none',
+                                    placeholder: Lng.t("search.title"),
+                                    autoCorrect: true,
+                                    ...inputProps
+                                }}
+                                onChangeText={onSearch}
+                                height={40}
+                                rounded
+                                fieldStyle={styles.inputField}
+                            />
+                        </View>
+                    )}
+                    </Form>
                 )}
 
                 {bottomDivider &&

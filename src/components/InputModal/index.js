@@ -3,7 +3,7 @@ import { View, Text, KeyboardAvoidingView, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { styles } from './styles'
 import { AnimateModal } from '../AnimateModal';
-import { Field } from 'redux-form';
+import { Field } from 'react-final-form';
 import { InputField } from '../InputField';
 import { CtButton } from '../Button';
 import { BUTTON_COLOR } from '../../api/consts';

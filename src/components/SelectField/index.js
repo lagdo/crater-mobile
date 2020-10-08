@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import {
     View,
 } from 'react-native';
+import { useForm } from 'react-final-form';
 import styles from './styles';
 import { SlideModal, FakeInput } from '..';
-import { change } from 'redux-form';
 import { CtButton } from '../Button';
 import Lng from '../../api/lang/i18n';
 import { connect } from 'react-redux';
@@ -60,6 +60,8 @@ export const SelectFieldComponent = (props: IProps) => {
     const [defaultItems, setDefaultItems] = useState([]);
     const [searchItems, setSearchItems] = useState([]);
     const [oldValue, setOldValue] = useState();
+
+    const form = useForm();
 
     useEffect(() => {
         if (typeof items !== 'undefined') {
@@ -169,7 +171,7 @@ export const SelectFieldComponent = (props: IProps) => {
 
             setVisible(!visible);
 
-            meta.dispatch(change(meta.form, 'search', ''));
+            form.change('search', '');
         }
     }
 
@@ -280,6 +282,9 @@ export const SelectFieldComponent = (props: IProps) => {
         onChange(selectedItems)
 
         setOldItems(selectedItems);
+
+        // Set the selected items in the form values
+        form.change(name, selectedItems);
 
         onToggle()
     }
