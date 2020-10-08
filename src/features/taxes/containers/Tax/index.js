@@ -1,10 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Tax } from '../../components/Tax';
-import { reduxForm } from 'redux-form';
 import * as TaxAction from '../../actions';
-import { validate } from './validation';
-import { TAX_FORM, ADD_TAX } from '../../constants';
+import { ADD_TAX } from '../../constants';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
@@ -21,7 +19,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
     const { tax: taxType = {}, type = ADD_TAX, onSelect = null } = params;
 
     const isLoading = editTaxLoading || addTaxLoading || removeTaxLoading;
-
 
     return {
         loading: isLoading,
@@ -43,16 +40,10 @@ const mapDispatchToProps = {
     removeTax: TaxAction.removeTax,
 };
 
-//  Redux Forms
-const TaxReduxForm = reduxForm({
-    form: TAX_FORM,
-    validate,
-})(Tax);
-
 //  connect
 const TaxContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(TaxReduxForm);
+)(Tax);
 
 export default TaxContainer;
