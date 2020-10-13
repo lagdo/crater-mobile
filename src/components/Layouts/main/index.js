@@ -7,7 +7,7 @@ import { Form, Field } from 'react-final-form';
 import { styles } from './styles';
 import { InputField, CtHeader, CtDivider } from '../..';
 import { Content } from '../../Content';
-import Lng from '../../../api/lang/i18n';
+import Lng from '~/api/lang/i18n';
 
 type IProps = {
     children: Object,

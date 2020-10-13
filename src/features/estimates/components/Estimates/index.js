@@ -3,15 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import styles from './styles';
-import { Tabs, MainLayout } from '../../../../components';
+import { Tabs, MainLayout } from '~/components';
 import Sent from '../Tab/Sent';
 import Draft from '../Tab/Draft';
 import All from '../Tab/All';
 
-import { ROUTES } from '../../../../navigation/routes';
+import { ROUTES } from '~/navigation/routes';
 import { ESTIMATES_TABS, ESTIMATE_ADD, ESTIMATE_EDIT, FILTER_ESTIMATE_STATUS, TAB_NAME } from '../../constants';
-import Lng from '../../../../api/lang/i18n';
-import { IMAGES } from '../../../../config';
+import Lng from '~/api/lang/i18n';
+import { IMAGES } from '~/config';
 
 const defaultParams = {
     search: '',

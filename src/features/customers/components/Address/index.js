@@ -10,10 +10,10 @@ import {
     InputField,
     CtButton,
     SelectField,
-} from '../../../../components';
-import Lng from '../../../../api/lang/i18n';
-import { colors } from '../../../../styles/colors';
-import { MAX_LENGTH, formatCountries } from '../../../../api/global';
+} from '~/components';
+import Lng from '~/api/lang/i18n';
+import { colors } from '~/styles/colors';
+import { MAX_LENGTH, formatCountries } from '~/api/global';
 
 type IProps = {
     label: String,

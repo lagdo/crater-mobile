@@ -8,10 +8,10 @@ import {
     DefaultLayout,
     CtButton,
     SelectField,
-} from '../../../../components';
-import Lng from '../../../../api/lang/i18n';
-import { SymbolStyle } from '../../../../components/CurrencyFormat/styles';
-import { headerTitle } from '../../../../api/helper';
+} from '~/components';
+import Lng from '~/api/lang/i18n';
+import { SymbolStyle } from '~/components/CurrencyFormat/styles';
+import { headerTitle } from '~/api/helper';
 import { validate } from '../../containers/LanguageAndCurrency/validation';
 
 type IProps = {

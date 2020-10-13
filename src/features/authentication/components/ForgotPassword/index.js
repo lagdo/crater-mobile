@@ -10,10 +10,10 @@ import {
     CtGradientButton,
     CtHeader,
     CtButton
-} from '../../../../components';
+} from '~/components';
 import { Text } from 'react-native-elements';
-import { IMAGES } from '../../../../config';
-import Lng from '../../../../api/lang/i18n';
+import { IMAGES } from '~/config';
+import Lng from '~/api/lang/i18n';
 import { validate } from '../../containers/ForgetPassword/validation';
 
 type IProps = {

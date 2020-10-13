@@ -1,9 +1,9 @@
 
-import React from "react";
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import TaxesContainer from "../../features/taxes/containers/Taxes";
-import TaxContainer from "../../features/taxes/containers/Tax";
-import { ROUTES, navigationOptions } from "../routes";
+import TaxesContainer from '~/features/taxes/containers/Taxes';
+import TaxContainer from '~/features/taxes/containers/Tax';
+import { ROUTES, navigationOptions } from '../routes';
 
 const Stack = createStackNavigator();
 

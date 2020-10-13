@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import CategoriesContainer from "../../features/categories/containers/Categories";
-import CategoryContainer from "../../features/categories/containers/Category";
-import { ROUTES, navigationOptions } from "../routes";
+import CategoriesContainer from '~/features/categories/containers/Categories';
+import CategoryContainer from '~/features/categories/containers/Category';
+import { ROUTES, navigationOptions } from '../routes';
 
 const Stack = createStackNavigator();
 

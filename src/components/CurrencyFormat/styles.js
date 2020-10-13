@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { isIosPlatform } from '../../api/helper';
+import { isIosPlatform } from '~/api/helper';
 
 export const SymbolStyle = {
     fontFamily: isIosPlatform() ? 'Arial' : 'sans-serif'

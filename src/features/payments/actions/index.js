@@ -11,7 +11,7 @@ import {
     SET_FILTER_PAYMENTS,
     REMOVE_PAYMENT,
     SEND_PAYMENT_RECEIPT,
-} from "../constants";
+} from '../constants';
 
 
 export const getPayments = (payload = {}) => ({

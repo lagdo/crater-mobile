@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../../styles/colors';
-import { isIPhoneX, headerTitle } from '../../../../api/helper';
-import { fonts } from '../../../../styles/fonts';
+import { colors } from '~/styles/colors';
+import { isIPhoneX, headerTitle } from '~/api/helper';
+import { fonts } from '~/styles/fonts';
 
 export default styles = StyleSheet.create({
     container: {

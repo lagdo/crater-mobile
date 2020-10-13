@@ -7,7 +7,7 @@ import {
     TAX_EDIT,
     SET_EDIT_TAX,
     SET_REMOVE_TAX,
-} from "../constants";
+} from '../constants';
 
 //  Taxes
 // -------------------------------------------------

@@ -4,11 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { Field, Form } from 'react-final-form';
 import styles from './styles';
-import { DefaultLayout, CtButton, InputField, CtDivider, FilePicker } from '../../../../components';
-import Lng from '../../../../api/lang/i18n';
+import { DefaultLayout, CtButton, InputField, CtDivider, FilePicker } from '~/components';
+import Lng from '~/api/lang/i18n';
 import { EDIT_ACCOUNT } from '../../constants';
-import { headerTitle } from '../../../../api/helper';
-import { env, IMAGES } from '../../../../config';
+import { headerTitle } from '~/api/helper';
+import { env, IMAGES } from '~/config';
 import { validate } from '../../containers/Account/validation';
 
 let name = 'name'

@@ -10,9 +10,9 @@ import {
     SelectField,
     ToggleSwitch,
     CtDivider
-} from '../../../../components';
-import Lng from '../../../../api/lang/i18n';
-import { headerTitle } from '../../../../api/helper';
+} from '~/components';
+import Lng from '~/api/lang/i18n';
+import { headerTitle } from '~/api/helper';
 import { validate } from '../../containers/Preferences/validation';
 
 type IProps = {

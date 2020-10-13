@@ -16,7 +16,7 @@ import {
     REMOVE_FROM_INVOICES,
     SET_ACTIVE_TAB,
     INVOICES_TABS
-} from "../constants";
+} from '../constants';
 
 const initialState = {
     invoices: [],

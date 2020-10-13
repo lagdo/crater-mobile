@@ -2,7 +2,7 @@ import { call, put, takeEvery, takeLatest } from 'redux-saga/effects';
 
 import {
     moreTriggerSpinner,
-} from '../../more/actions';
+} from '~/features/more/actions';
 import {
     setItems,
     setItem,
@@ -22,9 +22,9 @@ import {
     EDIT_ITEM_URL,
     REMOVE_ITEM_URL,
 } from '../constants';
-import Request from '../../../api/request';
-import { resetIdToken } from '../../authentication/actions';
-import { ROUTES } from '../../../navigation/routes';
+import Request from '~/api/request';
+import { resetIdToken } from '~/features/authentication/actions';
+import { ROUTES } from '~/navigation/routes';
 
 /**
  * Global Items.

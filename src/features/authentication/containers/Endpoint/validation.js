@@ -1,4 +1,4 @@
-import { getError, removeNullValues } from "../../../../api/validation";
+import { getError, removeNullValues } from '~/api/validation';
 
 export const validate = (values) => {
     const errors = {};

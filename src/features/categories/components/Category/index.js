@@ -8,11 +8,11 @@ import {
     InputField,
     CtButton,
     DefaultLayout
-} from '../../../../components';
-import { BUTTON_COLOR } from '../../../../api/consts/core';
-import Lng from '../../../../api/lang/i18n';
+} from '~/components';
+import { BUTTON_COLOR } from '~/api/consts/core';
+import Lng from '~/api/lang/i18n';
 import { CATEGORY_EDIT, CATEGORY_ADD } from '../../constants';
-import { MAX_LENGTH, alertMe } from '../../../../api/global';
+import { MAX_LENGTH, alertMe } from '~/api/global';
 import { validate } from '../../containers/Category/validation';
 
 type IProps = {

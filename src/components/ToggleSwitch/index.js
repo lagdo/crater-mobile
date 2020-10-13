@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Switch, View, Text } from 'react-native';
-import { colors } from '../../styles/colors';
+import { colors } from '~/styles/colors';
 import { styles } from './styles';
 
 type IProps = {

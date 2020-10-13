@@ -28,9 +28,9 @@ import {
     CREATE_ITEM_UNIT,
     EDIT_ITEM_UNIT,
     REMOVE_ITEM_UNIT,
-} from "../constants";
+} from '../constants';
 
-import { SET_SETTINGS } from "../../../api/consts";
+import { SET_SETTINGS } from '~/api/consts';
 
 export const settingsTriggerSpinner = (payload) => ({
     type: SETTINGS_TRIGGER_SPINNER,

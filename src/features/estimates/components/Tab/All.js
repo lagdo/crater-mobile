@@ -2,11 +2,11 @@
 import React from 'react';
 import { View, ScrollView, Alert } from 'react-native';
 import { styles } from './styles';
-import { ListView, Content } from '../../../../components';
-import { IMAGES } from '../../../../config';
+import { ListView, Content } from '~/components';
+import { IMAGES } from '~/config';
 import { ESTIMATES_STATUS, ESTIMATE_ADD, ESTIMATES_STATUS_BG_COLOR, ESTIMATES_STATUS_TEXT_COLOR } from '../../constants';
-import { ROUTES } from '../../../../navigation/routes';
-import Lng from '../../../../api/lang/i18n';
+import { ROUTES } from '~/navigation/routes';
+import Lng from '~/api/lang/i18n';
 
 type IProps = {
     estimates: Array,

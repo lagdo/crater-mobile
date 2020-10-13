@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import PaymentsContainer from "../../features/payments/containers/Payments";
-import PaymentContainer from "../../features/payments/containers/Payment";
-import { ROUTES, navigationOptions } from "../routes";
+import PaymentsContainer from '~/features/payments/containers/Payments';
+import PaymentContainer from '~/features/payments/containers/Payment';
+import { ROUTES, navigationOptions } from '../routes';
 
 const Stack = createStackNavigator();
 

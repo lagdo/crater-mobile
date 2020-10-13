@@ -5,8 +5,8 @@ import { ListItem, Avatar, CheckBox } from 'react-native-elements';
 import { styles } from './styles';
 import { InfiniteScroll } from '../InfiniteScroll';
 import { Empty } from '../Empty';
-import { fonts } from '../../styles/fonts';
-import { colors } from '../../styles/colors';
+import { fonts } from '~/styles/fonts';
+import { colors } from '~/styles/colors';
 import { CurrencyFormat } from '../CurrencyFormat';
 
 type IProps = {

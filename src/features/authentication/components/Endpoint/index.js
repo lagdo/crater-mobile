@@ -11,10 +11,10 @@ import {
 } from 'react-native';
 import { Form, Field } from 'react-final-form';
 import styles from './styles';
-import { InputField, CtButton, AssetImage, CtGradientButton, CtHeader } from '../../../../components';
-import Lng from '../../../../api/lang/i18n';
-import { IMAGES } from '../../../../config';
-import { alertMe } from '../../../../api/global';
+import { InputField, CtButton, AssetImage, CtGradientButton, CtHeader } from '~/components';
+import Lng from '~/api/lang/i18n';
+import { IMAGES } from '~/config';
+import { alertMe } from '~/api/global';
 import { validate } from '../../containers/Endpoint/validation';
 
 type IProps = {

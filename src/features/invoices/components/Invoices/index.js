@@ -3,12 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import styles from './styles';
-import { Tabs, MainLayout } from '../../../../components';
+import { Tabs, MainLayout } from '~/components';
 import Due from '../Tab/Due';
 import Draft from '../Tab/Draft';
 import All from '../Tab/All';
 
-import { ROUTES } from '../../../../navigation/routes';
+import { ROUTES } from '~/navigation/routes';
 import {
     INVOICES_TABS,
     INVOICE_ADD,
@@ -17,8 +17,8 @@ import {
     TAB_NAME,
     FILTER_INVOICE_PAID_STATUS,
 } from '../../constants';
-import Lng from '../../../../api/lang/i18n';
-import { IMAGES } from '../../../../config';
+import Lng from '~/api/lang/i18n';
+import { IMAGES } from '~/config';
 
 const defaultParams = {
     search: '',

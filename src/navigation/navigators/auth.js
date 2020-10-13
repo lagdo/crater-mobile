@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import LoginContainer from '../../features/authentication/containers/Login';
-import ForgotPasswordContainer from '../../features/authentication/containers/ForgetPassword';
-import EndpointContainer from "../../features/authentication/containers/Endpoint";
-// import UpdateAppVersion from '../../components/UpdateAppVersion';
-import { ROUTES, navigationOptions } from "../routes";
+import LoginContainer from '~/features/authentication/containers/Login';
+import ForgotPasswordContainer from '~/features/authentication/containers/ForgetPassword';
+import EndpointContainer from '~/features/authentication/containers/Endpoint';
+// import UpdateAppVersion from '~/components/UpdateAppVersion';
+import { ROUTES, navigationOptions } from '../routes';
 
 const Stack = createStackNavigator();
 

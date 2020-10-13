@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { Form, Field } from 'react-final-form';
 import styles from './styles';
-import { DefaultLayout, CtButton, InputField, FilePicker, AssetImage, SelectField } from '../../../../components';
-import Lng from '../../../../api/lang/i18n';
-import { MAX_LENGTH, formatCountries } from '../../../../api/global';
+import { DefaultLayout, CtButton, InputField, FilePicker, AssetImage, SelectField } from '~/components';
+import Lng from '~/api/lang/i18n';
+import { MAX_LENGTH, formatCountries } from '~/api/global';
 import { validate } from '../../containers/Company/validation';
 
 type IProps = {

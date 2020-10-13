@@ -9,14 +9,14 @@ import {
     CtButton,
     DefaultLayout,
     SelectField,
-} from '../../../../components';
+} from '~/components';
 import { CUSTOMER_EDIT, CUSTOMER_ADD, CUSTOMER_ACTIONS, ACTIONS_VALUE } from '../../constants';
 import AddressContainer from '../../containers/Address';
-import Lng from '../../../../api/lang/i18n';
-import { colors } from '../../../../styles/colors';
-import { SymbolStyle } from '../../../../components/CurrencyFormat/styles';
-import { headerTitle } from '../../../../api/helper';
-import { alertMe, hasValue } from '../../../../api/global';
+import Lng from '~/api/lang/i18n';
+import { colors } from '~/styles/colors';
+import { SymbolStyle } from '~/components/CurrencyFormat/styles';
+import { headerTitle } from '~/api/helper';
+import { alertMe, hasValue } from '~/api/global';
 import { validate } from '../../containers/Customer/validation';
 
 let customerField = [

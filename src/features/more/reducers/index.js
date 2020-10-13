@@ -1,7 +1,7 @@
 import {
     MORE_TRIGGER_SPINNER,
 } from '../constants';
-import { env } from '../../../config';
+import { env } from '~/config';
 
 const initialState = {
     loading: {

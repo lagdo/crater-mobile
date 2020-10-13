@@ -1,6 +1,6 @@
 import {
     GENERATE_REPORT,
-} from "../constants";
+} from '../constants';
 
 // Reports
 export const generateReport = (payload) => ({

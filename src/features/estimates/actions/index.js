@@ -24,7 +24,7 @@ import {
     REMOVE_ESTIMATE,
     REMOVE_FROM_ESTIMATES,
     CHANGE_ESTIMATE_STATUS,
-} from "../constants";
+} from '../constants';
 
 export const getEstimates = (payload = {}) => ({
     type: GET_ESTIMATES,
@@ -145,4 +145,3 @@ export const changeEstimateStatus = (payload = {}) => ({
     type: CHANGE_ESTIMATE_STATUS,
     payload,
 });
-

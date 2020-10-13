@@ -1,6 +1,6 @@
 import queryString from 'query-string';
-import { ROUTES } from "../../navigation/routes";
-import Lng from '../../api/lang/i18n';
+import { ROUTES } from '~/navigation/routes';
+import Lng from '~/api/lang/i18n';
 
 // Forms
 // -----------------------------------------

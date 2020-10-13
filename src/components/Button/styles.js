@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../styles/colors';
-import { fonts } from '../../styles/fonts';
-import { isIosPlatform } from '../../api/helper';
+import { colors } from '~/styles/colors';
+import { fonts } from '~/styles/fonts';
+import { isIosPlatform } from '~/api/helper';
 
 export default StyleSheet.create({
     buttonStyle: {

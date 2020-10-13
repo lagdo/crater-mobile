@@ -35,8 +35,8 @@ import {
     EDIT_CUSTOMIZE_SETTINGS_URL,
 } from '../constants';
 
-import Request from '../../../api/request';
-import { ROUTES } from '../../../navigation/routes';
+import Request from '~/api/request';
+import { ROUTES } from '~/navigation/routes';
 
 import modes from './modes';
 import units from './units';

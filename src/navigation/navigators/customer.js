@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import CustomersContainer from "../../features/customers/containers/Customers";
-import CustomerContainer from "../../features/customers/containers/Customer";
-import { ROUTES, navigationOptions } from "../routes";
+import CustomersContainer from '~/features/customers/containers/Customers';
+import CustomerContainer from '~/features/customers/containers/Customer';
+import { ROUTES, navigationOptions } from '../routes';
 
 const Stack = createStackNavigator();
 

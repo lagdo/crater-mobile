@@ -24,7 +24,7 @@ import {
     REMOVE_FROM_INVOICES,
     CHANGE_INVOICE_STATUS,
     SET_ACTIVE_TAB,
-} from "../constants";
+} from '../constants';
 
 export const getInvoices = (payload = {}) => ({
     type: GET_INVOICES,

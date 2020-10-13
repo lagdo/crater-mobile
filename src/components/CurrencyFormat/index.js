@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { formatMoney } from '../../api/helper';
+import { formatMoney } from '~/api/helper';
 import { styles, SymbolStyle } from './styles';
 
 type IProps = {

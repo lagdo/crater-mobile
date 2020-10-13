@@ -3,7 +3,7 @@
 import React from 'react';
 import { Image, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '../../styles/colors';
+import { colors } from '~/styles/colors';
 
 type IProps = {
     children: any,

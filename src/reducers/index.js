@@ -1,4 +1,4 @@
-import { combineReducers } from "redux";
+import { combineReducers } from 'redux';
 import auth from '../features/authentication/reducers';
 import invoices from '../features/invoices/reducers';
 import estimates from '../features/estimates/reducers';

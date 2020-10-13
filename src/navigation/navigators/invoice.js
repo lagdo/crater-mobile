@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import InvoicesContainer from '../../features/invoices/containers/Invoices';
-import InvoiceContainer from '../../features/invoices/containers/Invoice';
-import InvoiceItemContainer from '../../features/invoices/containers/Item';
-import { ROUTES, navigationOptions } from "../routes";
+import InvoicesContainer from '~/features/invoices/containers/Invoices';
+import InvoiceContainer from '~/features/invoices/containers/Invoice';
+import InvoiceItemContainer from '~/features/invoices/containers/Item';
+import { ROUTES, navigationOptions } from '../routes';
 
 const Stack = createStackNavigator();
 

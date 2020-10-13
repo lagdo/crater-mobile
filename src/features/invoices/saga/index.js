@@ -1,5 +1,5 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
-import Request from '../../../api/request';
+import Request from '~/api/request';
 import {
     GET_INVOICES,
     GET_CREATE_INVOICE,
@@ -34,11 +34,11 @@ import {
     setInvoice,
     removeFromInvoices,
 } from '../actions';
-import { store } from '../../../store';
-import { checkConnection } from '../../../api/helper';
-import { ROUTES } from '../../../navigation/routes';
-import { alertMe, hasValue } from '../../../api/global';
-import { getTitleByLanguage } from '../../../navigation/actions';
+import { store } from '~/store';
+import { checkConnection } from '~/api/helper';
+import { ROUTES } from '~/navigation/routes';
+import { alertMe, hasValue } from '~/api/global';
+import { getTitleByLanguage } from '~/navigation/actions';
 
 
 const alreadyInUse = (error) => {

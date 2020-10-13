@@ -1,5 +1,5 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
-import Request from '../../../api/request';
+import Request from '~/api/request';
 
 import {
     GET_EXPENSES,
@@ -26,8 +26,8 @@ import {
     setExpenses,
     setFilterExpenses,
 } from '../actions';
-import { ROUTES } from '../../../navigation/routes';
-import { store } from '../../../store';
+import { ROUTES } from '~/navigation/routes';
+import { store } from '~/store';
 
 function* getExpenses(payloadData) {
     const {

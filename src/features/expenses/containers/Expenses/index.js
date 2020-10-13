@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as ExpensesAction from '../../actions'
-import * as CategoriesAction from '../../../categories/actions';
+import * as CategoriesAction from '~/features/categories/actions';
 import { Expenses } from '../../components/Expenses';
 
 const mapStateToProps = (state) => {

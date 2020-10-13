@@ -5,11 +5,11 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import styles from './styles';
-import { colors } from '../../styles/colors';
+import { colors } from '~/styles/colors';
 import { Button } from 'react-native-elements';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AssetImage } from '../AssetImage';
-import { BUTTON_TYPE, BUTTON_COLOR } from '../../api/consts/core';
+import { BUTTON_TYPE, BUTTON_COLOR } from '~/api/consts/core';
 
 type IProps = {
     children: any,

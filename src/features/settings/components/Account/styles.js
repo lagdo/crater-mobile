@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../../../../styles/colors';
-import { fonts } from '../../../../styles/fonts';
+import { colors } from '~/styles/colors';
+import { fonts } from '~/styles/fonts';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 export default styles = StyleSheet.create({

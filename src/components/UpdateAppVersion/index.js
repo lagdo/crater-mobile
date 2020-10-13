@@ -5,8 +5,8 @@ import styles from './styles';
 import { AssetImage } from '../AssetImage';
 import { CtGradientButton } from '../Button';
 import { Text } from 'react-native-elements';
-import { IMAGES } from '../../config';
-import Lng from '../../api/lang/i18n';
+import { IMAGES } from '~/config';
+import Lng from '~/api/lang/i18n';
 
 export const UpdateAppVersion = (props) => {
     const [loading, setLoading] = useState(false);

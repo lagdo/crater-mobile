@@ -4,11 +4,11 @@ import React from 'react';
 import { View } from 'react-native';
 import { Form, Field } from 'react-final-form';
 import styles from './styles';
-import { DefaultLayout, CtButton, InputField, ToggleSwitch } from '../../../../components';
-import { BUTTON_COLOR } from '../../../../api/consts/core';
-import Lng from '../../../../api/lang/i18n';
+import { DefaultLayout, CtButton, InputField, ToggleSwitch } from '~/components';
+import { BUTTON_COLOR } from '~/api/consts/core';
+import Lng from '~/api/lang/i18n';
 import { ADD_TAX } from '../../constants';
-import { MAX_LENGTH, alertMe } from '../../../../api/global';
+import { MAX_LENGTH, alertMe } from '~/api/global';
 import { validate } from '../../containers/Tax/validation';
 
 export const Tax = (props: IProps) => {

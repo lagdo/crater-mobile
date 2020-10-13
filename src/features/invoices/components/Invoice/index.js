@@ -15,8 +15,8 @@ import {
     SelectPickerField,
     CurrencyFormat,
     FakeInput
-} from '../../../../components';
-import { ROUTES } from '../../../../navigation/routes';
+} from '~/components';
+import { ROUTES } from '~/navigation/routes';
 import {
     INVOICE_ADD,
     INVOICE_EDIT,
@@ -25,17 +25,17 @@ import {
     INVOICE_ACTIONS,
     EDIT_INVOICE_ACTIONS
 } from '../../constants';
-import { BUTTON_TYPE } from '../../../../api/consts/core';
-import { colors } from '../../../../styles/colors';
+import { BUTTON_TYPE } from '~/api/consts/core';
+import { colors } from '~/styles/colors';
 import { TemplateField } from '../TemplateField';
-import { setOnBackHandler, removeBackHandler } from '../../../../navigation/actions';
-import Lng from '../../../../api/lang/i18n';
+import { setOnBackHandler, removeBackHandler } from '~/navigation/actions';
+import Lng from '~/api/lang/i18n';
 import { INVOICE_DISCOUNT_OPTION } from '../../constants';
-import { CUSTOMER_ADD } from '../../../customers/constants';
-import { IMAGES } from '../../../../config';
-import { ADD_TAX } from '../../../settings/constants';
-import { PAYMENT_ADD } from '../../../payments/constants';
-import { MAX_LENGTH, alertMe } from '../../../../api/global';
+import { CUSTOMER_ADD } from '~/features/customers/constants';
+import { IMAGES } from '~/config';
+import { ADD_TAX } from '~/features/settings/constants';
+import { PAYMENT_ADD } from '~/features/payments/constants';
+import { MAX_LENGTH, alertMe } from '~/api/global';
 import { validate } from '../../containers/Invoice/validation';
 
 type IProps = {

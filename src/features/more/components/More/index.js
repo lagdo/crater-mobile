@@ -3,11 +3,11 @@
 import React from 'react';
 import { View } from 'react-native';
 import styles from './styles';
-import { MainLayout, ListView } from '../../../../components';
+import { MainLayout, ListView } from '~/components';
 import { MORE_MENU } from '../../constants';
-import { colors } from '../../../../styles/colors';
-import Lng from '../../../../api/lang/i18n';
-import { alertMe } from '../../../../api/global';
+import { colors } from '~/styles/colors';
+import Lng from '~/api/lang/i18n';
+import { alertMe } from '~/api/global';
 
 export const More = (props) => {
     const {

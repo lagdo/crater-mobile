@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as ItemsAction from '../../actions'
 import { Items } from '../../components/Items';
-import { getItemUnits } from '../../../settings/actions';
+import { getItemUnits } from '~/features/settings/actions';
 
 const mapStateToProps = (state) => {
     const {

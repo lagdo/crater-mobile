@@ -13,18 +13,18 @@ import {
     SelectPickerField,
     CurrencyFormat,
     RadioButtonGroup,
-} from '../../../../components';
-import { ROUTES } from '../../../../navigation/routes';
+} from '~/components';
+import { ROUTES } from '~/navigation/routes';
 import {
     ITEM_DISCOUNT_OPTION,
     ITEM_EDIT,
     ITEM_ADD,
 } from '../../constants';
-import { BUTTON_COLOR } from '../../../../api/consts/core';
-import { colors } from '../../../../styles/colors';
-import Lng from '../../../../api/lang/i18n';
-import { ADD_TAX } from '../../../settings/constants';
-import { MAX_LENGTH, formatSelectPickerName, alertMe } from '../../../../api/global';
+import { BUTTON_COLOR } from '~/api/consts/core';
+import { colors } from '~/styles/colors';
+import Lng from '~/api/lang/i18n';
+import { ADD_TAX } from '~/features/settings/constants';
+import { MAX_LENGTH, formatSelectPickerName, alertMe } from '~/api/global';
 import { validate } from '../../containers/Item/validation';
 
 let itemRefs = {

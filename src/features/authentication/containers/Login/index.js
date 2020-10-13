@@ -1,5 +1,5 @@
-import { connect } from "react-redux";
-import { Login } from "../../components/Login"; //imports the feature's login component.
+import { connect } from 'react-redux';
+import { Login } from '../../components/Login'; //imports the feature's login component.
 import * as AuthAction from '../../actions';
 
 const mapStateToProps = ({

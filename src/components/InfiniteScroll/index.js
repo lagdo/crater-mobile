@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
 
 import { styles } from './styles';
-import { colors } from '../../styles/colors';
+import { colors } from '~/styles/colors';
 
 type IProps = {
     loading: boolean,

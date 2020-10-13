@@ -6,7 +6,7 @@ import {
     SET_EXPENSE,
     CLEAR_EXPENSE,
     SET_FILTER_EXPENSES
-} from "../constants";
+} from '../constants';
 
 const initialState = {
     expenses: [],

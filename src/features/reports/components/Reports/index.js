@@ -3,10 +3,10 @@
 import React from 'react';
 import { View } from 'react-native';
 import styles from './styles';
-import { ListView, DefaultLayout } from '../../../../components';
-import { ROUTES } from '../../../../navigation/routes';
-import { colors } from '../../../../styles/colors';
-import Lng from '../../../../api/lang/i18n';
+import { ListView, DefaultLayout } from '~/components';
+import { ROUTES } from '~/navigation/routes';
+import { colors } from '~/styles/colors';
+import Lng from '~/api/lang/i18n';
 import { REPORTS_MENU } from '../../constants';
 
 export const Reports = (props) => {

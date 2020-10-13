@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { fonts } from '../../styles/fonts';
-import { colors } from '../../styles/colors';
+import { fonts } from '~/styles/fonts';
+import { colors } from '~/styles/colors';
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,

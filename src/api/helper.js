@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { Platform, findNodeHandle, Dimensions } from 'react-native';
 import Constants from 'expo-constants';
-import NetInfo from "@react-native-community/netinfo";
+import NetInfo from '@react-native-community/netinfo';
 import { Text } from 'react-native-elements';
 import moment from 'moment';
 import { fonts } from '../styles/fonts';
