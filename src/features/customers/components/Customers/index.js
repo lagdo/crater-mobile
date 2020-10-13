@@ -15,12 +15,14 @@ type IProps = {
     loading: Boolean,
 }
 
-let params = {
+const defaultParams = {
     search: '',
     display_name: '',
     contact_name: '',
     phone: '',
 }
+
+let filterRefs = {};
 
 export const Customers = (props: IProps) => {
     const {
@@ -34,17 +36,9 @@ export const Customers = (props: IProps) => {
 
     const [refreshing, setRefreshing] = useState(false);
     const [fresh, setFresh] = useState(true);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        limit: 10,
-        lastPage: 1,
-    });
+    const [pagination, setPagination] = useState({ page: 1, limit: 10, lastPage: 1 });
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(false);
-
-    const [name, setName] = useState('');
-    const [contact_name, setContactName] = useState('');
-    const [phone, setPhone] = useState('');
 
     useEffect(() => {
         getItems({ fresh: true });
@@ -87,32 +81,27 @@ export const Customers = (props: IProps) => {
     const onSearch = (keywords) => {
         onResetFilter();
         setSearch(keywords);
-        getItems({ fresh: true, params: { ...params, search: keywords } });
+        getItems({ fresh: true, params: { ...defaultParams, search: keywords } });
     };
 
-    const onResetFilter = () => {
-        setFilter(false);
-        setName('');
-        setContactName('');
-        setPhone('');
-}
+    const onResetFilter = () => setFilter(false);
 
     const onSubmitFilter = ({ name = '', contact_name = '', phone = '' }) => {
         if (name || contact_name || phone) {
             setFilter(true);
-            setName(name);
-            setContactName(contact_name);
-            setPhone(phone);
 
+            filterRefs.params = {
+                display_name: name,
+                contact_name,
+                phone,
+            };
             getItems({
                 fresh: true,
                 params: {
-                    ...params,
-                    display_name: name,
-                    contact_name,
-                    phone
+                    ...defaultParams,
+                    ...filterRefs.params,
                 },
-                filter: true
+                filter: true,
             });
             return;
         }
@@ -132,30 +121,21 @@ export const Customers = (props: IProps) => {
 
     const loadMoreItems = () => {
         if (!filter) {
-            getItems({ params: { ...params, search } });
+            getItems({ params: { ...defaultParams, search } });
             return;
         }
 
         getItems({
-            q: name,
             params: {
-                ...params,
-                display_name: name,
-                contact_name,
-                phone
+                ...defaultParams,
+                ...filterRefs.params,
             },
-            contact_name,
-            phone,
-            filter: true
+            filter: true,
         });
     }
 
-    const {
-        lastPage,
-        page,
-    } = pagination;
+    const { lastPage, page } = pagination;
 
-    let filterRefs = {}
     const canLoadMore = lastPage >= page;
 
     const inputFields = [
@@ -197,8 +177,6 @@ export const Customers = (props: IProps) => {
         : (!filter) ? Lng.t("customers.empty.title") :
             Lng.t("filter.empty.filterTitle");
 
-    const { isLoading } = params;
-
     return (
         <View style={styles.container}>
             <MainLayout
@@ -215,7 +193,7 @@ export const Customers = (props: IProps) => {
                     onResetFilter: onResetFilter
                 }}
                 bottomDivider
-                loadingProps={{ is: isLoading || (loading && fresh) }}
+                loadingProps={{ is: loading && fresh }}
             >
                 <View style={styles.listViewContainer}>
                     <ListView
@@ -232,7 +210,7 @@ export const Customers = (props: IProps) => {
                             getItems({
                                 fresh: true,
                                 onResult: onHide,
-                                params: { ...params, search }
+                                params: { ...defaultParams, search }
                             });
                         }}
                         getItems={loadMoreItems}

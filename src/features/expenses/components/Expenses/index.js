@@ -9,12 +9,14 @@ import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
 import { EXPENSE_ADD, EXPENSE_EDIT } from '../../constants';
 
-const params = {
+const defaultParams = {
     search: '',
     expense_category_id: '',
     from_date: '',
     to_date: '',
 };
+
+let filterRefs = {};
 
 type IProps = {
     navigation: Object,
@@ -101,7 +103,7 @@ export const Expenses = (props: IProps) => {
     const onSearch = (keywords) => {
         onResetFilter();
         setSearch(keywords);
-        getItems({ fresh: true, params: { ...params, search: keywords } });
+        getItems({ fresh: true, params: { ...defaultParams, search: keywords } });
     };
 
     const onResetFilter = () => setFilter(false);
@@ -110,15 +112,18 @@ export const Expenses = (props: IProps) => {
         if (from_date || to_date || expense_category_id) {
             setFilter(true);
 
+            filterRefs.params = {
+                expense_category_id,
+                from_date,
+                to_date,
+            };
             getItems({
                 fresh: true,
                 params: {
-                    ...params,
-                    expense_category_id,
-                    from_date,
-                    to_date,
+                    ...defaultParams,
+                    ...filterRefs.params,
                 },
-                filter: true
+                filter: true,
             });
             return;
         }
@@ -128,18 +133,16 @@ export const Expenses = (props: IProps) => {
 
     const loadMoreItems = () => {
         if (!filter) {
-            getItems({ params: { ...params, search } });
+            getItems({ params: { ...defaultParams, search } });
             return;
         }
 
         getItems({
             params: {
-                ...params,
-                expense_category_id: selectedCategory,
-                from_date: selectedFromDate,
-                to_date: selectedToDate,
+                ...defaultParams,
+                ...filterRefs.params,
             },
-            filter: true
+            filter: true,
         });
     }
 
@@ -184,10 +187,7 @@ export const Expenses = (props: IProps) => {
         return CategoriesList
     }
 
-    const {
-        lastPage,
-        page,
-    } = pagination;
+    const { lastPage, page } = pagination;
 
     const canLoadMore = lastPage >= page;
 
@@ -243,9 +243,6 @@ export const Expenses = (props: IProps) => {
         : (!filter) ? Lng.t("expenses.empty.title") :
             Lng.t("filter.empty.filterTitle")
 
-    const { isLoading } = params;
-
-    console.log(expenses);
     return (
         <View style={styles.container}>
             <MainLayout
@@ -263,7 +260,7 @@ export const Expenses = (props: IProps) => {
                     clearFilter: props,
                     onResetFilter: () => onResetFilter()
                 }}
-                loadingProps={{ is: isLoading || (loading && fresh) }}
+                loadingProps={{ is: loading && fresh }}
             >
                 <View style={styles.listViewContainer} >
                     <ListView
@@ -280,7 +277,7 @@ export const Expenses = (props: IProps) => {
                             getItems({
                                 fresh: true,
                                 onResult: onHide,
-                                params: { ...params, search }
+                                params: { ...defaultParams, search }
                             });
                         }}
                         getItems={loadMoreItems}

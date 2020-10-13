@@ -206,7 +206,7 @@ export const Payment = (props: IProps) => {
     }
 
     const onPaymentSubmit = (values) => {
-        let params = {
+        const params = {
             ...values,
             payment_number: `${values.payment_prefix}-${values.payment_number}`,
         }

@@ -21,11 +21,13 @@ type IProps = {
     loading: Boolean,
 }
 
-let params = {
+const defaultParams = {
     search: '',
     unit_id: '',
     price: '',
 }
+
+let filterRefs = {};
 
 export const Items = (props: IProps) => {
     const {
@@ -46,9 +48,7 @@ export const Items = (props: IProps) => {
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(false);
 
-    const [unit_id, setUnitId] = useState('');
-    const [name, setName] = useState('');
-    const [price, setPrice] = useState('');
+    const [selectedUnitId, setSelectedUnitId] = useState('');
 
     useEffect(() => {
         getItems({ fresh: true });
@@ -100,15 +100,18 @@ export const Items = (props: IProps) => {
         if (unit_id || name || price) {
             setFilter(true);
 
+            filterRefs.params = {
+                search: name,
+                unit_id,
+                price,
+            };
             getItems({
                 fresh: true,
                 params: {
-                    ...params,
-                    search: name,
-                    unit_id,
-                    price,
+                    ...defaultParams,
+                    ...filterRefs.params,
                 },
-                filter: true
+                filter: true,
             });
             return;
         }
@@ -119,7 +122,7 @@ export const Items = (props: IProps) => {
     const onSearch = (keywords) => {
         onResetFilter()
         setSearch(keywords)
-        getItems({ fresh: true, params: { ...params, search: keywords } })
+        getItems({ fresh: true, params: { ...defaultParams, search: keywords } })
     };
 
     const getItemList = (items) => {
@@ -148,29 +151,22 @@ export const Items = (props: IProps) => {
 
     const loadMoreItems = () => {
         if (!filter) {
-            getItems({ params: { ...params, search } });
+            getItems({ params: { ...defaultParams, search } });
             return;
         }
 
         getItems({
             params: {
-                ...params,
-                search: name,
-                unit_id,
-                price,
+                ...defaultParams,
+                ...filterRefs.params,
             },
-            filter: true
+            filter: true,
         });
     }
 
-    const {
-        lastPage,
-        page,
-    } = pagination;
+    const { lastPage, page } = pagination;
 
     const canLoadMore = lastPage >= page;
-
-    let filterRefs = {}
 
     let inputFields = [
         {
@@ -181,7 +177,6 @@ export const Items = (props: IProps) => {
                 autoCorrect: true,
                 autoFocus: true,
                 onSubmitEditing: () => filterRefs.price.focus(),
-                onChangeText: setName,
             },
             refLinkFn: (ref) => filterRefs.name = ref,
         },
@@ -191,7 +186,6 @@ export const Items = (props: IProps) => {
             inputProps: {
                 returnKeyType: 'next',
                 keyboardType: 'numeric',
-                onChangeText: setPrice,
             },
             isCurrencyInput: true,
             refLinkFn: (ref) => filterRefs.price = ref,
@@ -203,13 +197,13 @@ export const Items = (props: IProps) => {
         label: Lng.t("items.unit"),
         fieldIcon: 'align-center',
         items: formatSelectPickerName(units),
-        onChangeCallback: setUnitId,
+        onChangeCallback: setSelectedUnitId,
         defaultPickerOptions: {
             label: Lng.t("items.unitPlaceholder"),
             value: '',
 
         },
-        selectedItem: unit_id,
+        selectedItem: selectedUnitId,
         onDonePress: () => filterRefs.name.focus(),
         containerStyle: styles.selectPicker
     }]
@@ -254,7 +248,7 @@ export const Items = (props: IProps) => {
                     clearFilter: props,
                     onResetFilter: () => onResetFilter()
                 }}
-                loadingProps={{ is: loading || itemUnitsLoading }}
+                loadingProps={{ is: (loading && fresh) || itemUnitsLoading }}
             >
                 <View style={styles.listViewContainer} >
                     <ListView
@@ -271,7 +265,7 @@ export const Items = (props: IProps) => {
                             getItems({
                                 fresh: true,
                                 onResult: onHide,
-                                params: { ...params, search }
+                                params: { ...defaultParams, search }
                             });
                         }}
                         getItems={() => {

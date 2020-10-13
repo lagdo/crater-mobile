@@ -32,7 +32,7 @@ import { getTitleByLanguage } from '../../../navigation/actions';
 
 
 const addressParams = (address, type) => {
-    let params = {
+    const params = {
         name: address.name ? address.name : null,
         address_street_1: address.address_street_1 ? address.address_street_1 : null,
         address_street_2: address.address_street_2 ? address.address_street_2 : null,

@@ -12,12 +12,14 @@ import Lng from '../../../../api/lang/i18n';
 import { PAYMENT_ADD, PAYMENT_EDIT } from '../../constants';
 import { formatSelectPickerName } from '../../../../api/global';
 
-let params = {
+const defaultParams = {
     search: '',
     payment_method_id: '',
     payment_number: '',
     customer_id: '',
 }
+
+let filterRefs = {};
 
 type IProps = {
     navigation: Object,
@@ -47,9 +49,7 @@ export const Payments = (props: IProps) => {
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(false);
 
-    const [customer_id, setCustomerId] = useState('');
-    const [payment_method_id, setPaymentMethodId] = useState('');
-    const [payment_number, setPaymentNumber] = useState('');
+    const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState('');
 
     useEffect(() => {
         getItems({ fresh: true });
@@ -69,7 +69,7 @@ export const Payments = (props: IProps) => {
     const onSearch = (keywords) => {
         onResetFilter()
         setSearch(keywords)
-        getItems({ fresh: true, params: { ...params, search: keywords } })
+        getItems({ fresh: true, params: { ...defaultParams, search: keywords } })
     };
 
     const getItems = ({ fresh = false, onResult, params, filter = false } = {}) => {
@@ -112,15 +112,18 @@ export const Payments = (props: IProps) => {
         if (customer_id || payment_method_id || payment_number) {
             setFilter(true);
 
+            filterRefs.params = {
+                customer_id,
+                payment_method_id,
+                payment_number,
+            };
             getItems({
                 fresh: true,
                 params: {
-                    ...params,
-                    customer_id,
-                    payment_method_id,
-                    payment_number,
+                    ...defaultParams,
+                    ...filterRefs.params,
                 },
-                filter: true
+                filter: true,
             })
             return;
         }
@@ -157,32 +160,25 @@ export const Payments = (props: IProps) => {
 
     const loadMoreItems = () => {
         if (!filter) {
-            getItems({ params: { ...params, search } });
+            getItems({ params: { ...defaultParams, search } });
             return;
         }
 
         getItems({
             params: {
-                ...params,
-                customer_id,
-                payment_method_id,
-                payment_number,
+                ...defaultParams,
+                ...filterRefs.params,
             },
-            filter: true
+            filter: true,
         });
     }
 
-    const {
-        lastPage,
-        page,
-    } = pagination;
+    const { lastPage, page } = pagination;
 
     const canLoadMore = lastPage >= page;
 
     let paymentsItem = getPaymentsList(payments)
     let filterPaymentItem = getPaymentsList(filterPayments)
-
-    let filterRefs = {}
 
     let selectFields = [
         {
@@ -197,7 +193,7 @@ export const Payments = (props: IProps) => {
             placeholder: Lng.t("customers.placeholder"),
             navigation: navigation,
             compareField: "id",
-            onSelect: (item) => setCustomerId(item.id),
+            // onSelect: (item) => setCustomerId(item.id),
             headerProps: {
                 title: Lng.t("customers.title"),
                 rightIconPress: null
@@ -219,11 +215,8 @@ export const Payments = (props: IProps) => {
         inputProps: {
             autoCapitalize: 'none',
             autoCorrect: true,
-            onChangeText: (val) => setPaymentNumber(val),
         },
-        refLinkFn: (ref) => {
-            filterRefs.paymentNumber = ref;
-        }
+        refLinkFn: (ref) => filterRefs.paymentNumber = ref,
     }]
 
     let dropdownFields = [{
@@ -231,12 +224,12 @@ export const Payments = (props: IProps) => {
         label: Lng.t("payments.mode"),
         fieldIcon: 'align-center',
         items: formatSelectPickerName(paymentMethods),
-        onChangeCallback: (val) => setPaymentMethodId(val),
+        onChangeCallback: setSelectedPaymentMethodId,
         defaultPickerOptions: {
             label: Lng.t("payments.modePlaceholder"),
             value: '',
         },
-        selectedItem: payment_method_id,
+        selectedItem: selectedPaymentMethodId,
         onDonePress: () => filterRefs.paymentNumber.focus(),
         containerStyle: styles.selectPicker
     }]
@@ -286,7 +279,7 @@ export const Payments = (props: IProps) => {
                             getItems({
                                 fresh: true,
                                 onResult: onHide,
-                                params: { ...params, search }
+                                params: { ...defaultParams, search }
                             });
                         }}
                         getItems={loadMoreItems}
