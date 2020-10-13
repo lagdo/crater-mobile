@@ -13,15 +13,15 @@ import {
     SelectPickerField,
     SelectField,
     FakeInput,
-} from '../../../../components';
-import { ROUTES } from '../../../../navigation/routes';
-import { DATE_FORMAT } from '../../../../api/consts/core';
+} from '~/components';
+import { ROUTES } from '~/navigation/routes';
+import { DATE_FORMAT } from '~/api/consts/core';
 import { PAYMENT_ADD, PAYMENT_EDIT, PAYMENT_ACTIONS, ACTIONS_VALUE } from '../../constants';
-import Lng from '../../../../api/lang/i18n';
-import { IMAGES } from '../../../../config';
-import { CUSTOMER_ADD } from '../../../customers/constants';
-import { INVOICES_STATUS_BG_COLOR, INVOICES_STATUS_TEXT_COLOR } from '../../../invoices/constants';
-import { MAX_LENGTH, alertMe, formatSelectPickerName } from '../../../../api/global';
+import Lng from '~/api/lang/i18n';
+import { IMAGES } from '~/config';
+import { CUSTOMER_ADD } from '~/features/customers/constants';
+import { INVOICES_STATUS_BG_COLOR, INVOICES_STATUS_TEXT_COLOR } from '~/features/invoices/constants';
+import { MAX_LENGTH, alertMe, formatSelectPickerName } from '~/api/global';
 import { validate } from '../../containers/Payment/validation';
 
 let paymentRefs = {}

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import * as PaymentAction from '../../actions';
 import { PAYMENT_ADD } from '../../constants';
 import { Payment } from '../../components/Payment';
-import { getCustomers } from '../../../customers/actions';
+import { getCustomers } from '~/features/customers/actions';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import queryString from 'query-string';
-import Lng from '../../api/lang/i18n';
+import Lng from '~/api/lang/i18n';
 
 // Forms
 // -----------------------------------------

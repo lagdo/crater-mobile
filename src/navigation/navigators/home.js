@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ROUTES, navigationOptions } from "../routes";
-import InvoiceContainer from '../../features/invoices/containers/Invoice';
-import InvoiceItemContainer from '../../features/invoices/containers/Item';
-import CustomerContainer from '../../features/customers/containers/Customer';
-import PaymentContainer from "../../features/payments/containers/Payment";
-import ExpenseContainer from "../../features/expenses/containers/Expense";
+import { ROUTES, navigationOptions } from '../routes';
+import InvoiceContainer from '~/features/invoices/containers/Invoice';
+import InvoiceItemContainer from '~/features/invoices/containers/Item';
+import CustomerContainer from '~/features/customers/containers/Customer';
+import PaymentContainer from '~/features/payments/containers/Payment';
+import ExpenseContainer from '~/features/expenses/containers/Expense';
 
 import { MainNavigator } from './main';
 import { EstimateNavigator } from './estimate';

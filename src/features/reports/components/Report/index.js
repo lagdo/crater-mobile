@@ -9,7 +9,7 @@ import {
     DefaultLayout,
     DatePickerField,
     SelectPickerField,
-} from '../../../../components';
+} from '~/components';
 import {
     SALES,
     PROFIT_AND_LOSS,
@@ -18,12 +18,12 @@ import {
     REPORT_TYPE_OPTION,
     DATE_RANGE
 } from '../../constants';
-import { DATE_FORMAT } from '../../../../api/consts/core';
-import Lng from '../../../../api/lang/i18n';
+import { DATE_FORMAT } from '~/api/consts/core';
+import Lng from '~/api/lang/i18n';
 import moment from 'moment';
 import { Linking } from 'expo';
 import QueryString from 'qs';
-import { headerTitle } from '../../../../api/helper';
+import { headerTitle } from '~/api/helper';
 import { validate } from '../../containers/Report/validation';
 
 type IProps = {

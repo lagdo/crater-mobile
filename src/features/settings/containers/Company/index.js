@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Company } from '../../components/Company';
 import * as CompanyAction from '../../actions';
-import * as AddressAction from '../../../customers/actions';
+import * as AddressAction from '~/features/customers/actions';
 
 const mapStateToProps = (state) => {
     const {

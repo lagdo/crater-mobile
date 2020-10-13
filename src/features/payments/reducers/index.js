@@ -2,7 +2,7 @@ import {
     SET_PAYMENTS,
     PAYMENTS_TRIGGER_SPINNER,
     SET_FILTER_PAYMENTS,
-} from "../constants";
+} from '../constants';
 
 const initialState = {
     payments: [],

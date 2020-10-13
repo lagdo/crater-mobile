@@ -13,12 +13,12 @@ import {
     CHECK_ENDPOINT_API,
     PING_ENDPOINT_URL
 } from '../constants';
-import Request from '../../../api/request';
-import { getTitleByLanguage } from '../../../navigation/actions';
-import { ROUTES } from '../../../navigation/routes';
-import { setAccountInformation } from '../../settings/actions';
-import { GET_APP_VERSION } from '../../../api/consts';
-import { alertMe } from '../../../api/global';
+import Request from '~/api/request';
+import { getTitleByLanguage } from '~/navigation/actions';
+import { ROUTES } from '~/navigation/routes';
+import { setAccountInformation } from '~/features/settings/actions';
+import { GET_APP_VERSION } from '~/api/consts';
+import { alertMe } from '~/api/global';
 import moment from 'moment';
 import { getInvoices } from '../../invoices/actions';
 

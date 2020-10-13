@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 
 import { styles } from './styles';
-import { getConditionStyles } from '../../api/helper';
+import { getConditionStyles } from '~/api/helper';
 
 type IProps = {
     activeTab: boolean,

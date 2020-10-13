@@ -7,8 +7,8 @@ import { Input } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import styles from './styles';
 import { IInputField } from './type';
-import { colors } from '../../styles/colors';
-import Lng from '../../api/lang/i18n';
+import { colors } from '~/styles/colors';
+import Lng from '~/api/lang/i18n';
 
 export const InputFieldComponent = (props: IInputField) => {
     const {

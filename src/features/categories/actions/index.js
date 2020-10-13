@@ -8,7 +8,7 @@ import {
     SET_CREATE_EXPENSE_CATEGORIES,
     SET_EDI_EXPENSE_CATEGORIES,
     SET_REMOVE_EXPENSE_CATEGORIES,
-} from "../constants";
+} from '../constants';
 
 // Expense Categories
 // -------------------------------------------------

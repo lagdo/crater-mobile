@@ -11,12 +11,12 @@ import {
 } from 'react-native';
 import { Form, Field } from 'react-final-form';
 import styles from './styles';
-import { InputField, AssetImage, CtGradientButton } from '../../../../components';
+import { InputField, AssetImage, CtGradientButton } from '~/components';
 // import * as Google from 'expo-google-app-auth';
-import { env, IMAGES } from '../../../../config';
-import { colors } from '../../../../styles/colors';
-import { ROUTES } from '../../../../navigation/routes';
-import Lng from '../../../../api/lang/i18n';
+import { env, IMAGES } from '~/config';
+import { colors } from '~/styles/colors';
+import { ROUTES } from '~/navigation/routes';
+import Lng from '~/api/lang/i18n';
 import { validate } from '../../containers/Login/validation';
 
 type IProps = {

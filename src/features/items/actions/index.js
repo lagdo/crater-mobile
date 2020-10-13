@@ -9,7 +9,7 @@ import {
     SET_ITEM,
     DELETE_ITEM,
     SET_FILTER_ITEMS
-} from "../constants";
+} from '../constants';
 
 export const addItem = (payload = {}) => ({
     type: ITEM_ADD,

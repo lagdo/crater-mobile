@@ -15,7 +15,7 @@ import {
     REMOVE_EXPENSE,
     GET_RECEIPT,
     DOWNLOAD_RECEIPT
-} from "../constants";
+} from '../constants';
 
 export const getCategories = (payload = {}) => ({
     type: GET_CATEGORIES,

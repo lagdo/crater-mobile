@@ -5,12 +5,12 @@ import styles from './styles';
 import {
     MainLayout,
     ListView
-} from '../../../../components';
-import { ROUTES } from '../../../../navigation/routes';
-import { IMAGES } from '../../../../config';
-import Lng from '../../../../api/lang/i18n';
+} from '~/components';
+import { ROUTES } from '~/navigation/routes';
+import { IMAGES } from '~/config';
+import Lng from '~/api/lang/i18n';
 import { PAYMENT_ADD, PAYMENT_EDIT } from '../../constants';
-import { formatSelectPickerName } from '../../../../api/global';
+import { formatSelectPickerName } from '~/api/global';
 
 const defaultParams = {
     search: '',

@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { InvoiceItem } from '../../components/Item';
 import * as InvoicesAction from '../../actions';
-import { getItemUnits } from '../../../settings/actions';
+import { getItemUnits } from '~/features/settings/actions';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {

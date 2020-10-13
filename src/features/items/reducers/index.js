@@ -5,7 +5,7 @@ import {
     DELETE_ITEM,
     SET_FILTER_ITEMS,
 } from '../constants';
-import { env } from '../../../config';
+import { env } from '~/config';
 
 const initialState = {
     items: [],

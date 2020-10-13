@@ -6,8 +6,8 @@ import {
 import {
     LOGOUT,
 } from '../constants';
-import { resetIdToken } from '../../authentication/actions';
-import { ROUTES } from '../../../navigation/routes';
+import { resetIdToken } from '~/features/authentication/actions';
+import { ROUTES } from '~/navigation/routes';
 
 /**
  * app logout action.

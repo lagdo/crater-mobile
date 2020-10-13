@@ -8,10 +8,10 @@ import { useForm } from 'react-final-form';
 import styles from './styles';
 import { SlideModal, FakeInput } from '..';
 import { CtButton } from '../Button';
-import Lng from '../../api/lang/i18n';
+import Lng from '~/api/lang/i18n';
 import { connect } from 'react-redux';
 import { IProps } from './type';
-import { headerTitle } from '../../api/helper';
+import { headerTitle } from '~/api/helper';
 
 export const SelectFieldComponent = (props: IProps) => {
     const {

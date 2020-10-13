@@ -12,7 +12,7 @@ import {
     REMOVE_CUSTOMER,
     SET_REMOVE_CUSTOMER,
     SET_FILTER_CUSTOMERS
-} from "../constants";
+} from '../constants';
 
 export const getCustomers = (payload = {}) => ({
     type: GET_CUSTOMERS,

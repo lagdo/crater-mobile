@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Item } from '../../components/Item';
 import * as ItemAction from '../../actions';
 import { EDIT_ITEM } from '../../constants';
-import { getItemUnits, getSettingItem } from '../../../settings/actions';
+import { getItemUnits, getSettingItem } from '~/features/settings/actions';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {

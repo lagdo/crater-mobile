@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import EstimatesContainer from '../../features/estimates/containers/Estimates';
-import EstimateContainer from '../../features/estimates/containers/Estimate';
-import EstimateItemContainer from '../../features/estimates/containers/Item';
-import { ROUTES, navigationOptions } from "../routes";
+import EstimatesContainer from '~/features/estimates/containers/Estimates';
+import EstimateContainer from '~/features/estimates/containers/Estimate';
+import EstimateItemContainer from '~/features/estimates/containers/Item';
+import { ROUTES, navigationOptions } from '../routes';
 
 const Stack = createStackNavigator();
 

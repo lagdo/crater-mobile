@@ -7,8 +7,8 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import styles from './styles';
 import { FakeInput } from '../FakeInput';
 import FakeInputStyle from '../FakeInput/styles';
-import { colors } from '../../styles/colors';
-import { isIosPlatform } from '../../api/helper';
+import { colors } from '~/styles/colors';
+import { isIosPlatform } from '~/api/helper';
 
 type IProps = {
     hint: string,

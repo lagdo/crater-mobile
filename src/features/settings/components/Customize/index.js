@@ -11,13 +11,13 @@ import {
     ToggleSwitch,
     CtDivider,
     Tabs,
-} from '../../../../components';
+} from '~/components';
 import { CUSTOMIZE_TYPE, PAYMENT_TABS } from '../../constants';
-import Lng from '../../../../api/lang/i18n';
-import { headerTitle } from '../../../../api/helper';
+import Lng from '~/api/lang/i18n';
+import { headerTitle } from '~/api/helper';
 import { PaymentModes } from './PaymentModes'
 import { Units } from './Units';
-import { hasObjectLength } from '../../../../api/global';
+import { hasObjectLength } from '~/api/global';
 import { validate } from '../../containers/Customize/validation';
 
 type IProps = {

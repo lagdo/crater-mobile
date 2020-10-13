@@ -2,7 +2,7 @@ import { call, put, takeEvery } from 'redux-saga/effects';
 
 import {
     settingsTriggerSpinner,
-} from '../../settings/actions';
+} from '~/features/settings/actions';
 import {
     setExpenseCategories,
     setCreateExpenseCategories,
@@ -24,8 +24,8 @@ import {
     REMOVE_EXPENSE_CATEGORIES_URL,
 } from '../constants';
 
-import Request from '../../../api/request';
-import { ROUTES } from '../../../navigation/routes';
+import Request from '~/api/request';
+import { ROUTES } from '~/navigation/routes';
 
 
 function* getExpenseCategories(payloadData) {

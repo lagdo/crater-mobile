@@ -3,9 +3,9 @@ import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { colors } from '../../styles/colors';
-import { fonts } from '../../styles/fonts';
-import { isIosPlatform } from '../../api/helper';
+import { colors } from '~/styles/colors';
+import { fonts } from '~/styles/fonts';
+import { isIosPlatform } from '~/api/helper';
 
 const container = {
     borderWidth: 1,

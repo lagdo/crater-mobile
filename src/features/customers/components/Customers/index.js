@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import styles from './styles';
-import { ListView, MainLayout } from '../../../../components';
-import { IMAGES } from '../../../../config';
-import { ROUTES } from '../../../../navigation/routes';
-import Lng from '../../../../api/lang/i18n';
+import { ListView, MainLayout } from '~/components';
+import { IMAGES } from '~/config';
+import { ROUTES } from '~/navigation/routes';
+import Lng from '~/api/lang/i18n';
 import { CUSTOMER_ADD, CUSTOMER_EDIT } from '../../constants';
 
 type IProps = {

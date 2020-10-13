@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Estimates } from '../../components/Estimates';
 import * as EstimatesAction from '../../actions';
-import { getCustomers } from '../../../customers/actions';
+import { getCustomers } from '~/features/customers/actions';
 
 const mapStateToProps = (state) => {
 

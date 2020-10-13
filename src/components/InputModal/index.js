@@ -6,9 +6,9 @@ import { AnimateModal } from '../AnimateModal';
 import { Field } from 'react-final-form';
 import { InputField } from '../InputField';
 import { CtButton } from '../Button';
-import { BUTTON_COLOR } from '../../api/consts';
-import Lng from '../../api/lang/i18n';
-import { colors } from '../../styles/colors';
+import { BUTTON_COLOR } from '~/api/consts';
+import Lng from '~/api/lang/i18n';
+import { colors } from '~/styles/colors';
 
 type Iprops = {
     modalProps: Object,

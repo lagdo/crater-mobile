@@ -14,7 +14,7 @@ import {
     CLEAR_ESTIMATE,
     SET_ESTIMATE,
     REMOVE_FROM_ESTIMATES
-} from "../constants";
+} from '../constants';
 
 const initialState = {
     estimates: [],

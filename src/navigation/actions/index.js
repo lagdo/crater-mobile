@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { BackHandler } from 'react-native';
-import Lng from '../../api/lang/i18n';
-import { alertMe } from '../../api/global';
+import Lng from '~/api/lang/i18n';
+import { alertMe } from '~/api/global';
 
 
 export const navigationRef = React.createRef();

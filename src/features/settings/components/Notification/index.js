@@ -10,10 +10,10 @@ import {
     InputField,
     ToggleSwitch,
     CtDivider
-} from '../../../../components';
-import Lng from '../../../../api/lang/i18n';
+} from '~/components';
+import Lng from '~/api/lang/i18n';
 import { NOTIFICATION } from '../../constants';
-import { colors } from '../../../../styles/colors';
+import { colors } from '~/styles/colors';
 import { validate } from '../../containers/Notification/validation';
 
 type IProps = {

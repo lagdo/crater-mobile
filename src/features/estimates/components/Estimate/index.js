@@ -15,8 +15,8 @@ import {
     SelectPickerField,
     CurrencyFormat,
     FakeInput
-} from '../../../../components';
-import { ROUTES } from '../../../../navigation/routes';
+} from '~/components';
+import { ROUTES } from '~/navigation/routes';
 import {
     ESTIMATE_ADD,
     ESTIMATE_EDIT,
@@ -26,18 +26,18 @@ import {
     EDIT_ESTIMATE_ACTIONS,
     MARK_AS_ACCEPT, MARK_AS_REJECT, MARK_AS_SENT
 } from '../../constants';
-import { BUTTON_TYPE } from '../../../../api/consts/core';
-import { colors } from '../../../../styles/colors';
+import { BUTTON_TYPE } from '~/api/consts/core';
+import { colors } from '~/styles/colors';
 import { TemplateField } from '../TemplateField';
-import { setOnBackHandler, removeBackHandler } from '../../../../navigation/actions';
-import Lng from '../../../../api/lang/i18n';
+import { setOnBackHandler, removeBackHandler } from '~/navigation/actions';
+import Lng from '~/api/lang/i18n';
 import { ESTIMATE_DISCOUNT_OPTION } from '../../constants';
-import { CUSTOMER_ADD } from '../../../customers/constants';
-import { IMAGES } from '../../../../config';
-import { ADD_TAX } from '../../../settings/constants';
-import { MAX_LENGTH, alertMe } from '../../../../api/global';
-import { itemsDescriptionStyle } from '../../../invoices/components/Invoice/styles';
-import { headerTitle } from '../../../../api/helper';
+import { CUSTOMER_ADD } from '~/features/customers/constants';
+import { IMAGES } from '~/config';
+import { ADD_TAX } from '~/features/settings/constants';
+import { MAX_LENGTH, alertMe } from '~/api/global';
+import { itemsDescriptionStyle } from '~/features/invoices/components/Invoice/styles';
+import { headerTitle } from '~/api/helper';
 import { validate } from '../../containers/Estimate/validation';
 
 type IProps = {

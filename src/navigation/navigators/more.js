@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import MoreContainer from "../../features/more/containers/More";
+import MoreContainer from '~/features/more/containers/More';
 import { EstimateNavigator } from './estimate';
 import { ItemNavigator } from './item';
 import { ReportNavigator } from './report';
 import { CategoryNavigator } from './category';
 import { TaxNavigator } from './tax';
 import { SettingsNavigator } from './settings';
-import { ROUTES, navigationOptions } from "../routes";
+import { ROUTES, navigationOptions } from '../routes';
 
 const Stack = createStackNavigator();
 

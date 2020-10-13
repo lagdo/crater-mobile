@@ -11,14 +11,14 @@ import {
     FilePicker,
     SelectPickerField,
     DatePickerField,
-} from '../../../../components';
-import { ROUTES } from '../../../../navigation/routes';
+} from '~/components';
+import { ROUTES } from '~/navigation/routes';
 import { EXPENSE_ADD, EXPENSE_EDIT, EXPENSE_ACTIONS, ACTIONS_VALUE } from '../../constants';
-import Lng from '../../../../api/lang/i18n';
-import { CATEGORY_ADD } from '../../../settings/constants';
+import Lng from '~/api/lang/i18n';
+import { CATEGORY_ADD } from '~/features/settings/constants';
 import { Linking } from 'expo';
 import moment from 'moment';
-import { MAX_LENGTH, alertMe } from '../../../../api/global';
+import { MAX_LENGTH, alertMe } from '~/api/global';
 import { validate } from '../../containers/Expense/validation';
 
 const IMAGE_TYPE = 'image'

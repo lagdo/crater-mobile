@@ -4,7 +4,7 @@ import { Estimate } from '../../components/Estimate';
 import * as EstimatesAction from '../../actions';
 import { ESTIMATE_EDIT } from '../../constants';
 import moment from 'moment';
-import * as CustomersAction from '../../../customers/actions';
+import * as CustomersAction from '~/features/customers/actions';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {

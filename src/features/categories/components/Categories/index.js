@@ -6,9 +6,9 @@ import styles from './styles';
 import {
     MainLayout,
     ListView
-} from '../../../../components';
-import { ROUTES } from '../../../../navigation/routes';
-import Lng from '../../../../api/lang/i18n';
+} from '~/components';
+import { ROUTES } from '~/navigation/routes';
+import Lng from '~/api/lang/i18n';
 import { CATEGORY_ADD, CATEGORY_EDIT } from '../../constants';
 
 type IProps = {

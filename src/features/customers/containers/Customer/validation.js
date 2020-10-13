@@ -1,5 +1,5 @@
 
-import { getError, removeNullValues } from "../../../../api/validation";
+import { getError, removeNullValues } from '~/api/validation';
 
 // @flow
 

@@ -2,9 +2,9 @@
 import React from 'react';
 import { View } from 'react-native';
 import { styles } from './styles';
-import { ListView, Content } from '../../../../components';
-import { IMAGES } from '../../../../config';
-import Lng from '../../../../api/lang/i18n';
+import { ListView, Content } from '~/components';
+import { IMAGES } from '~/config';
+import Lng from '~/api/lang/i18n';
 import { INVOICES_STATUS_BG_COLOR, INVOICES_STATUS_TEXT_COLOR } from '../../constants';
 
 type IProps = {

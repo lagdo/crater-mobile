@@ -1,18 +1,18 @@
-import React from "react";
+import React from 'react';
 import { Text } from 'react-native';
 import { connect } from 'react-redux';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SvgXml } from 'react-native-svg';
 import * as SVG_ICONS from '../../assets/svg';
-import { ROUTES } from "../routes";
-import { isIPhoneX } from "../../api/helper";
-import { fonts } from "../../styles/fonts";
-import { colors } from "../../styles/colors";
-import InvoicesContainer from '../../features/invoices/containers/Invoices';
-import CustomersContainer from '../../features/customers/containers/Customers';
-import ExpensesContainer from "../../features/expenses/containers/Expenses";
-import PaymentsContainer from "../../features/payments/containers/Payments";
-import MoreContainer from "../../features/more/containers/More";
+import { ROUTES } from '../routes';
+import { isIPhoneX } from '../../api/helper';
+import { fonts } from '../../styles/fonts';
+import { colors } from '~/styles/colors';
+import InvoicesContainer from '~/features/invoices/containers/Invoices';
+import CustomersContainer from '~/features/customers/containers/Customers';
+import ExpensesContainer from '~/features/expenses/containers/Expenses';
+import PaymentsContainer from '~/features/payments/containers/Payments';
+import MoreContainer from '~/features/more/containers/More';
 
 import { getTitleByLanguage } from '../actions';
 

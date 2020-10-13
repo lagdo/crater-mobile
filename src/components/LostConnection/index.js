@@ -5,10 +5,10 @@ import styles from './styles';
 import { AssetImage } from '../AssetImage';
 import { CtGradientButton } from '../Button';
 import { Text } from 'react-native-elements';
-import { IMAGES } from '../../config';
-import Lng from '../../api/lang/i18n';
-import { checkConnection } from '../../api/helper';
-import { ROUTES } from '../../navigation/routes';
+import { IMAGES } from '~/config';
+import Lng from '~/api/lang/i18n';
+import { checkConnection } from '~/api/helper';
+import { ROUTES } from '~/navigation/routes';
 
 export const LostConnection = (props) => {
     const {

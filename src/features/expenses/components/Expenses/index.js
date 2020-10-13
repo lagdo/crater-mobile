@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import styles from './styles';
-import { MainLayout, ListView } from '../../../../components';
-import { ROUTES } from '../../../../navigation/routes';
-import { IMAGES } from '../../../../config';
-import Lng from '../../../../api/lang/i18n';
+import { MainLayout, ListView } from '~/components';
+import { ROUTES } from '~/navigation/routes';
+import { IMAGES } from '~/config';
+import Lng from '~/api/lang/i18n';
 import { EXPENSE_ADD, EXPENSE_EDIT } from '../../constants';
 
 const defaultParams = {

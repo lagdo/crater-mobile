@@ -1,16 +1,16 @@
-import React from "react";
+import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import SettingsContainer from "../../features/settings/containers/Settings";
-import AccountContainer from "../../features/settings/containers/Account";
-import CompanyContainer from "../../features/settings/containers/Company";
-import LanguageAndCurrencyContainer from "../../features/settings/containers/LanguageAndCurrency";
-import NotificationContainer from "../../features/settings/containers/Notification";
-import PreferencesContainer from "../../features/settings/containers/Preferences";
-import EndpointContainer from "../../features/authentication/containers/Endpoint";
-import UpdateAppVersionContainer from "../../components/UpdateAppVersion";
-import CustomizesContainer from "../../features/settings/containers/Customizes";
-import CustomizeContainer from "../../features/settings/containers/Customize";
-import { ROUTES, navigationOptions } from "../routes";
+import SettingsContainer from '~/features/settings/containers/Settings';
+import AccountContainer from '~/features/settings/containers/Account';
+import CompanyContainer from '~/features/settings/containers/Company';
+import LanguageAndCurrencyContainer from '~/features/settings/containers/LanguageAndCurrency';
+import NotificationContainer from '~/features/settings/containers/Notification';
+import PreferencesContainer from '~/features/settings/containers/Preferences';
+import EndpointContainer from '~/features/authentication/containers/Endpoint';
+import UpdateAppVersionContainer from '~/components/UpdateAppVersion';
+import CustomizesContainer from '~/features/settings/containers/Customizes';
+import CustomizeContainer from '~/features/settings/containers/Customize';
+import { ROUTES, navigationOptions } from '../routes';
 
 const Stack = createStackNavigator();
 
