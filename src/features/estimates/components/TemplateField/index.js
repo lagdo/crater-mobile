@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     TouchableWithoutFeedback,
     View
@@ -27,7 +27,6 @@ type IProps = {
 
 export const TemplateField = (props: IProps) => {
     const {
-        navigation,
         containerStyle,
         templates,
         label,
@@ -40,22 +39,17 @@ export const TemplateField = (props: IProps) => {
 
     // const [page, setPage] = useState(1);
     const [visible, setVisible] = useState(false);
-    const [selectedTemplate, setSelectedTemplate] = useState('');
-
-    useEffect(() => {
-        const template = templates.filter(val => val.id === value)[0]
-
-        setSelectedTemplate(template);
-    }, []);
+    const template = templates.find(tpl => tpl.id === value) ?? templates[0];
+    const [selectedTemplate, setSelectedTemplate] = useState(template);
 
     const onToggle = () => setVisible(!visible);
 
     const onSubmit = () => {
-        onChange(selectedTemplate.id)
+        onChange(selectedTemplate.id);
 
-        onChangeCallback && onChangeCallback(selectedTemplate)
+        onChangeCallback && onChangeCallback(selectedTemplate);
 
-        onToggle()
+        onToggle();
     }
 
     const BOTTOM_ACTION = () => {
@@ -73,7 +67,6 @@ export const TemplateField = (props: IProps) => {
 
     return (
         <View style={styles.container}>
-
             <FakeInput
                 label={label}
                 icon={icon}

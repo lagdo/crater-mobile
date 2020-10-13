@@ -1,10 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Estimate } from '../../components/Estimate';
-import { reduxForm, getFormValues } from 'redux-form';
-import { validate } from './validation';
 import * as EstimatesAction from '../../actions';
-import { ESTIMATE_FORM, ESTIMATE_EDIT } from '../../constants';
+import { ESTIMATE_EDIT } from '../../constants';
 import moment from 'moment';
 import * as CustomersAction from '../../../customers/actions';
 
@@ -38,7 +36,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         customers,
         itemsLoading: loading.itemsLoading,
         language,
-        formValues: getFormValues(ESTIMATE_FORM)(state) || {},
         taxTypes,
         initialValues: !isLoading ? {
             expiry_date: moment().add(7, 'days'),
@@ -70,16 +67,10 @@ const mapDispatchToProps = {
     getCustomers: CustomersAction.getCustomers,
 };
 
-//  Redux Forms
-const addEstimateReduxForm = reduxForm({
-    form: ESTIMATE_FORM,
-    validate,
-})(Estimate);
-
 //  connect
 const EstimateContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(addEstimateReduxForm);
+)(Estimate);
 
 export default EstimateContainer;

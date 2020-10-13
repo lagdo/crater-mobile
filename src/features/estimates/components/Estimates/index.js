@@ -1,8 +1,7 @@
 // @flow
 
 import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
-import { change } from 'redux-form';
+import { View } from 'react-native';
 import styles from './styles';
 import { Tabs, MainLayout } from '../../../../components';
 import Sent from '../Tab/Sent';
@@ -10,11 +9,11 @@ import Draft from '../Tab/Draft';
 import All from '../Tab/All';
 
 import { ROUTES } from '../../../../navigation/routes';
-import { ESTIMATES_TABS, ESTIMATE_ADD, ESTIMATE_EDIT, ESTIMATE_SEARCH, FILTER_ESTIMATE_STATUS, TAB_NAME } from '../../constants';
+import { ESTIMATES_TABS, ESTIMATE_ADD, ESTIMATE_EDIT, FILTER_ESTIMATE_STATUS, TAB_NAME } from '../../constants';
 import Lng from '../../../../api/lang/i18n';
 import { IMAGES } from '../../../../config';
 
-let params = {
+const defaultParams = {
     search: '',
     customer_id: '',
     estimate_number: '',
@@ -22,6 +21,7 @@ let params = {
     to_date: '',
 }
 
+let filterRefs = {};
 
 type IProps = {
     navigation: Object,
@@ -36,28 +36,17 @@ export const Estimates = (props: IProps) => {
     const {
         navigation,
         loading,
-        handleSubmit,
         estimates,
         getEstimates,
         customers,
         getCustomers,
-        formValues: {
-            filterStatus = '',
-            from_date = '',
-            to_date = '',
-            estimate_number = '',
-            customer_id = '',
-        },
     } = props;
 
     const [activeTab, setActiveTab] = useState(ESTIMATES_TABS.DRAFT);
     const [refreshing, setRefreshing] = useState(false);
     const [fresh, setFresh] = useState(true);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        limit: 10,
-        lastPage: 1,
-    });
+    const [pagination, setPagination] = useState({ page: 1, limit: 10, lastPage: 1 });
+
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(false);
     const [selectedFromDate, setSelectedFromDate] = useState('');
@@ -102,7 +91,7 @@ export const Estimates = (props: IProps) => {
             fresh,
             type,
             pagination: paginationParams,
-            params: { ...params, search: q },
+            params: { ...defaultParams, search: q },
             onMeta: ({ last_page, current_page }) => {
                 setPagination({
                     ...paginationParams,
@@ -118,16 +107,22 @@ export const Estimates = (props: IProps) => {
         });
     };
 
+    const onAddEstimate = () => {
+        onSetActiveTab(ESTIMATES_TABS.ALL);
+        onResetFilter(ESTIMATES_TABS.ALL);
+        navigation.navigate(ROUTES.ESTIMATE, { type: ESTIMATE_ADD });
+    }
+
     const onEstimateSelect = (estimate) => {
-        navigation.navigate(ROUTES.ESTIMATE, { id: estimate.id, type: ESTIMATE_EDIT })
-        onResetFilter(ESTIMATES_TABS.ALL)
-        onSetActiveTab(ESTIMATES_TABS.ALL)
+        onResetFilter(ESTIMATES_TABS.ALL);
+        onSetActiveTab(ESTIMATES_TABS.ALL);
+        navigation.navigate(ROUTES.ESTIMATE, { id: estimate.id, type: ESTIMATE_EDIT });
     };
 
     const onSearch = (keywords) => {
-        const type = getActiveTab()
-        setSearch(keywords)
-        getItems({ fresh: true, q: keywords, type })
+        const type = getActiveTab();
+        setSearch(keywords);
+        getItems({ fresh: true, q: keywords, type });
     };
 
     const getActiveTab = (activeTab = state.activeTab) => {
@@ -141,12 +136,8 @@ export const Estimates = (props: IProps) => {
         return type
     }
 
-    const setFormField = (field, value) => {
-        props.dispatch(change(ESTIMATE_SEARCH, field, value));
-    };
-
     const onResetFilter = (tab = '') => {
-        setFilter(false)
+        setFilter(false);
 
         if (filter && !tab) {
             getItems({ fresh: true, q: '', type: getActiveTab() });
@@ -155,7 +146,6 @@ export const Estimates = (props: IProps) => {
 
     const onSubmitFilter = ({ filterStatus = '', from_date = '', to_date = '', estimate_number = '', customer_id = '' }) => {
         if (filterStatus || from_date || to_date || estimate_number || customer_id) {
-
             if (filterStatus === ESTIMATES_TABS.SENT)
                 setActiveTab(ESTIMATES_TABS.SENT);
             else if (filterStatus === ESTIMATES_TABS.DRAFT)
@@ -165,16 +155,20 @@ export const Estimates = (props: IProps) => {
 
             setFilter(true);
 
+            filterRefs.params = {
+                customer_id,
+                estimate_number,
+                from_date,
+                to_date,
+            };
+            filterRefs.status = filterStatus;
             getItems({
                 fresh: true,
                 params: {
-                    ...params,
-                    customer_id,
-                    estimate_number,
-                    from_date,
-                    to_date,
+                    ...defaultParams,
+                    ...filterRefs.params,
                 },
-                type: filterStatus,
+                type: filterRefs.status,
             });
             return;
         }
@@ -189,28 +183,16 @@ export const Estimates = (props: IProps) => {
         }
 
         getItems({
+            filter: true,
             params: {
-                ...params,
-                customer_id,
-                estimate_number,
-                from_date,
-                to_date,
+                ...defaultParams,
+                ...filterRefs.params,
             },
-            type: filterStatus,
-            filter: true
+            type: filterRefs.status,
         });
     }
 
-    const onAddEstimate = () => {
-        onSetActiveTab(ESTIMATES_TABS.ALL)
-        onResetFilter(ESTIMATES_TABS.ALL)
-        navigation.navigate(ROUTES.ESTIMATE, { type: ESTIMATE_ADD })
-    }
-
-    const {
-        lastPage,
-        page,
-    } = pagination;
+    const { lastPage, page } = pagination;
 
     const canLoadMore = lastPage >= page;
 
@@ -230,20 +212,18 @@ export const Estimates = (props: IProps) => {
             placeholder: Lng.t("customers.placeholder"),
             navigation: navigation,
             compareField: "id",
-            onSelect: (item) => setFormField('customer_id', item.id),
+            // onSelect: (item) => setFormField('customer_id', item.id),
             headerProps: {
                 title: Lng.t("customers.title"),
                 rightIconPress: null
             },
-            listViewProps: {
-                hasAvatar: true,
-            },
+            listViewProps: { hasAvatar: true },
             emptyContentProps: {
                 contentType: "customers",
                 image: IMAGES.EMPTY_CUSTOMERS,
             }
         }
-    ]
+    ];
 
     let datePickerFields = [
         {
@@ -264,9 +244,9 @@ export const Estimates = (props: IProps) => {
                 setSelectedToDateValue(formDate);
             },
             selectedDate: selectedToDate,
-            selectedDateValue: selectedToDateValue
+            selectedDateValue: selectedToDateValue,
         }
-    ]
+    ];
 
     let inputFields = [{
         name: 'estimate_number',
@@ -275,22 +255,20 @@ export const Estimates = (props: IProps) => {
             autoCapitalize: 'none',
             autoCorrect: true,
         }
-    }]
+    }];
 
     let dropdownFields = [{
         name: "filterStatus",
         label: Lng.t("estimates.status"),
         fieldIcon: 'align-center',
         items: FILTER_ESTIMATE_STATUS,
-        onChangeCallback: (val) => {
-            setFormField('filterStatus', val)
-        },
+        // onChangeCallback: (val) => setFormField('filterStatus', val),
         defaultPickerOptions: {
             label: Lng.t("estimates.statusPlaceholder"),
             value: '',
         },
-        containerStyle: styles.selectPicker
-    }]
+        containerStyle: styles.selectPicker,
+    }];
 
     return (
         <View style={styles.container}>
@@ -298,24 +276,21 @@ export const Estimates = (props: IProps) => {
                 headerProps={{
                     title: Lng.t("header.estimates"),
                     leftIcon: "long-arrow-alt-left",
-                    leftIconPress: () => navigation.navigate(ROUTES.MAIN_MORE),
+                    leftIconPress: navigation.goBack,
                     title: Lng.t("header.estimates"),
-                    titleStyle: styles.headerTitle,
                     placement: "center",
                     rightIcon: "plus",
-                    rightIconPress: () => {
-                        onAddEstimate()
-                    },
+                    rightIconPress: onAddEstimate,
                 }}
                 onSearch={onSearch}
                 filterProps={{
-                    onSubmitFilter: handleSubmit(onSubmitFilter),
+                    onSubmitFilter: onSubmitFilter,
                     selectFields: selectFields,
                     datePickerFields: datePickerFields,
                     inputFields: inputFields,
                     dropdownFields: dropdownFields,
                     clearFilter: props,
-                    onResetFilter: () => onResetFilter()
+                    onResetFilter: onResetFilter,
                 }}
             >
                 <Tabs
