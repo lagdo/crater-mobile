@@ -11,7 +11,7 @@ Here the changes I've planned (there's no change on the backend side).
 - [x] Convert class components into functional components.
 - [x] Upgrade navigation to v5
 - [x] Improve translations
-- [ ] Replace the redux-form package (form data should not be stored in global state)
+- [x] Replace the redux-form package (form data should not be stored in global state)
 - [ ] Improve calls to the API (by caching for example)
 - [ ] Upgrade or remove deprecated packages
 - [ ] Optimize data access in redux store  with memoization
