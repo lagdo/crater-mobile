@@ -12,6 +12,7 @@ Here the changes I've planned (there's no change on the backend side).
 - [x] Upgrade navigation to v5
 - [x] Improve translations
 - [x] Replace the redux-form package (form data should not be stored in global state)
+- [x] Use absolute dirs when importing files
 - [ ] Improve calls to the API (by caching for example)
 - [ ] Upgrade or remove deprecated packages
 - [ ] Optimize data access in redux store  with memoization
