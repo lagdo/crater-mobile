@@ -1,4 +1,4 @@
-import { getError } from "../../../../api/validation";
+import { getError, removeNullValues } from "../../../../api/validation";
 
 // @flow
 
@@ -37,5 +37,5 @@ export const validate = (values) => {
 
     errors.discount_type = getError(discount_type, ['required']);
 
-    return errors;
+    return removeNullValues(errors);
 };

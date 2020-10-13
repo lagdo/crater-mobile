@@ -2,16 +2,16 @@
 
 import React from 'react';
 import { View } from 'react-native';
+import { Form, Field } from 'react-final-form';
 import styles from './styles';
 import { DefaultLayout, CtButton, InputField, ToggleSwitch } from '../../../../components';
-import { ROUTES } from '../../../../navigation/routes';
 import { BUTTON_COLOR } from '../../../../api/consts/core';
-import { Field } from 'redux-form';
 import Lng from '../../../../api/lang/i18n';
 import { ADD_TAX } from '../../constants';
 import { MAX_LENGTH, alertMe } from '../../../../api/global';
+import { validate } from '../../containers/Tax/validation';
 
-export const Tax = (props) => {
+export const Tax = (props: IProps) => {
     const {
         navigation,
         addTax,
@@ -20,7 +20,6 @@ export const Tax = (props) => {
         taxId,
         initialValues,
         initialValues: { name },
-        handleSubmit,
         onSelect,
         type,
         loading,
@@ -39,7 +38,7 @@ export const Tax = (props) => {
                     }
                 }) : editTax({
                     tax,
-                    onResult: () => navigation.goBack(null)
+                    onResult: navigation.goBack
                 })
         }
     }
@@ -52,18 +51,17 @@ export const Tax = (props) => {
             okPress: () => removeTax({
                 id: taxId,
                 onResult: (val) => {
-                    val ? navigation.navigate(ROUTES.TAXES) :
-                        alertMe({ title: `${name} ${Lng.t("taxes.alreadyUsed")}` })
+                    val ? navigation.goBack() : alertMe({ title: `${name} ${Lng.t("taxes.alreadyUsed")}` })
                 }
             })
         })
     }
 
-    const BOTTOM_ACTION = () => {
+    const BOTTOM_ACTION = (handleSubmit) => {
         return (
             <View style={[styles.submitButton, !isCreate && styles.multipleButton]}>
                 <CtButton
-                    onPress={handleSubmit(onSave)}
+                    onPress={handleSubmit}
                     btnTitle={Lng.t("button.save")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={!isCreate && styles.buttonContainer}
@@ -86,80 +84,80 @@ export const Tax = (props) => {
     let taxRefs = {}
 
     return (
-        <DefaultLayout
-            headerProps={{
-                leftIconPress: () => navigation.goBack(null),
-                title: isCreate ?
-                    Lng.t("header.addTaxes") :
-                    Lng.t("header.editTaxes"),
-                placement: "center",
-                rightIcon: "save",
-                rightIconProps: {
-                    solid: true,
-                },
-                rightIconPress: handleSubmit(onSave),
-            }}
-            bottomAction={BOTTOM_ACTION()}
-        >
-            <View style={styles.mainContainer}>
-                <Field
-                    name="name"
-                    component={InputField}
-                    isRequired
-                    hint={Lng.t("taxes.type")}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        autoCapitalize: 'none',
-                        autoCorrect: true,
-                        autoFocus: true,
-                        onSubmitEditing: () => {
-                            taxRefs.percent.focus();
-                        }
-                    }}
-                />
+        <Form validate={validate} initialValues={initialValues} onSubmit={onSave}>
+        { ({ handleSubmit }) => (
+            <DefaultLayout
+                headerProps={{
+                    leftIconPress: navigation.goBack,
+                    title: isCreate ?
+                        Lng.t("header.addTaxes") :
+                        Lng.t("header.editTaxes"),
+                    placement: "center",
+                    rightIcon: "save",
+                    rightIconProps: {
+                        solid: true,
+                    },
+                    rightIconPress: handleSubmit,
+                }}
+                bottomAction={BOTTOM_ACTION(handleSubmit)}
+            >
+                <View style={styles.mainContainer}>
+                    <Field
+                        name="name"
+                        component={InputField}
+                        isRequired
+                        hint={Lng.t("taxes.type")}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCapitalize: 'none',
+                            autoCorrect: true,
+                            autoFocus: true,
+                            onSubmitEditing: () => taxRefs.percent.focus()
+                        }}
+                    />
 
-                <Field
-                    name="percent"
-                    isRequired
-                    component={InputField}
-                    hint={Lng.t("taxes.percentage") + ' (%)'}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        keyboardType: 'numeric',
-                        onSubmitEditing: () => {
-                            taxRefs.description.focus();
-                        }
-                    }}
-                    refLinkFn={(ref) => {
-                        taxRefs.percent = ref;
-                    }}
-                    maxNumber={100}
-                />
+                    <Field
+                        name="percent"
+                        isRequired
+                        component={InputField}
+                        hint={Lng.t("taxes.percentage") + ' (%)'}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            keyboardType: 'numeric',
+                            onSubmitEditing: () => taxRefs.description.focus()
+                        }}
+                        refLinkFn={(ref) => {
+                            taxRefs.percent = ref;
+                        }}
+                        maxNumber={100}
+                    />
 
-                <Field
-                    name="description"
-                    component={InputField}
-                    hint={Lng.t("taxes.description")}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        autoCapitalize: 'none',
-                        autoCorrect: true,
-                        multiline: true,
-                        maxLength: MAX_LENGTH
-                    }}
-                    refLinkFn={(ref) => {
-                        taxRefs.description = ref;
-                    }}
-                    height={80}
-                />
+                    <Field
+                        name="description"
+                        component={InputField}
+                        hint={Lng.t("taxes.description")}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCapitalize: 'none',
+                            autoCorrect: true,
+                            multiline: true,
+                            maxLength: MAX_LENGTH
+                        }}
+                        refLinkFn={(ref) => {
+                            taxRefs.description = ref;
+                        }}
+                        height={80}
+                    />
 
-                <Field
-                    name="compound_tax"
-                    component={ToggleSwitch}
-                    hint={Lng.t("taxes.compoundTax")}
-                />
+                    <Field
+                        name="compound_tax"
+                        component={ToggleSwitch}
+                        hint={Lng.t("taxes.compoundTax")}
+                    />
 
-            </View>
-        </DefaultLayout>
+                </View>
+            </DefaultLayout>
+        )}
+        </Form>
     );
 }

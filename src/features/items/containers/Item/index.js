@@ -1,10 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Item } from '../../components/Item';
-import { reduxForm, getFormValues } from 'redux-form';
-import { validate } from './validation';
 import * as ItemAction from '../../actions';
-import { ITEM_FORM, EDIT_ITEM } from '../../constants';
+import { EDIT_ITEM } from '../../constants';
 import { getItemUnits, getSettingItem } from '../../../settings/actions';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
@@ -25,7 +23,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
 
     return {
         loading: isLoading,
-        formValues: getFormValues(ITEM_FORM)(state) || {},
         itemId,
         taxTypes,
         taxByItems,
@@ -33,11 +30,12 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         type,
         currency,
         units,
-
-        initialValues: !isLoading ? {
+        initialValues: {
             taxes: [],
+            quantity: 1,
+            discount_type: 'none',
             ...item
-        } : null,
+        },
     };
 };
 
@@ -51,16 +49,10 @@ const mapDispatchToProps = {
     getSettingItem: getSettingItem,
 };
 
-//  Redux Forms
-const ItemReduxForm = reduxForm({
-    form: ITEM_FORM,
-    validate,
-})(Item);
-
 //  connect
 const ItemContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(ItemReduxForm);
+)(Item);
 
 export default ItemContainer;

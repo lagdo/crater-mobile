@@ -3,8 +3,7 @@
 import React from 'react';
 import { View, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { styles } from './styles';
-import { Field } from 'redux-form';
-import { InputField, CtHeader, CtDivider } from '../..';
+import { CtHeader } from '../..';
 import { Content } from '../../Content';
 import Dropdown from '../../Dropdown';
 import Toast from '../../Toast';

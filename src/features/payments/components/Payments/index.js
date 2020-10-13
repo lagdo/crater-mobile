@@ -1,8 +1,6 @@
 // @flow
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
-
-import { change } from 'redux-form';
 import styles from './styles';
 import {
     MainLayout,
@@ -11,15 +9,17 @@ import {
 import { ROUTES } from '../../../../navigation/routes';
 import { IMAGES } from '../../../../config';
 import Lng from '../../../../api/lang/i18n';
-import { PAYMENT_ADD, PAYMENT_EDIT, PAYMENT_SEARCH } from '../../constants';
+import { PAYMENT_ADD, PAYMENT_EDIT } from '../../constants';
 import { formatSelectPickerName } from '../../../../api/global';
 
-let params = {
+const defaultParams = {
     search: '',
     payment_method_id: '',
     payment_number: '',
     customer_id: '',
 }
+
+let filterRefs = {};
 
 type IProps = {
     navigation: Object,
@@ -33,7 +33,6 @@ export const Payments = (props: IProps) => {
     const {
         navigation,
         loading,
-        handleSubmit,
         payments,
         filterPayments,
         getPayments,
@@ -42,23 +41,15 @@ export const Payments = (props: IProps) => {
         paymentModesLoading,
         paymentMethods,
         getPaymentModes,
-        formValues: {
-            customer_id = '',
-            payment_method_id = '',
-            payment_number = ''
-        },
     } = props;
 
     const [refreshing, setRefreshing] = useState(false);
     const [fresh, setFresh] = useState(true);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        limit: 10,
-        lastPage: 1,
-    });
+    const [pagination, setPagination] = useState({ page: 1, limit: 10, lastPage: 1 });
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(false);
-    const [selectedPaymentMode, setSelectedPaymentMode] = useState('');
+
+    const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState('');
 
     useEffect(() => {
         getItems({ fresh: true });
@@ -66,23 +57,19 @@ export const Payments = (props: IProps) => {
     }, []);
 
     const onPaymentSelect = (payment) => {
-        navigation.navigate(ROUTES.PAYMENT,
-            { paymentId: payment.id, type: PAYMENT_EDIT }
-        )
-        onResetFilter()
-    }
+        navigation.navigate(ROUTES.PAYMENT, { paymentId: payment.id, type: PAYMENT_EDIT });
+        onResetFilter();
+    };
+
+    const onAddPayment = () => {
+        navigation.navigate(ROUTES.PAYMENT, { type: PAYMENT_ADD });
+        onResetFilter();
+    };
 
     const onSearch = (keywords) => {
         onResetFilter()
         setSearch(keywords)
-        getItems({ fresh: true, params: { ...params, search: keywords } })
-    };
-
-    const setFormField = (field, value) => {
-        props.dispatch(change(PAYMENT_SEARCH, field, value));
-
-        if (field === 'payment_method_id')
-            setSelectedPaymentMode(value)
+        getItems({ fresh: true, params: { ...defaultParams, search: keywords } })
     };
 
     const getItems = ({ fresh = false, onResult, params, filter = false } = {}) => {
@@ -119,23 +106,24 @@ export const Payments = (props: IProps) => {
         });
     };
 
-    const onResetFilter = () => {
-        setFilter(false)
-    }
+    const onResetFilter = () => setFilter(false);
 
     const onSubmitFilter = ({ customer_id = '', payment_method_id = '', payment_number = '' }) => {
         if (customer_id || payment_method_id || payment_number) {
-            setFilter(false)
+            setFilter(true);
 
+            filterRefs.params = {
+                customer_id,
+                payment_method_id,
+                payment_number,
+            };
             getItems({
                 fresh: true,
                 params: {
-                    ...params,
-                    customer_id,
-                    payment_method_id,
-                    payment_number,
+                    ...defaultParams,
+                    ...filterRefs.params,
                 },
-                filter: true
+                filter: true,
             })
             return;
         }
@@ -172,32 +160,25 @@ export const Payments = (props: IProps) => {
 
     const loadMoreItems = () => {
         if (!filter) {
-            getItems({ params: { ...params, search } });
+            getItems({ params: { ...defaultParams, search } });
             return;
         }
 
         getItems({
             params: {
-                ...params,
-                customer_id,
-                payment_method_id,
-                payment_number,
+                ...defaultParams,
+                ...filterRefs.params,
             },
-            filter: true
+            filter: true,
         });
     }
 
-    const {
-        lastPage,
-        page,
-    } = pagination;
+    const { lastPage, page } = pagination;
 
     const canLoadMore = lastPage >= page;
 
     let paymentsItem = getPaymentsList(payments)
     let filterPaymentItem = getPaymentsList(filterPayments)
-
-    let filterRefs = {}
 
     let selectFields = [
         {
@@ -212,7 +193,7 @@ export const Payments = (props: IProps) => {
             placeholder: Lng.t("customers.placeholder"),
             navigation: navigation,
             compareField: "id",
-            onSelect: (item) => setFormField('customer_id', item.id),
+            // onSelect: (item) => setCustomerId(item.id),
             headerProps: {
                 title: Lng.t("customers.title"),
                 rightIconPress: null
@@ -235,9 +216,7 @@ export const Payments = (props: IProps) => {
             autoCapitalize: 'none',
             autoCorrect: true,
         },
-        refLinkFn: (ref) => {
-            filterRefs.paymentNumber = ref;
-        }
+        refLinkFn: (ref) => filterRefs.paymentNumber = ref,
     }]
 
     let dropdownFields = [{
@@ -245,14 +224,12 @@ export const Payments = (props: IProps) => {
         label: Lng.t("payments.mode"),
         fieldIcon: 'align-center',
         items: formatSelectPickerName(paymentMethods),
-        onChangeCallback: (val) => {
-            setFormField('payment_method_id', val)
-        },
+        onChangeCallback: setSelectedPaymentMethodId,
         defaultPickerOptions: {
             label: Lng.t("payments.modePlaceholder"),
             value: '',
         },
-        selectedItem: selectedPaymentMode,
+        selectedItem: selectedPaymentMethodId,
         onDonePress: () => filterRefs.paymentNumber.focus(),
         containerStyle: styles.selectPicker
     }]
@@ -260,42 +237,34 @@ export const Payments = (props: IProps) => {
     let empty = (!filter && !search) ? {
         description: Lng.t("payments.empty.description"),
         buttonTitle: Lng.t("payments.empty.buttonTitle"),
-        buttonPress: () => {
-            navigation.navigate(ROUTES.PAYMENT, { type: PAYMENT_ADD })
-            onResetFilter()
-        }
-    } : {}
+        buttonPress: onAddPayment
+    } : {};
 
     let emptyTitle = search ? Lng.t("search.noResult", { search })
         : (!filter) ? Lng.t("payments.empty.title") :
-            Lng.t("filter.empty.filterTitle")
+            Lng.t("filter.empty.filterTitle");
 
     return (
         <View style={styles.container}>
             <MainLayout
                 headerProps={{
                     rightIcon: "plus",
-                    rightIconPress: () => {
-                        navigation.navigate(ROUTES.PAYMENT, { type: PAYMENT_ADD })
-                        onResetFilter()
-                    },
+                    rightIconPress: onAddPayment,
                     title: Lng.t("header.payments")
                 }}
                 onSearch={onSearch}
                 bottomDivider
                 filterProps={{
-                    onSubmitFilter: handleSubmit(onSubmitFilter),
+                    onSubmitFilter: onSubmitFilter,
                     selectFields: selectFields,
                     inputFields: inputFields,
                     dropdownFields: dropdownFields,
                     clearFilter: props,
-                    onResetFilter: () => onResetFilter()
+                    onResetFilter: onResetFilter
                 }}
                 loadingProps={{ is: paymentModesLoading || (loading && fresh) }}
             >
-
                 <View style={styles.listViewContainer}>
-
                     <ListView
                         items={!filter ? paymentsItem : filterPaymentItem}
                         onPress={onPaymentSelect}
@@ -310,12 +279,10 @@ export const Payments = (props: IProps) => {
                             getItems({
                                 fresh: true,
                                 onResult: onHide,
-                                params: { ...params, search }
+                                params: { ...defaultParams, search }
                             });
                         }}
-                        getItems={() => {
-                            loadMoreItems()
-                        }}
+                        getItems={loadMoreItems}
                         contentContainerStyle={{ flex: 0 }}
                         bottomDivider
                         emptyContentProps={{

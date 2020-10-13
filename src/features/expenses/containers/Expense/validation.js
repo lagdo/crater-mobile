@@ -1,4 +1,4 @@
-import { getError } from "../../../../api/validation";
+import { getError, removeNullValues } from "../../../../api/validation";
 
 // @flow
 
@@ -26,5 +26,5 @@ export const validate = (values) => {
         ['requiredField', 'isNumberFormat'],
     );
 
-    return errors;
+    return removeNullValues(errors);
 };

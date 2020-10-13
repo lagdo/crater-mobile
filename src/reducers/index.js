@@ -10,7 +10,6 @@ import expenses from '../features/expenses/reducers';
 import categories from '../features/categories/reducers';
 import items from '../features/items/reducers';
 import global from './global';
-import { reducer as formReducer } from 'redux-form';
 
 export default combineReducers({
     auth,
@@ -22,7 +21,6 @@ export default combineReducers({
     payments,
     categories,
     items,
-    form: formReducer,
     global,
     settings,
 });

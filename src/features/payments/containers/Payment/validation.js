@@ -1,4 +1,4 @@
-import { getError } from "../../../../api/validation";
+import { getError, removeNullValues } from "../../../../api/validation";
 
 // @flow
 
@@ -32,5 +32,5 @@ export const validate = (values) => {
             ['moreThanDue'],
         );
 
-    return errors;
+    return removeNullValues(errors);
 };

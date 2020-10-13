@@ -1,9 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { reduxForm, getFormValues } from 'redux-form';
-import { EDIT_PREFERENCES } from '../../constants';
 import * as PreferencesAction from '../../actions';
-import { validate } from './validation';
 import { Preferences } from '../../components/Preferences';
 
 const mapStateToProps = (state) => {
@@ -28,7 +25,6 @@ const mapStateToProps = (state) => {
         currencies,
         editPreferencesLoading,
         editSettingItemLoading,
-        formValues: getFormValues(EDIT_PREFERENCES)(state) || {},
         initialValues: !isLoading ? {
             currency: preferences.selectedCurrency,
             language: preferences.selectedLanguage,
@@ -37,11 +33,9 @@ const mapStateToProps = (state) => {
             carbon_date_format: preferences.carbon_date_format,
             moment_date_format: preferences.moment_date_format,
             fiscal_year: preferences.fiscal_year
-        } : null
-
+        } : {},
     };
 };
-
 
 const mapDispatchToProps = {
     getPreferences: PreferencesAction.getPreferences,
@@ -51,16 +45,10 @@ const mapDispatchToProps = {
     editSettingItem: PreferencesAction.editSettingItem
 };
 
-//  Redux Forms
-const PreferencesReduxForm = reduxForm({
-    form: EDIT_PREFERENCES,
-    validate,
-})(Preferences);
-
 //  connect
 const PreferencesContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(PreferencesReduxForm);
+)(Preferences);
 
 export default PreferencesContainer;

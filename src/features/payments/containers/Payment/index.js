@@ -1,9 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { reduxForm, getFormValues } from 'redux-form';
-import { validate } from './validation';
 import * as PaymentAction from '../../actions';
-import { PAYMENT_FORM, PAYMENT_ADD } from '../../constants';
+import { PAYMENT_ADD } from '../../constants';
 import { Payment } from '../../components/Payment';
 import { getCustomers } from '../../../customers/actions';
 
@@ -19,9 +17,14 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
                 getUnpaidInvoicesLoading,
             }
         }
-    } = state
+    } = state;
 
-    const { id = null, type = PAYMENT_ADD, invoice = null, hasRecordPayment = false } = params;
+    const {
+        paymentId: id = null,
+        type = PAYMENT_ADD,
+        invoice = null,
+        hasRecordPayment = false,
+    } = params;
 
     return {
         id,
@@ -33,8 +36,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         initPaymentLoading,
         paymentLoading,
         getUnpaidInvoicesLoading,
-        formValues: getFormValues(PAYMENT_FORM)(state) || {},
-
         initialValues: {
             payment_method_id: null
         }
@@ -53,17 +54,10 @@ const mapDispatchToProps = {
     getCustomers: getCustomers,
 };
 
-
-//  Redux Forms
-const addEditPaymentReduxForm = reduxForm({
-    form: PAYMENT_FORM,
-    validate: (val) => validate(val),
-})(Payment);
-
 //  connect
-const AddEditPaymentContainer = connect(
+const PaymentContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(addEditPaymentReduxForm);
+)(Payment);
 
-export default AddEditPaymentContainer;
+export default PaymentContainer;

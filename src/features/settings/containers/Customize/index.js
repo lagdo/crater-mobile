@@ -1,8 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { reduxForm, getFormValues } from 'redux-form';
-import { validate } from './validation';
-import { CUSTOMIZE_FORM } from '../../constants';
 import * as customizeAction from '../../actions'
 import { Customize } from '../../components/Customize';
 
@@ -27,7 +24,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
     let isLoading = getCustomizeLoading || paymentModesLoading || customizes === null || typeof customizes === 'undefined'
 
     return {
-        formValues: getFormValues(CUSTOMIZE_FORM)(state) || {},
         language,
         type,
         customizes,
@@ -59,16 +55,10 @@ const mapDispatchToProps = {
     removeItemUnit: customizeAction.removeItemUnit
 };
 
-//  Redux Forms
-const CustomizeReduxForm = reduxForm({
-    form: CUSTOMIZE_FORM,
-    validate,
-})(Customize);
-
 //  connect
 const CustomizeContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(CustomizeReduxForm);
+)(Customize);
 
 export default CustomizeContainer;

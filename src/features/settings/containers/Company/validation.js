@@ -1,4 +1,4 @@
-import { getError } from "../../../../api/validation";
+import { getError, removeNullValues } from "../../../../api/validation";
 
 // @flow
 
@@ -10,5 +10,5 @@ export const validate = (values) => {
     errors.name = getError(name, ['requiredField']);
     errors.country_id = getError(country_id, ['required']);
 
-    return errors;
+    return removeNullValues(errors);
 };

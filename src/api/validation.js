@@ -77,3 +77,15 @@ export function getError(
 
 export const getMinNumberError = (fieldName, minNumber) =>
     `validation.minimumNumber`;
+
+export const removeNullValues = (errors) => {
+    let nonNullErrors = {}, key;
+
+    for(key in errors) {
+        if (errors[key] !== null) {
+            nonNullErrors[key] = errors[key];
+        }
+    }
+
+    return nonNullErrors;
+}

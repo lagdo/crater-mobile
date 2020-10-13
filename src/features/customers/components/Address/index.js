@@ -1,9 +1,9 @@
 // @flow
 
 import React, { useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
+import { Form, Field } from 'react-final-form';
 import styles from './styles';
-import { Field, change } from 'redux-form';
 import {
     SlideModal,
     FakeInput,
@@ -11,7 +11,6 @@ import {
     CtButton,
     SelectField,
 } from '../../../../components';
-import { CUSTOMER_ADDRESS, CUSTOMER_EDIT } from '../../constants';
 import Lng from '../../../../api/lang/i18n';
 import { colors } from '../../../../styles/colors';
 import { MAX_LENGTH, formatCountries } from '../../../../api/global';
@@ -48,7 +47,9 @@ let addressField = [
     "state",
     "city",
     "type"
-]
+];
+
+let addressRefs = {}
 
 export const Address = (props: IProps) => {
     const {
@@ -66,7 +67,6 @@ export const Address = (props: IProps) => {
         addressValue,
         autoFillValue,
         onChangeCallback,
-        formValues,
         countries,
     } = props
 
@@ -115,28 +115,26 @@ export const Address = (props: IProps) => {
     }
 
     const setFormField = (field, value) => {
-        props.dispatch(change(CUSTOMER_ADDRESS, field, value));
+        addressRefs.form.change(field, value);
     };
 
     const clearFormField = () => {
-        addressField.map((field) => {
-            setFormField(field, "")
-        })
+        addressField.map((field) => setFormField(field, ""));
     };
 
     const saveAddress = (address) => {
-        onToggle()
+        onToggle();
 
-        onChangeCallback(address)
-        clearFormField()
+        onChangeCallback(address);
+        clearFormField();
     }
 
-    const BOTTOM_ACTION = () => {
+    const BOTTOM_ACTION = (handleSubmit) => {
         return (
             <View style={styles.submitButton}>
                 <View style={{ flex: 1 }}>
                     <CtButton
-                        onPress={handleSubmit(saveAddress)}
+                        onPress={handleSubmit}
                         btnTitle={Lng.t("button.done")}
                         containerStyle={styles.handleBtn}
                     />
@@ -145,8 +143,8 @@ export const Address = (props: IProps) => {
         )
     }
 
-    const Screen = () => {
-        let addressRefs = {}
+    const Screen = (form) => {
+        addressRefs.form = form;
 
         return (
             <View>
@@ -158,9 +156,7 @@ export const Address = (props: IProps) => {
                         leftIconSolid={false}
                         values={Lng.t("customers.address.sameAs")}
                         valueStyle={styles.sameAsToggle}
-                        onChangeCallback={
-                            () => fillShippingAddress(!status)
-                        }
+                        onChangeCallback={() => fillShippingAddress(!status)}
                     />
                 )}
 
@@ -187,9 +183,7 @@ export const Address = (props: IProps) => {
                     navigation={navigation}
                     searchFields={['name']}
                     compareField="id"
-                    onSelect={({ id }) => {
-                        setFormField(country, id)
-                    }}
+                    onSelect={({ id }) => setFormField(country, id)}
                     headerProps={{
                         title: Lng.t("header.country"),
                         rightIconPress: null
@@ -210,9 +204,7 @@ export const Address = (props: IProps) => {
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
                         autoCorrect: true,
-                        onSubmitEditing: () => {
-                            addressRefs.city.focus();
-                        }
+                        onSubmitEditing: () => addressRefs.city.focus()
                     }}
                 />
 
@@ -224,13 +216,9 @@ export const Address = (props: IProps) => {
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
                         autoCorrect: true,
-                        onSubmitEditing: () => {
-                            addressRefs.street1.focus();
-                        }
+                        onSubmitEditing: () => addressRefs.street1.focus()
                     }}
-                    refLinkFn={(ref) => {
-                        addressRefs.city = ref;
-                    }}
+                    refLinkFn={(ref) => addressRefs.city = ref}
                 />
 
                 <Field
@@ -247,9 +235,7 @@ export const Address = (props: IProps) => {
                     }}
                     height={60}
                     autoCorrect={true}
-                    refLinkFn={(ref) => {
-                        addressRefs.street1 = ref;
-                    }}
+                    refLinkFn={(ref) => addressRefs.street1 = ref}
                 />
 
                 <Field
@@ -278,9 +264,7 @@ export const Address = (props: IProps) => {
                         autoCorrect: true,
                         keyboardType: 'phone-pad'
                     }}
-                    refLinkFn={(ref) => {
-                        addressRefs.phone = ref;
-                    }}
+                    refLinkFn={(ref) => addressRefs.phone = ref}
                 />
 
                 <Field
@@ -291,7 +275,7 @@ export const Address = (props: IProps) => {
                         returnKeyType: 'next',
                         autoCapitalize: 'none',
                         autoCorrect: true,
-                        onSubmitEditing: handleSubmit(saveAddress)
+                        onSubmitEditing: handleSubmit
                     }}
                 />
             </View>
@@ -299,39 +283,42 @@ export const Address = (props: IProps) => {
     }
 
     return (
-        <View style={styles.container}>
-            <FakeInput
-                label={label}
-                icon={icon}
-                rightIcon={rightIcon}
-                values={values || placeholder}
-                placeholder={placeholder}
-                onChangeCallback={onToggle}
-                containerStyle={containerStyle}
-                meta={meta}
-                {...fakeInputProps}
-            />
+        <Form onSubmit={saveAddress}>
+        { ({ handleSubmit, form }) => (
+            <View style={styles.container}>
+                <FakeInput
+                    label={label}
+                    icon={icon}
+                    rightIcon={rightIcon}
+                    values={values || placeholder}
+                    placeholder={placeholder}
+                    onChangeCallback={onToggle}
+                    containerStyle={containerStyle}
+                    meta={meta}
+                    {...fakeInputProps}
+                />
 
-            <SlideModal
-                defaultLayout
-                visible={visible}
-                onToggle={onToggle}
-                headerProps={{
-                    leftIcon: "long-arrow-alt-left",
-                    leftIconPress: onToggle,
-                    title: hasBillingAddress ?
-                        Lng.t("header.billingAddress") :
-                        Lng.t("header.shippingAddress"),
-                    placement: "center",
-                    hasCircle: false,
-                    noBorder: false,
-                    transparent: false,
-                }}
-                bottomAction={BOTTOM_ACTION()}
-            >
-                {Screen()}
-            </SlideModal>
-
-        </View>
+                <SlideModal
+                    defaultLayout
+                    visible={visible}
+                    onToggle={onToggle}
+                    headerProps={{
+                        leftIcon: "long-arrow-alt-left",
+                        leftIconPress: onToggle,
+                        title: hasBillingAddress ?
+                            Lng.t("header.billingAddress") :
+                            Lng.t("header.shippingAddress"),
+                        placement: "center",
+                        hasCircle: false,
+                        noBorder: false,
+                        transparent: false,
+                    }}
+                    bottomAction={BOTTOM_ACTION(handleSubmit)}
+                >
+                    {Screen(form)}
+                </SlideModal>
+            </View>
+        )}
+        </Form>
     );
 }

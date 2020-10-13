@@ -24,7 +24,6 @@ import {
     expenseTriggerSpinner,
     setCategories,
     setExpenses,
-    setExpense,
     setFilterExpenses,
 } from '../actions';
 import { ROUTES } from '../../../navigation/routes';
@@ -84,7 +83,6 @@ function* getCreateExpense(payloadData) {
     yield put(expenseTriggerSpinner({ initExpenseLoading: true }));
 
     try {
-
         const options = {
             path: GET_CREATE_EXPENSE_URL(),
         };
@@ -108,8 +106,6 @@ function* createExpense(payloadData) {
     yield put(expenseTriggerSpinner({ expenseLoading: true }));
 
     try {
-
-
         const options = {
             path: CREATE_EXPENSE_URL(),
             body: params,
@@ -145,8 +141,6 @@ function* editExpense(payloadData) {
     yield put(expenseTriggerSpinner({ expenseLoading: true }));
 
     try {
-
-
         const options = {
             path: EDIT_EXPENSE_URL(id),
             body: params,
@@ -183,15 +177,11 @@ function* getEditExpense(payloadData) {
     yield put(expenseTriggerSpinner({ initExpenseLoading: true }));
 
     try {
-
-
         const options = {
             path: GET_EDIT_EXPENSE_URL(id),
         };
 
         const response = yield call([Request, 'get'], options);
-
-        yield put(setExpense(response))
 
         onResult && onResult(response.expense)
 
@@ -210,8 +200,6 @@ function* removeExpense(payloadData) {
     yield put(expenseTriggerSpinner({ expenseLoading: true }));
 
     try {
-
-
         const options = {
             path: REMOVE_EXPENSE_URL(id),
         };

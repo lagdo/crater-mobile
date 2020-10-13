@@ -1,15 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { InvoiceItem } from '../../components/Item';
-import { reduxForm, getFormValues } from 'redux-form';
-import { validate } from './validation';
 import * as InvoicesAction from '../../actions';
-import { ITEM_FORM } from '../../constants';
 import { getItemUnits } from '../../../settings/actions';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
-        invoices: { loading },
         global: { language, taxTypes },
         settings: {
             units,
@@ -29,7 +25,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
 
     return {
         loading: isLoading,
-        formValues: getFormValues(ITEM_FORM)(state) || {},
         itemId: item && (item.item_id || item.id),
         taxTypes,
         currency,
@@ -38,7 +33,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         taxPerItem,
         type,
         units,
-
         initialValues: {
             price: null,
             quantity: 1,
@@ -57,16 +51,10 @@ const mapDispatchToProps = {
     removeInvoiceItem: InvoicesAction.removeInvoiceItem,
 };
 
-//  Redux Forms
-const addItemReduxForm = reduxForm({
-    form: ITEM_FORM,
-    validate,
-})(InvoiceItem);
-
 //  connect
 const InvoiceItemContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(addItemReduxForm);
+)(InvoiceItem);
 
 export default InvoiceItemContainer;

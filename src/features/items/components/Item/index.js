@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
+import { Form, Field } from 'react-final-form';
 import styles from './styles';
-import { Field, change } from 'redux-form';
 import {
     InputField,
     CtDivider,
@@ -14,12 +14,18 @@ import {
     CurrencyFormat,
 } from '../../../../components';
 import { ROUTES } from '../../../../navigation/routes';
-import { ITEM_FORM, EDIT_ITEM, ADD_ITEM, ITEM_UNITS } from '../../constants';
+import { EDIT_ITEM, ADD_ITEM } from '../../constants';
 import { BUTTON_COLOR } from '../../../../api/consts/core';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
 import { ADD_TAX } from '../../../settings/constants';
 import { MAX_LENGTH, alertMe, formatSelectPickerName, hasValue } from '../../../../api/global';
+import { validate } from '../../containers/Item/validation';
+
+let itemRefs = {
+    taxes: [],
+    price: 0,
+}
 
 export const Item = (props) => {
     const {
@@ -35,10 +41,9 @@ export const Item = (props) => {
         itemId,
         getItemUnits,
         getSettingItem,
-        formValues: { taxes, price },
-        handleSubmit,
         units,
         taxTypes,
+        initialValues,
     } = props;
 
     const isCreateItem = (type === ADD_ITEM)
@@ -56,14 +61,8 @@ export const Item = (props) => {
         const isEdit = (type === EDIT_ITEM)
         isEdit && getEditItem({ id: itemId })
 
-        return () => {
-            clearItem()
-        }
+        return () => clearItem();
     }, []);
-
-    const setFormField = (field, value) => {
-        props.dispatch(change(ITEM_FORM, field, value));
-    };
 
     const saveItem = (values) => {
         if (finalAmount() < 0) {
@@ -87,17 +86,12 @@ export const Item = (props) => {
 
         type == ADD_ITEM ? addItem({
             item,
-            onResult: () => {
-                navigation.navigate(ROUTES.GLOBAL_ITEMS)
-            }
+            onResult: navigation.goBack
         }) : editItem({
             item: { ...item },
             id: itemId,
-            onResult: () => {
-                navigation.navigate(ROUTES.GLOBAL_ITEMS)
-            }
+            onResult: navigation.goBack
         })
-
     };
 
     const onRemoveItem = () => {
@@ -113,7 +107,7 @@ export const Item = (props) => {
                             title: Lng.t("items.alreadyAttachTitle"),
                             desc: Lng.t("items.alreadyAttachDescription")
                         })
-                        : navigation.navigate(ROUTES.GLOBAL_ITEMS)
+                        : navigation.goBack()
                 }
             })
         })
@@ -121,13 +115,13 @@ export const Item = (props) => {
     }
 
     const totalAmount = () => {
-        return price + itemTax()
+        return itemRefs.price + itemTax()
     }
 
     const itemTax = () => {
         let totalTax = 0
 
-        taxes && taxes.map(val => {
+        itemRefs.taxes && itemRefs.taxes.map(val => {
             if (!val.compound_tax) {
                 totalTax += getTaxValue(val.percent)
             }
@@ -139,7 +133,7 @@ export const Item = (props) => {
     const itemCompoundTax = () => {
         let totalTax = 0
 
-        taxes && taxes.map(val => {
+        itemRefs.taxes && itemRefs.taxes.map(val => {
             if (val.compound_tax) {
                 totalTax += getCompoundTaxValue(val.percent)
             }
@@ -149,7 +143,7 @@ export const Item = (props) => {
     }
 
     const getTaxValue = (tax) => {
-        return (tax * price) / 100
+        return (tax * itemRefs.price) / 100
     }
 
     const getCompoundTaxValue = (tax) => {
@@ -182,15 +176,15 @@ export const Item = (props) => {
                     </View>
                     <View>
                         <CurrencyFormat
-                            amount={price}
+                            amount={itemRefs.price}
                             currency={currency}
                             style={styles.price}
                         />
                     </View>
                 </View>
 
-                {taxes &&
-                    taxes.map(val => !val.compound_tax ? (
+                {itemRefs.taxes &&
+                    itemRefs.taxes.map(val => !val.compound_tax ? (
                         <View style={styles.subContainer}>
                             <View>
                                 <Text style={styles.label}>
@@ -208,8 +202,8 @@ export const Item = (props) => {
                     ) : null)
                 }
 
-                {taxes &&
-                    taxes.map(val => val.compound_tax ? (
+                {itemRefs.taxes &&
+                    itemRefs.taxes.map(val => val.compound_tax ? (
                         <View style={styles.subContainer}>
                             <View>
                                 <Text style={styles.label}>
@@ -247,11 +241,11 @@ export const Item = (props) => {
         )
     };
 
-    const BOTTOM_ACTION = () => {
+    const BOTTOM_ACTION = (handleSubmit) => {
         return (
             <View style={styles.submitButton}>
                 <CtButton
-                    onPress={handleSubmit(saveItem)}
+                    onPress={handleSubmit}
                     btnTitle={Lng.t("button.save")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
@@ -271,7 +265,7 @@ export const Item = (props) => {
         )
     }
 
-    const TAX_FIELD_VIEW = () => {
+    const TAX_FIELD_VIEW = (form) => {
         return (
             <Field
                 name="taxes"
@@ -302,11 +296,7 @@ export const Item = (props) => {
                 rightIconPress={
                     () => navigation.navigate(ROUTES.TAX, {
                         type: ADD_TAX,
-                        onSelect: (val) => {
-                            setFormField('taxes',
-                                [...val, ...taxes]
-                            )
-                        }
+                        onSelect: (val) => form.change('taxes', [...val, ...taxes])
                     })
                 }
                 emptyContentProps={{
@@ -316,93 +306,94 @@ export const Item = (props) => {
         )
     }
 
-    let itemRefs = {}
-
     return (
-        <DefaultLayout
-            headerProps={{
-                leftIconPress: () => navigation.navigate(ROUTES.GLOBAL_ITEMS),
-                title: isCreateItem ?
-                    Lng.t("header.addItem") :
-                    Lng.t("header.editItem"),
-                placement: "center",
-                rightIcon: 'save',
-                rightIconProps: {
-                    solid: true
-                },
-                rightIconPress: handleSubmit(saveItem),
-            }}
-            bottomAction={BOTTOM_ACTION()}
-            loadingProps={{ is: loading || !hasValue(isTaxPerItem) }}
-        >
-            <View style={styles.bodyContainer}>
-                <Field
-                    name="name"
-                    component={InputField}
-                    isRequired
-                    hint={Lng.t("items.name")}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        autoCapitalize: 'none',
-                        autoCorrect: true,
-                        autoFocus: true,
-                        onSubmitEditing: () => {
-                            itemRefs.price.focus();
-                        }
-                    }}
-                />
+        <Form validate={validate} initialValues={initialValues} onSubmit={saveItem}>
+        { ({ handleSubmit, form }) => {
+            const formValues = form.getState().values || {};
+            const { taxes = [], price = 0 } = formValues;
+            itemRefs.taxes = taxes;
+            itemRefs.price = price;
 
-                <Field
-                    name="price"
-                    component={InputField}
-                    isRequired
-                    hint={Lng.t("items.price")}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        autoCapitalize: 'none',
-                        autoCorrect: true,
-                        keyboardType: 'numeric'
-                    }}
-                    isCurrencyInput
-                    refLinkFn={(ref) => {
-                        itemRefs.price = ref;
-                    }}
-                />
+            return (
+            <DefaultLayout
+                headerProps={{
+                    leftIconPress: navigation.goBack,
+                    title: isCreateItem ? Lng.t("header.addItem") : Lng.t("header.editItem"),
+                    placement: "center",
+                    rightIcon: 'save',
+                    rightIconProps: {
+                        solid: true
+                    },
+                    rightIconPress: handleSubmit,
+                }}
+                bottomAction={BOTTOM_ACTION(handleSubmit)}
+                loadingProps={{ is: loading || !hasValue(isTaxPerItem) }}
+            >
+                <View style={styles.bodyContainer}>
+                    <Field
+                        name="name"
+                        component={InputField}
+                        isRequired
+                        hint={Lng.t("items.name")}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCapitalize: 'none',
+                            autoCorrect: true,
+                            autoFocus: true,
+                            onSubmitEditing: () => itemRefs.price.focus()
+                        }}
+                    />
 
-                <Field
-                    name="unit_id"
-                    component={SelectPickerField}
-                    label={Lng.t("items.unit")}
-                    items={formatSelectPickerName(units)}
-                    fieldIcon={'balance-scale'}
-                    containerStyle={styles.selectPicker}
-                    defaultPickerOptions={{
-                        label: Lng.t("items.unitPlaceholder"),
-                        value: '',
-                    }}
-                />
+                    <Field
+                        name="price"
+                        component={InputField}
+                        isRequired
+                        hint={Lng.t("items.price")}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCapitalize: 'none',
+                            autoCorrect: true,
+                            keyboardType: 'numeric'
+                        }}
+                        isCurrencyInput
+                        refLinkFn={(ref) => itemRefs.price = ref}
+                    />
 
-                {isTaxPerItem && TAX_FIELD_VIEW()}
+                    <Field
+                        name="unit_id"
+                        component={SelectPickerField}
+                        label={Lng.t("items.unit")}
+                        items={formatSelectPickerName(units)}
+                        fieldIcon={'balance-scale'}
+                        containerStyle={styles.selectPicker}
+                        defaultPickerOptions={{
+                            label: Lng.t("items.unitPlaceholder"),
+                            value: '',
+                        }}
+                    />
 
-                {FINAL_AMOUNT()}
+                    {isTaxPerItem && TAX_FIELD_VIEW(form)}
 
-                <Field
-                    name="description"
-                    component={InputField}
-                    hint={Lng.t("items.description")}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        autoCapitalize: 'none',
-                        autoCorrect: true,
-                        multiline: true,
-                        maxLength: MAX_LENGTH
-                    }}
-                    height={80}
-                    refLinkFn={(ref) => {
-                        itemRefs.description = ref;
-                    }}
-                />
-            </View>
-        </DefaultLayout>
+                    {FINAL_AMOUNT()}
+
+                    <Field
+                        name="description"
+                        component={InputField}
+                        hint={Lng.t("items.description")}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCapitalize: 'none',
+                            autoCorrect: true,
+                            multiline: true,
+                            maxLength: MAX_LENGTH
+                        }}
+                        height={80}
+                        refLinkFn={(ref) => itemRefs.description = ref}
+                    />
+                </View>
+            </DefaultLayout>
+            );
+        }}
+        </Form>
     );
 }

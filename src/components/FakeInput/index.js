@@ -3,7 +3,7 @@
 import React from 'react';
 import { View, TouchableWithoutFeedback, Text, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
-import { Field } from 'redux-form';
+import { Field } from 'react-final-form';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import styles from './styles';
 import { colors } from '../../styles/colors';

@@ -1,11 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Endpoint } from '../../components/Endpoint';
-import { reduxForm } from 'redux-form';
-import { SET_ENDPOINT_API } from '../../constants';
 import * as AuthAction from '../../actions';
-import { env } from '../../../../config';
-import { validate } from './validation';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
@@ -33,16 +29,10 @@ const mapDispatchToProps = {
     checkEndpointApi: AuthAction.checkEndpointApi
 };
 
-//  Redux Forms
-const EndpointReduxForm = reduxForm({
-    form: SET_ENDPOINT_API,
-    validate
-})(Endpoint);
-
 //  connect
 const EndpointContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(EndpointReduxForm);
+)(Endpoint);
 
 export default EndpointContainer;

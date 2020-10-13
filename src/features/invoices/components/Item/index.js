@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
-import { Field, change } from 'redux-form';
+import { Form, Field } from 'react-final-form';
 import styles from './styles';
 import {
     InputField,
@@ -19,13 +19,21 @@ import {
     ITEM_DISCOUNT_OPTION,
     ITEM_EDIT,
     ITEM_ADD,
-    ITEM_FORM
 } from '../../constants';
 import { BUTTON_COLOR } from '../../../../api/consts/core';
 import { colors } from '../../../../styles/colors';
 import Lng from '../../../../api/lang/i18n';
 import { ADD_TAX } from '../../../settings/constants';
 import { MAX_LENGTH, formatSelectPickerName, alertMe } from '../../../../api/global';
+import { validate } from '../../containers/Item/validation';
+
+let itemRefs = {
+    quantity: 0,
+    price: 0,
+    discount: 0,
+    discount_type: 'none',
+    taxes: [],
+};
 
 export const InvoiceItem = (props) => {
     const {
@@ -33,8 +41,6 @@ export const InvoiceItem = (props) => {
         loading,
         type,
         currency,
-        handleSubmit,
-        initialValues,
         discountPerItem,
         taxPerItem,
         taxTypes,
@@ -44,17 +50,17 @@ export const InvoiceItem = (props) => {
         addItem,
         removeInvoiceItem,
         setInvoiceItems,
-        formValues: { quantity, price, discount, discount_type, taxes },
+        initialValues,
     } = props;
 
-    const isCreateItem = (type === ITEM_ADD)
+    const isCreateItem = (type === ITEM_ADD);
 
     useEffect(() => {
-        !itemId && getItemUnits && getItemUnits()
+        !itemId && getItemUnits && getItemUnits();
     }, []);
 
     const setFormField = (field, value) => {
-        props.dispatch(change(ITEM_FORM, field, value));
+        itemRefs.form.change(field, value);
     };
 
     const saveItem = (values) => {
@@ -80,29 +86,27 @@ export const InvoiceItem = (props) => {
             }),
         }
 
-        const callback = () => {
-            addItem({
-                item,
-                onResult: () => {
-                    navigation.goBack(null)
-                }
-            })
-        }
+        const callback = () => addItem({ item, onResult: navigation.goBack });
 
         if (!itemId) {
-            callback()
+            callback();
         } else {
-            const invoiceItem = [{ ...item, item_id: itemId }]
+            const invoiceItem = [{ ...item, item_id: itemId }];
 
             if (type === ITEM_EDIT) {
-                removeInvoiceItem({ id: itemId })
+                removeInvoiceItem({ id: itemId });
             }
 
-            setInvoiceItems({ invoiceItem })
+            setInvoiceItems({ invoiceItem });
 
-            navigation.navigate(ROUTES.INVOICE)
+            navigation.navigate(ROUTES.INVOICE);
         }
     };
+
+    const addTax = () => navigation.navigate(ROUTES.TAX, {
+        type: ADD_TAX,
+        onSelect: (val) => itemRefs.form.change('taxes', [...val, ...itemRefs.taxes])
+    });
 
     const removeItem = () => {
         alertMe({
@@ -118,12 +122,12 @@ export const InvoiceItem = (props) => {
     const totalDiscount = () => {
         let discountPrice = 0
 
-        if (discount_type === 'percentage') {
-            discountPrice = ((discount * itemSubTotal()) / 100)
-        } else if (discount_type === 'fixed') {
-            discountPrice = (discount * 100)
+        if (itemRefs.discount_type === 'percentage') {
+            discountPrice = ((itemRefs.discount * itemSubTotal()) / 100)
+        } else if (itemRefs.discount_type === 'fixed') {
+            discountPrice = (itemRefs.discount * 100)
         }
-        else if (discount_type === 'none') {
+        else if (itemRefs.discount_type === 'none') {
             discountPrice = 0
             setFormField('discount', 0)
         }
@@ -136,7 +140,7 @@ export const InvoiceItem = (props) => {
     }
 
     const itemSubTotal = () => {
-        return (price * quantity)
+        return (itemRefs.price * itemRefs.quantity)
     }
 
     const subTotal = () => {
@@ -146,7 +150,7 @@ export const InvoiceItem = (props) => {
     const itemTax = () => {
         let totalTax = 0
 
-        taxes && taxes.map(val => {
+        itemRefs.taxes && itemRefs.taxes.map(val => {
             if (!val.compound_tax) {
                 totalTax += getTaxValue(val.percent)
             }
@@ -158,7 +162,7 @@ export const InvoiceItem = (props) => {
     const itemCompoundTax = () => {
         let totalTax = 0
 
-        taxes && taxes.map(val => {
+        itemRefs.taxes && itemRefs.taxes.map(val => {
             if (val.compound_tax) {
                 totalTax += getCompoundTaxValue(val.percent)
             }
@@ -196,9 +200,9 @@ export const InvoiceItem = (props) => {
                 <View style={styles.subContainer}>
                     <View>
                         <CurrencyFormat
-                            amount={price}
+                            amount={itemRefs.price}
                             currency={currency}
-                            preText={`${quantity} x `}
+                            preText={`${itemRefs.quantity} x `}
                             style={styles.label}
                         />
                     </View>
@@ -228,8 +232,8 @@ export const InvoiceItem = (props) => {
                     </View>
                 )}
 
-                {taxes &&
-                    taxes.map((val, index) => !val.compound_tax ? (
+                {itemRefs.taxes &&
+                    itemRefs.taxes.map((val, index) => !val.compound_tax ? (
                         <View
                             style={styles.subContainer}
                             key={index}
@@ -250,8 +254,8 @@ export const InvoiceItem = (props) => {
                     ) : null)
                 }
 
-                {taxes &&
-                    taxes.map(val => val.compound_tax ? (
+                {itemRefs.taxes &&
+                    itemRefs.taxes.map(val => val.compound_tax ? (
                         <View style={styles.subContainer}>
                             <View>
                                 <Text style={styles.label}>
@@ -289,11 +293,11 @@ export const InvoiceItem = (props) => {
         )
     };
 
-    const BOTTOM_ACTION = () => {
+    const BOTTOM_ACTION = (handleSubmit) => {
         return (
             <View style={styles.submitButton}>
                 <CtButton
-                    onPress={handleSubmit(saveItem)}
+                    onPress={handleSubmit}
                     btnTitle={Lng.t("button.save")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
@@ -314,179 +318,163 @@ export const InvoiceItem = (props) => {
         )
     }
 
-    let itemRefs = {}
-
     return (
-        <DefaultLayout
-            headerProps={{
-                leftIconPress: () => navigation.navigate(ROUTES.INVOICE),
-                title: isCreateItem ?
-                    Lng.t("header.addItem") :
-                    Lng.t("header.editItem"),
-                placement: "center",
-                rightIcon: 'save',
-                rightIconProps: {
-                    solid: true
-                },
-                rightIconPress: handleSubmit(saveItem),
-            }}
-            loadingProps={{
-                is: loading
-            }}
-            bottomAction={BOTTOM_ACTION()}
-        >
-            <View style={styles.bodyContainer}>
-                <Field
-                    name="name"
-                    isRequired
-                    component={InputField}
-                    hint={Lng.t("items.name")}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        autoCapitalize: 'none',
-                        autoCorrect: true,
-                        onSubmitEditing: () => {
-                            itemRefs.quantity.focus();
-                        }
-                    }}
-                />
+        <Form validate={validate} initialValues={initialValues} onSubmit={saveItem}>
+        {({ handleSubmit, form }) => {
+            const formValues = form.getState().values || {};
+            const { quantity, price, discount, discount_type, taxes } = formValues;
+            itemRefs.form = form;
+            itemRefs.quantity = quantity;
+            itemRefs.price = price;
+            itemRefs.discount = discount;
+            itemRefs.discount_type = discount_type;
+            itemRefs.taxes = taxes;
 
-                <View style={styles.dateFieldContainer}>
-                    <View style={styles.dateField}>
-                        <Field
-                            name={'quantity'}
-                            component={InputField}
-                            isRequired
-                            hint={Lng.t("items.quantity")}
-                            inputProps={{
-                                returnKeyType: 'next',
-                                keyboardType: 'numeric',
-                                onSubmitEditing: () => {
-                                    itemRefs.price.focus();
-                                }
-                            }}
-                            refLinkFn={(ref) => {
-                                itemRefs.quantity = ref;
-                            }}
-                        />
+            return (
+            <DefaultLayout
+                headerProps={{
+                    leftIconPress: navigation.goBack,
+                    title: isCreateItem ? Lng.t("header.addItem") : Lng.t("header.editItem"),
+                    placement: "center",
+                    rightIcon: 'save',
+                    rightIconProps: { solid: true },
+                    rightIconPress: handleSubmit,
+                }}
+                loadingProps={{ is: loading }}
+                bottomAction={BOTTOM_ACTION(handleSubmit)}
+            >
+                <View style={styles.bodyContainer}>
+                    <Field
+                        name="name"
+                        isRequired
+                        component={InputField}
+                        hint={Lng.t("items.name")}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCapitalize: 'none',
+                            autoCorrect: true,
+                            onSubmitEditing: () => itemRefs.quantity.focus(),
+                        }}
+                    />
+
+                    <View style={styles.dateFieldContainer}>
+                        <View style={styles.dateField}>
+                            <Field
+                                name={'quantity'}
+                                component={InputField}
+                                isRequired
+                                hint={Lng.t("items.quantity")}
+                                inputProps={{
+                                    returnKeyType: 'next',
+                                    keyboardType: 'numeric',
+                                    onSubmitEditing: () => itemRefs.price.focus(),
+                                }}
+                                refLinkFn={(ref) => itemRefs.quantity = ref}
+                            />
+                        </View>
+                        <View style={styles.dateField}>
+                            <Field
+                                name="price"
+                                isRequired
+                                component={InputField}
+                                hint={Lng.t("items.price")}
+                                inputProps={{
+                                    returnKeyType: 'next',
+                                    keyboardType: 'numeric'
+                                }}
+                                refLinkFn={(ref) => itemRefs.price = ref}
+                                isCurrencyInput
+                            />
+                        </View>
                     </View>
-                    <View style={styles.dateField}>
+
+                    {(initialValues.unit || !itemId) && (
                         <Field
-                            name="price"
-                            isRequired
-                            component={InputField}
-                            hint={Lng.t("items.price")}
-                            inputProps={{
-                                returnKeyType: 'next',
-                                keyboardType: 'numeric'
+                            name="unit_id"
+                            label={Lng.t("items.unit")}
+                            component={SelectPickerField}
+                            items={formatSelectPickerName(units)}
+                            defaultPickerOptions={{
+                                label: Lng.t("items.unitPlaceholder"),
+                                value: '',
                             }}
-                            refLinkFn={(ref) => {
-                                itemRefs.price = ref;
-                            }}
-                            isCurrencyInput
+                            disabled={itemId ? true : false}
+                            fieldIcon={'balance-scale'}
                         />
-                    </View>
+                    )}
+
+                    {discountPerItem == 'YES' && (
+                        <View>
+                            <Field
+                                name="discount_type"
+                                component={RadioButtonGroup}
+                                hint={Lng.t("items.discountType")}
+                                options={ITEM_DISCOUNT_OPTION}
+                                initialValue={initialValues.discount_type}
+                            />
+
+                            <Field
+                                name="discount"
+                                component={InputField}
+                                hint={Lng.t("items.discount")}
+                                inputProps={{
+                                    returnKeyType: 'next',
+                                    autoCapitalize: 'none',
+                                    autoCorrect: true,
+                                    keyboardType: 'numeric'
+                                }}
+                                disabled={discount_type === 'none'}
+                            />
+                        </View>
+                    )}
+
+                    {taxPerItem === 'YES' && (
+                        <Field
+                            name="taxes"
+                            items={taxTypes}
+                            displayName="name"
+                            label={Lng.t("items.taxes")}
+                            component={SelectField}
+                            searchFields={['name', 'percent']}
+                            placeholder={Lng.t("items.selectTax")}
+                            onlyPlaceholder
+                            fakeInputProps={{
+                                icon: 'percent',
+                                rightIcon: 'angle-right',
+                                color: colors.gray,
+                            }}
+                            navigation={navigation}
+                            isInternalSearch
+                            isMultiSelect
+                            concurrentMultiSelect
+                            compareField="id"
+                            valueCompareField="tax_type_id"
+                            listViewProps={{ contentContainerStyle: { flex: 3 } }}
+                            headerProps={{ title: Lng.t("taxes.title") }}
+                            rightIconPress={addTax}
+                            emptyContentProps={{ contentType: "taxes" }}
+                        />
+                    )}
+
+                    {FINAL_AMOUNT()}
+
+                    <Field
+                        name="description"
+                        component={InputField}
+                        hint={Lng.t("items.description")}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCapitalize: 'none',
+                            autoCorrect: true,
+                            multiline: true,
+                            maxLength: MAX_LENGTH
+                        }}
+                        height={80}
+                    />
                 </View>
-
-                {(initialValues.unit || !itemId) && (
-                    <Field
-                        name="unit_id"
-                        label={Lng.t("items.unit")}
-                        component={SelectPickerField}
-                        items={formatSelectPickerName(units)}
-                        defaultPickerOptions={{
-                            label: Lng.t("items.unitPlaceholder"),
-                            value: '',
-                        }}
-                        disabled={itemId ? true : false}
-                        fieldIcon={'balance-scale'}
-                    />
-                )}
-
-                {discountPerItem == 'YES' && (
-                    <View>
-                        <Field
-                            name="discount_type"
-                            component={RadioButtonGroup}
-                            hint={Lng.t("items.discountType")}
-                            options={ITEM_DISCOUNT_OPTION}
-                            initialValue={initialValues.discount_type}
-                        />
-
-                        <Field
-                            name="discount"
-                            component={InputField}
-                            hint={Lng.t("items.discount")}
-                            inputProps={{
-                                returnKeyType: 'next',
-                                autoCapitalize: 'none',
-                                autoCorrect: true,
-                                keyboardType: 'numeric'
-                            }}
-                            disabled={discount_type === 'none'}
-                        />
-                    </View>
-                )}
-
-                {taxPerItem === 'YES' && (
-                    <Field
-                        name="taxes"
-                        items={taxTypes}
-                        displayName="name"
-                        label={Lng.t("items.taxes")}
-                        component={SelectField}
-                        searchFields={['name', 'percent']}
-                        placeholder={Lng.t("items.selectTax")}
-                        onlyPlaceholder
-                        fakeInputProps={{
-                            icon: 'percent',
-                            rightIcon: 'angle-right',
-                            color: colors.gray,
-                        }}
-                        navigation={navigation}
-                        isInternalSearch
-                        isMultiSelect
-                        concurrentMultiSelect
-                        compareField="id"
-                        valueCompareField="tax_type_id"
-                        listViewProps={{
-                            contentContainerStyle: { flex: 3 }
-                        }}
-                        headerProps={{
-                            title: Lng.t("taxes.title")
-                        }}
-                        rightIconPress={
-                            () => navigation.navigate(ROUTES.TAX, {
-                                type: ADD_TAX,
-                                onSelect: (val) => {
-                                    setFormField('taxes',
-                                        [...val, ...taxes]
-                                    )
-                                }
-                            })
-                        }
-                        emptyContentProps={{
-                            contentType: "taxes",
-                        }}
-                    />
-                )}
-
-                {FINAL_AMOUNT()}
-
-                <Field
-                    name="description"
-                    component={InputField}
-                    hint={Lng.t("items.description")}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        autoCapitalize: 'none',
-                        autoCorrect: true,
-                        multiline: true,
-                        maxLength: MAX_LENGTH
-                    }}
-                    height={80}
-                />
-            </View>
-        </DefaultLayout>
+            </DefaultLayout>
+            );
+        }}
+        </Form>
     );
 }

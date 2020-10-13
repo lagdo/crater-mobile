@@ -1,11 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Company } from '../../components/Company';
-import { reduxForm, getFormValues } from 'redux-form';
 import * as PreferencesAction from '../../actions';
 import { LanguageAndCurrency } from '../../components/LanguageAndCurrency';
-import { validate } from './validation'
-import { EDIT_LANGUAGE_AND_CURRENCY } from '../../constants';
 
 const mapStateToProps = (state) => {
     const {
@@ -21,13 +17,11 @@ const mapStateToProps = (state) => {
 
     let isLoading = getPreferencesLoading || typeof preferences === 'undefined' || preferences === null
 
-
     return {
         language,
         isLoading,
         currencies,
         editPreferencesLoading,
-        formValues: getFormValues(EDIT_LANGUAGE_AND_CURRENCY)(state) || {},
         initialValues: !isLoading ? {
             currency: preferences.selectedCurrency,
             language: preferences.selectedLanguage,
@@ -37,10 +31,8 @@ const mapStateToProps = (state) => {
             moment_date_format: preferences.moment_date_format,
             fiscal_year: preferences.fiscal_year
         } : null
-
     };
 };
-
 
 const mapDispatchToProps = {
     getPreferences: PreferencesAction.getPreferences,
@@ -48,16 +40,10 @@ const mapDispatchToProps = {
     clearPreferences: PreferencesAction.clearPreferences,
 };
 
-//  Redux Forms
-const LanguageandCurrencyReduxForm = reduxForm({
-    form: EDIT_LANGUAGE_AND_CURRENCY,
-    validate,
-})(LanguageAndCurrency);
-
 //  connect
 const LanguageAndCurrencyContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(LanguageandCurrencyReduxForm);
+)(LanguageAndCurrency);
 
 export default LanguageAndCurrencyContainer;

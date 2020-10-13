@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { reduxForm, getFormValues } from 'redux-form';
-import { validate } from './validation';
-import { CUSTOMER_FORM, CUSTOMER_ADD } from '../../constants';
+import { CUSTOMER_ADD } from '../../constants';
 import * as customerAction from '../../actions'
 import { Customer } from '../../components/Customer';
 
@@ -25,7 +23,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
     return {
         id: customerId,
         onSelect,
-        formValues: getFormValues(CUSTOMER_FORM)(state) || {},
         type,
         language,
         currencies,
@@ -34,7 +31,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         customerLoading,
         getEditCustomerLoading,
         countriesLoading,
-
         initialValues: {
             enable_portal: false,
             currency_id: null,
@@ -51,16 +47,10 @@ const mapDispatchToProps = {
     getCountries: customerAction.getCountries,
 };
 
-//  Redux Forms
-const addEditCustomerReduxForm = reduxForm({
-    form: CUSTOMER_FORM,
-    validate,
-})(Customer);
-
 //  connect
-const AddEditCustomerContainer = connect(
+const CustomerContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(addEditCustomerReduxForm);
+)(Customer);
 
-export default AddEditCustomerContainer;
+export default CustomerContainer;

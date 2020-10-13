@@ -1,13 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { reduxForm, getFormValues } from 'redux-form';
-import { validate } from './validation';
 import * as CategoryAction from '../../actions';
 import { Category } from '../../components/Category';
-import { CATEGORY_FORM, CATEGORY_ADD } from '../../constants';
+import { CATEGORY_ADD } from '../../constants';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
-
     const {
         global: { language },
         settings: {
@@ -31,7 +28,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         categoryLoading: expenseCategoryLoading,
         getEditCategoryLoading: initExpenseCategoryLoading,
         onFirstTimeCreateExpense,
-        formValues: getFormValues(CATEGORY_FORM)(state) || {},
     };
 };
 
@@ -42,16 +38,10 @@ const mapDispatchToProps = {
     removeCategory: CategoryAction.removeExpenseCategory
 };
 
-//  Redux Forms
-const addEditPaymentReduxForm = reduxForm({
-    form: CATEGORY_FORM,
-    validate,
-})(Category);
-
 //  connect
 const AddEditCategoryContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(addEditPaymentReduxForm);
+)(Category);
 
 export default AddEditCategoryContainer;

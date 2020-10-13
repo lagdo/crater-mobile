@@ -1,4 +1,4 @@
-import { getError } from "../../../../api/validation";
+import { getError, removeNullValues } from "../../../../api/validation";
 
 export const validate = (values) => {
     const errors = {};
@@ -6,5 +6,5 @@ export const validate = (values) => {
 
     errors.email = getError(email, ['required', 'emailFormat']);
 
-    return errors;
+    return removeNullValues(errors);
 };
