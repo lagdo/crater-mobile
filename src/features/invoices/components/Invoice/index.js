@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, Linking } from 'react-native';
-import { Field, change } from 'redux-form';
+import { Form, Field } from 'react-final-form';
 import styles, { itemsDescriptionStyle } from './styles';
 import {
     InputField,
@@ -22,7 +22,6 @@ import {
     INVOICE_EDIT,
     ITEM_ADD,
     ITEM_EDIT,
-    INVOICE_FORM,
     INVOICE_ACTIONS,
     EDIT_INVOICE_ACTIONS
 } from '../../constants';
@@ -37,6 +36,7 @@ import { IMAGES } from '../../../../config';
 import { ADD_TAX } from '../../../settings/constants';
 import { PAYMENT_ADD } from '../../../payments/constants';
 import { MAX_LENGTH, alertMe } from '../../../../api/global';
+import { validate } from '../../containers/Invoice/validation';
 
 type IProps = {
     navigation: Object,
@@ -60,26 +60,23 @@ type IProps = {
     type: String
 }
 
+const invoiceRefs = {
+    taxes: [],
+    discount: 0,
+    discount_type: 'none',
+    status: 'draft',
+};
+
 export const Invoice = (props: IProps) => {
     const {
         navigation,
         loading,
+        id,
         type,
         getCreateInvoice,
         invoiceItems,
         getEditInvoice,
-        clearInvoice,
         removeInvoice,
-        formValues: {
-            id,
-            user,
-            user_id,
-            due_amount,
-            invoice_number,
-            taxes,
-            discount,
-            discount_type,
-        },
         invoiceData: {
             invoice_prefix = '',
             invoiceTemplates,
@@ -97,7 +94,7 @@ export const Invoice = (props: IProps) => {
         createInvoice,
         editInvoice,
         changeInvoiceStatus,
-        handleSubmit,
+        initialValues,
     } = props;
 
     // const [taxTypeList, setTaxTypeList] = useState([]);
@@ -111,58 +108,58 @@ export const Invoice = (props: IProps) => {
             getEditInvoice({
                 id,
                 onResult: ({ user, status }) => {
-                    setCurrency(user.currency)
-                    setCustomerName(user.name)
-                    setMarkAsStatus(status)
+                    setCurrency(user.currency);
+                    setCustomerName(user.name);
+                    setMarkAsStatus(status);
                 }
             }) :
-            getCreateInvoice({
-                onResult: (val) => {
-                    setCurrency(val.currency)
-                }
-            });
+            getCreateInvoice({ onResult: (val) => setCurrency(val.currency) });
 
-        getInvoiceItemList(invoiceItems)
+        getInvoiceItemList(invoiceItems);
 
-        setOnBackHandler(() => onDraft(handleSubmit))
+        setOnBackHandler(onDraft);
 
         return () => {
+            const { clearInvoice } = props;
             clearInvoice();
             removeBackHandler();
         }
     }, []);
 
     const setFormField = (field, value) => {
-        props.dispatch(change(INVOICE_FORM, field, value));
+        invoiceRefs.form.change(field, value);
     };
 
     const onEditItem = (item) => {
-        navigation.navigate(
-            ROUTES.INVOICE_ITEM,
-            { item, type: ITEM_EDIT, currency, discount_per_item, tax_per_item }
-        )
-    }
+        navigation.navigate(ROUTES.INVOICE_ITEM,
+            { item, type: ITEM_EDIT, currency, discount_per_item, tax_per_item });
+    };
 
-    const onDraft = (handleSubmit) => {
+    const onDraft = () => {
         if (type === INVOICE_EDIT) {
-            navigation.navigate(ROUTES.MAIN_INVOICES)
-            return
+            navigation.goBack();
+            return;
         }
 
         alertMe({
             title: Lng.t("invoices.alert.draftTitle"),
             showCancel: true,
             cancelText: Lng.t("alert.action.discard"),
-            cancelPress: () => navigation.navigate(ROUTES.MAIN_INVOICES),
+            cancelPress: navigation.goBack,
             okText: Lng.t("alert.action.saveAsDraft"),
-            okPress: handleSubmit(onSubmitInvoice)
-        })
+            okPress: onSaveInvoice('draft'),
+        });
     }
 
-    const onSubmitInvoice = (values, status = 'draft') => {
+    const onSaveInvoice = (status = 'draft') => {
+        invoiceRefs.status = status;
+        invoiceRefs.handleSubmit();
+    }
+
+    const onSubmitInvoice = (values) => {
         if (finalAmount() < 0) {
-            alert(Lng.t("invoices.alert.lessAmount"))
-            return
+            alert(Lng.t("invoices.alert.lessAmount"));
+            return;
         }
 
         let invoice = {
@@ -176,13 +173,12 @@ export const Invoice = (props: IProps) => {
                 return {
                     ...val,
                     amount: val.compound_tax ?
-                        getCompoundTaxValue(val.percent) :
-                        getTaxValue(val.percent),
+                        getCompoundTaxValue(val.percent) : getTaxValue(val.percent),
                 }
             }) : [],
         }
 
-        if (status === 'send') {
+        if (invoiceRefs.status === 'send') {
             invoice.invoiceSend = true
         }
 
@@ -190,19 +186,19 @@ export const Invoice = (props: IProps) => {
             createInvoice({
                 invoice,
                 onResult: (url) => {
-                    if (status === 'download') {
+                    if (invoiceRefs.status === 'download') {
                         Linking.openURL(url);
                     }
-                    navigation.navigate(ROUTES.MAIN_INVOICES)
+                    navigation.goBack();
                 }
             }) :
             editInvoice({
                 invoice: { ...invoice, id },
                 onResult: (url) => {
-                    if (status === 'download') {
+                    if (invoiceRefs.status === 'download') {
                         Linking.openURL(url);
                     }
-                    navigation.navigate(ROUTES.MAIN_INVOICES)
+                    navigation.goBack();
                 }
             })
     };
@@ -227,7 +223,7 @@ export const Invoice = (props: IProps) => {
     const invoiceTax = () => {
         let totalTax = 0
 
-        taxes && taxes.map(val => {
+        invoiceRefs.taxes && invoiceRefs.taxes.map(val => {
             if (!val.compound_tax) {
                 totalTax += getTaxValue(val.percent)
             }
@@ -239,7 +235,7 @@ export const Invoice = (props: IProps) => {
     const invoiceCompoundTax = () => {
         let totalTax = 0
 
-        taxes && taxes.map(val => {
+        invoiceRefs.taxes && invoiceRefs.taxes.map(val => {
             if (val.compound_tax) {
                 totalTax += getCompoundTaxValue(val.percent)
             }
@@ -267,15 +263,8 @@ export const Invoice = (props: IProps) => {
     }
 
     const totalDiscount = () => {
-        let discountPrice = 0
-
-        if (discount_type === 'percentage') {
-            discountPrice = ((discount * invoiceSubTotal()) / 100)
-        } else {
-            discountPrice = (discount * 100)
-        }
-
-        return discountPrice
+        return invoiceRefs.discount_type === 'percentage' ?
+            (invoiceRefs.discount * invoiceSubTotal()) / 100 : invoiceRefs.discount * 100;
     }
 
     const totalAmount = () => {
@@ -313,7 +302,7 @@ export const Invoice = (props: IProps) => {
         return taxes
     }
 
-    const FINAL_AMOUNT = () => {
+    const FINAL_AMOUNT = (form) => {
         let taxPerItem = !(tax_per_item === 'NO' || typeof tax_per_item === 'undefined' || tax_per_item === null)
 
         let discountPerItem = !(discount_per_item === 'NO' || typeof discount_per_item === 'undefined' || discount_per_item === null)
@@ -359,7 +348,7 @@ export const Invoice = (props: IProps) => {
                                 component={SelectPickerField}
                                 items={INVOICE_DISCOUNT_OPTION}
                                 onChangeCallback={(val) => {
-                                    setFormField('discount_type', val)
+                                    form.change('discount_type', val)
                                 }}
                                 isFakeInput
                                 defaultPickerOptions={{
@@ -376,12 +365,9 @@ export const Invoice = (props: IProps) => {
                     </View>
                 )}
 
-                {taxes &&
-                    taxes.map((val, index) => !val.compound_tax ? (
-                        <View
-                            style={styles.subContainer}
-                            key={index}
-                        >
+                {invoiceRefs.taxes &&
+                    invoiceRefs.taxes.map((val, index) => !val.compound_tax ? (
+                        <View style={styles.subContainer} key={index}>
                             <View>
                                 <Text style={styles.amountHeading}>
                                     {getTaxName(val)} ({val.percent} %)
@@ -399,8 +385,8 @@ export const Invoice = (props: IProps) => {
                     )
                 }
 
-                {taxes &&
-                    taxes.map((val, index) => val.compound_tax ? (
+                {invoiceRefs.taxes &&
+                    invoiceRefs.taxes.map((val, index) => val.compound_tax ? (
                         <View
                             style={styles.subContainer}
                             key={index}
@@ -451,11 +437,7 @@ export const Invoice = (props: IProps) => {
                         rightIconPress={
                             () => navigation.navigate(ROUTES.TAX, {
                                 type: ADD_TAX,
-                                onSelect: (val) => {
-                                    setFormField('taxes',
-                                        [...val, ...taxes]
-                                    )
-                                }
+                                onSelect: (val) => form.change('taxes', [...val, ...invoiceRefs.taxes])
                             })
                         }
                         listViewProps={{
@@ -491,7 +473,7 @@ export const Invoice = (props: IProps) => {
         return (
             <View style={styles.submitButton}>
                 <CtButton
-                    onPress={handleSubmit((val) => onSubmitInvoice(val, status = INVOICE_ACTIONS.VIEW))}
+                    onPress={() => onSaveInvoice(INVOICE_ACTIONS.VIEW)}
                     btnTitle={Lng.t("button.viewPdf")}
                     type={BUTTON_TYPE.OUTLINE}
                     containerStyle={styles.handleBtn}
@@ -500,7 +482,7 @@ export const Invoice = (props: IProps) => {
                 />
 
                 <CtButton
-                    onPress={handleSubmit((val) => onSubmitInvoice(val, status = 'save'))}
+                    onPress={() => onSaveInvoice('save')}
                     btnTitle={Lng.t("button.save")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
@@ -516,10 +498,7 @@ export const Invoice = (props: IProps) => {
 
         return taxes ? (
             taxes.map((val, index) => (
-                <View
-                    style={styles.subContainer}
-                    key={index}
-                >
+                <View style={styles.subContainer} key={index}>
                     <View>
                         <Text style={styles.amountHeading}>
                             {getTaxName(val)} ({val.percent} %)
@@ -610,7 +589,6 @@ export const Invoice = (props: IProps) => {
                         navigation
                     })
                 })
-
                 break;
 
             case INVOICE_ACTIONS.MARK_AS_SENT:
@@ -622,18 +600,22 @@ export const Invoice = (props: IProps) => {
                 break;
 
             case INVOICE_ACTIONS.RECORD_PAYMENT:
-
-                let invoice = {
+                const {
                     user,
                     user_id,
                     due_amount,
                     invoice_number,
-                    id
-                }
+                } = invoiceRefs.form.getState().values;
+                const invoice = {
+                    id,
+                    user,
+                    user_id,
+                    due_amount,
+                    invoice_number,
+                };
 
                 navigation.navigate(ROUTES.PAYMENT,
-                    { type: PAYMENT_ADD, invoice, hasRecordPayment: true }
-                )
+                    { type: PAYMENT_ADD, invoice, hasRecordPayment: true });
                 break;
 
             case INVOICE_ACTIONS.CLONE:
@@ -646,8 +628,7 @@ export const Invoice = (props: IProps) => {
                         action: 'clone',
                         navigation
                     })
-                })
-
+                });
                 break;
 
             case INVOICE_ACTIONS.DELETE:
@@ -658,8 +639,7 @@ export const Invoice = (props: IProps) => {
                     okPress: () => removeInvoice({
                         id,
                         onResult: (res) => {
-                            res.success &&
-                                navigation.navigate(ROUTES.MAIN_INVOICES)
+                            res.success && navigation.goBack()
 
                             res.error && (res.error === 'payment_attached') &&
                                 alertMe({
@@ -668,246 +648,234 @@ export const Invoice = (props: IProps) => {
                                 })
                         }
                     })
-                })
-
+                });
                 break;
 
             default:
                 break;
         }
-
     }
 
-    const isEditInvoice = (type === INVOICE_EDIT)
+    const isEditInvoice = (type === INVOICE_EDIT);
 
-    let hasSentStatus = (markAsStatus === 'SENT' || markAsStatus === 'VIEWED')
-    let hasCompleteStatus = (markAsStatus === 'COMPLETED')
+    const hasSentStatus = (markAsStatus === 'SENT' || markAsStatus === 'VIEWED');
+    const hasCompleteStatus = (markAsStatus === 'COMPLETED');
 
-    let drownDownProps = (isEditInvoice && !initLoading) ? {
+    const drownDownProps = (isEditInvoice && !initLoading) ? {
         options: EDIT_INVOICE_ACTIONS(hasSentStatus, hasCompleteStatus),
         onSelect: onOptionSelect,
-        cancelButtonIndex:
-            hasSentStatus ? 3 :
-                hasCompleteStatus ? 2 : 5,
-        destructiveButtonIndex:
-            hasSentStatus ? 2 :
-                hasCompleteStatus ? 1 : 4,
-    } : null
-
+        cancelButtonIndex: hasSentStatus ? 3 : hasCompleteStatus ? 2 : 5,
+        destructiveButtonIndex: hasSentStatus ? 2 : hasCompleteStatus ? 1 : 4,
+    } : null;
 
     return (
-        <DefaultLayout
-            headerProps={{
-                leftIconPress: () => onDraft(handleSubmit),
-                title: isEditInvoice ?
-                    Lng.t("header.editInvoice") :
-                    Lng.t("header.addInvoice"),
-                rightIcon: !isEditInvoice ? 'save' : null,
-                rightIconPress: handleSubmit((val) => onSubmitInvoice(val, status = 'save')),
-                rightIconProps: {
-                    solid: true
-                },
-                placement: "center",
-            }}
+        <Form validate={validate} initialValues={initialValues} onSubmit={onSubmitInvoice}>
+        {({ handleSubmit, form }) => {
+            const formValues = form.getState().values || {};
+            const { taxes, discount, discount_type } = formValues;
+            invoiceRefs.handleSubmit = handleSubmit;
+            invoiceRefs.form = form;
+            invoiceRefs.taxes = taxes;
+            invoiceRefs.discount = discount;
+            invoiceRefs.discount_type = discount_type;
 
-            bottomAction={BOTTOM_ACTION()}
-            loadingProps={{ is: initLoading }}
-            dropdownProps={drownDownProps}
-        >
-            <View style={styles.bodyContainer}>
-                <View style={styles.dateFieldContainer}>
-                    <View style={styles.dateField}>
-                        <Field
-                            name={'invoice_date'}
-                            isRequired
-                            component={DatePickerField}
-                            label={Lng.t("invoices.invoiceDate")}
-                            icon={'calendar-alt'}
-                            onChangeCallback={(val) =>
-                                setFormField('invoice_date', val)
-                            }
-                        />
+            return (
+            <DefaultLayout
+                headerProps={{
+                    leftIconPress: onDraft,
+                    title: isEditInvoice ? Lng.t("header.editInvoice") : Lng.t("header.addInvoice"),
+                    rightIcon: !isEditInvoice ? 'save' : null,
+                    rightIconPress: () => onSaveInvoice('save'),
+                    rightIconProps: { solid: true },
+                    placement: "center",
+                }}
+                bottomAction={BOTTOM_ACTION()}
+                loadingProps={{ is: initLoading }}
+                dropdownProps={drownDownProps}
+            >
+                <View style={styles.bodyContainer}>
+                    <View style={styles.dateFieldContainer}>
+                        <View style={styles.dateField}>
+                            <Field
+                                name={'invoice_date'}
+                                isRequired
+                                component={DatePickerField}
+                                label={Lng.t("invoices.invoiceDate")}
+                                icon={'calendar-alt'}
+                                onChangeCallback={(val) => form.change('invoice_date', val)}
+                            />
+                        </View>
+                        <View style={styles.dateField}>
+                            <Field
+                                name="due_date"
+                                isRequired
+                                component={DatePickerField}
+                                label={Lng.t("invoices.dueDate")}
+                                icon={'calendar-alt'}
+                                onChangeCallback={(val) => form.change('due_date', val)}
+                            />
+                        </View>
                     </View>
-                    <View style={styles.dateField}>
-                        <Field
-                            name="due_date"
-                            isRequired
-                            component={DatePickerField}
-                            label={Lng.t("invoices.dueDate")}
-                            icon={'calendar-alt'}
-                            onChangeCallback={(val) =>
-                                setFormField('due_date', val)
-                            }
-                        />
-                    </View>
-                </View>
 
-                <Field
-                    name="invoice_number"
-                    component={FakeInput}
-                    label={Lng.t("invoices.invoiceNumber")}
-                    isRequired
-                    prefixProps={{
-                        fieldName: "invoice_number",
-                        prefix: invoice_prefix,
-                        icon: 'hashtag',
-                        iconSolid: false,
-                    }}
-                />
+                    <Field
+                        name="invoice_number"
+                        component={FakeInput}
+                        label={Lng.t("invoices.invoiceNumber")}
+                        isRequired
+                        prefixProps={{
+                            fieldName: "invoice_number",
+                            prefix: invoice_prefix,
+                            icon: 'hashtag',
+                            iconSolid: false,
+                        }}
+                    />
 
-                <Field
-                    name="user_id"
-                    items={customers}
-                    apiSearch
-                    hasPagination
-                    isRequired
-                    getItems={getCustomers}
-                    displayName="name"
-                    component={SelectField}
-                    label={Lng.t("invoices.customer")}
-                    icon={'user'}
-                    placeholder={customerName ? customerName :
-                        Lng.t("invoices.customerPlaceholder")
-                    }
-                    navigation={navigation}
-                    compareField="id"
-                    onSelect={(item) => {
-                        setFormField('user_id', item.id)
-                        setCurrency(item.currency)
-                    }}
-                    rightIconPress={
-                        () => navigation.navigate(ROUTES.CUSTOMER, {
-                            type: CUSTOMER_ADD,
-                            currency,
-                            onSelect: (val) => {
-                                setFormField('user_id', val.id)
-                                setCurrency(val.currency)
-                            }
-                        })
-                    }
-                    headerProps={{
-                        title: Lng.t("customers.title"),
-                    }}
-                    listViewProps={{
-                        hasAvatar: true,
-                    }}
-                    emptyContentProps={{
-                        contentType: "customers",
-                        image: IMAGES.EMPTY_CUSTOMERS,
-                    }}
-                    fakeInputProps={{ loading: customersLoading }}
-                />
-
-                <Text style={[styles.inputTextStyle, styles.label]}>
-                    {Lng.t("invoices.items")}
-                    <Text style={styles.required}> *</Text>
-                </Text>
-
-                <ListView
-                    items={getInvoiceItemList(invoiceItems)}
-                    itemContainer={styles.itemContainer}
-                    leftTitleStyle={styles.itemLeftTitle}
-                    leftSubTitleLabelStyle={[styles.itemLeftSubTitle, styles.itemLeftSubTitleLabel]}
-                    leftSubTitleStyle={styles.itemLeftSubTitle}
-                    rightTitleStyle={styles.itemRightTitle}
-                    backgroundColor={colors.white}
-                    onPress={onEditItem}
-                />
-
-                <Field
-                    name="items"
-                    items={getItemList(items)}
-                    displayName="name"
-                    component={SelectField}
-                    hasPagination
-                    apiSearch
-                    getItems={getItems}
-                    compareField="id"
-                    valueCompareField="item_id"
-                    icon={'percent'}
-                    placeholder={Lng.t("invoices.addItem")}
-                    navigation={navigation}
-                    onlyPlaceholder
-                    isMultiSelect
-                    loading={itemsLoading}
-                    fakeInputProps={{
-                        icon: 'shopping-basket',
-                        rightIcon: 'angle-right',
-                        color: colors.primaryLight,
-                    }}
-                    onSelect={
-                        (item) => {
-                            navigation.navigate(ROUTES.INVOICE_ITEM, {
-                                item,
+                    <Field
+                        name="user_id"
+                        items={customers}
+                        apiSearch
+                        hasPagination
+                        isRequired
+                        getItems={getCustomers}
+                        displayName="name"
+                        component={SelectField}
+                        label={Lng.t("invoices.customer")}
+                        icon={'user'}
+                        placeholder={customerName ? customerName :
+                            Lng.t("invoices.customerPlaceholder")
+                        }
+                        navigation={navigation}
+                        compareField="id"
+                        onSelect={(item) => {
+                            form.change('user_id', item.id)
+                            setCurrency(item.currency)
+                        }}
+                        rightIconPress={
+                            () => navigation.navigate(ROUTES.CUSTOMER, {
+                                type: CUSTOMER_ADD,
                                 currency,
+                                onSelect: (val) => {
+                                    form.change('user_id', val.id)
+                                    setCurrency(val.currency)
+                                }
+                            })
+                        }
+                        headerProps={{ title: Lng.t("customers.title") }}
+                        listViewProps={{ hasAvatar: true }}
+                        emptyContentProps={{
+                            contentType: "customers",
+                            image: IMAGES.EMPTY_CUSTOMERS,
+                        }}
+                        fakeInputProps={{ loading: customersLoading }}
+                    />
+
+                    <Text style={[styles.inputTextStyle, styles.label]}>
+                        {Lng.t("invoices.items")}
+                        <Text style={styles.required}> *</Text>
+                    </Text>
+
+                    <ListView
+                        items={getInvoiceItemList(invoiceItems)}
+                        itemContainer={styles.itemContainer}
+                        leftTitleStyle={styles.itemLeftTitle}
+                        leftSubTitleLabelStyle={[styles.itemLeftSubTitle, styles.itemLeftSubTitleLabel]}
+                        leftSubTitleStyle={styles.itemLeftSubTitle}
+                        rightTitleStyle={styles.itemRightTitle}
+                        backgroundColor={colors.white}
+                        onPress={onEditItem}
+                    />
+
+                    <Field
+                        name="items"
+                        items={getItemList(items)}
+                        displayName="name"
+                        component={SelectField}
+                        hasPagination
+                        apiSearch
+                        getItems={getItems}
+                        compareField="id"
+                        valueCompareField="item_id"
+                        icon={'percent'}
+                        placeholder={Lng.t("invoices.addItem")}
+                        navigation={navigation}
+                        onlyPlaceholder
+                        isMultiSelect
+                        loading={itemsLoading}
+                        fakeInputProps={{
+                            icon: 'shopping-basket',
+                            rightIcon: 'angle-right',
+                            color: colors.primaryLight,
+                        }}
+                        onSelect={
+                            (item) => {
+                                navigation.navigate(ROUTES.INVOICE_ITEM, {
+                                    item,
+                                    currency,
+                                    type: ITEM_ADD,
+                                    discount_per_item,
+                                    tax_per_item
+                                })
+                            }
+                        }
+                        rightIconPress={
+                            () => navigation.navigate(ROUTES.INVOICE_ITEM, {
                                 type: ITEM_ADD,
+                                currency,
                                 discount_per_item,
                                 tax_per_item
                             })
                         }
-                    }
-                    rightIconPress={
-                        () => navigation.navigate(ROUTES.INVOICE_ITEM, {
-                            type: ITEM_ADD,
-                            currency,
-                            discount_per_item,
-                            tax_per_item
-                        })
-                    }
-                    headerProps={{
-                        title: Lng.t("items.title"),
-                    }}
-                    emptyContentProps={{
-                        contentType: "items",
-                        image: IMAGES.EMPTY_ITEMS,
-                    }}
-                    listViewProps={{
-                        leftSubTitleStyle: itemsDescriptionStyle()
-                    }}
-                />
+                        headerProps={{ title: Lng.t("items.title") }}
+                        emptyContentProps={{
+                            contentType: "items",
+                            image: IMAGES.EMPTY_ITEMS,
+                        }}
+                        listViewProps={{ leftSubTitleStyle: itemsDescriptionStyle() }}
+                    />
 
-                {FINAL_AMOUNT()}
+                    {FINAL_AMOUNT(form)}
 
-                <Field
-                    name="reference_number"
-                    component={InputField}
-                    hint={Lng.t("invoices.referenceNumber")}
-                    leftIcon={'hashtag'}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        autoCapitalize: 'none',
-                        autoCorrect: true,
-                    }}
-                />
+                    <Field
+                        name="reference_number"
+                        component={InputField}
+                        hint={Lng.t("invoices.referenceNumber")}
+                        leftIcon={'hashtag'}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            autoCapitalize: 'none',
+                            autoCorrect: true,
+                        }}
+                    />
 
-                <Field
-                    name="notes"
-                    component={InputField}
-                    hint={Lng.t("invoices.notes")}
-                    inputProps={{
-                        returnKeyType: 'next',
-                        placeholder: Lng.t("invoices.notePlaceholder"),
-                        autoCorrect: true,
-                        multiline: true,
-                        maxLength: MAX_LENGTH
-                    }}
-                    height={80}
-                    hintStyle={styles.noteHintStyle}
-                    autoCorrect={true}
-                />
+                    <Field
+                        name="notes"
+                        component={InputField}
+                        hint={Lng.t("invoices.notes")}
+                        inputProps={{
+                            returnKeyType: 'next',
+                            placeholder: Lng.t("invoices.notePlaceholder"),
+                            autoCorrect: true,
+                            multiline: true,
+                            maxLength: MAX_LENGTH
+                        }}
+                        height={80}
+                        hintStyle={styles.noteHintStyle}
+                        autoCorrect={true}
+                    />
 
-                <Field
-                    name="invoice_template_id"
-                    templates={invoiceTemplates}
-                    component={TemplateField}
-                    label={Lng.t("invoices.template")}
-                    icon={'file-alt'}
-                    placeholder={Lng.t("invoices.templatePlaceholder")}
-                    navigation={navigation}
-                />
-
-            </View>
-
-        </DefaultLayout>
+                    <Field
+                        name="invoice_template_id"
+                        templates={invoiceTemplates}
+                        component={TemplateField}
+                        label={Lng.t("invoices.template")}
+                        icon={'file-alt'}
+                        placeholder={Lng.t("invoices.templatePlaceholder")}
+                        navigation={navigation}
+                    />
+                </View>
+            </DefaultLayout>
+            );
+        }}
+        </Form>
     );
 }

@@ -1,17 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Invoice } from '../../components/Invoice';
-import { reduxForm, getFormValues } from 'redux-form';
-import { validate } from './validation';
 import * as InvoicesAction from '../../actions';
-import { INVOICE_FORM, INVOICE_EDIT } from '../../constants';
+import { INVOICE_EDIT } from '../../constants';
 import moment from 'moment';
 import * as CustomersAction from '../../../customers/actions';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { language, taxTypes },
-        invoices: { loading, invoiceItems, invoiceData, items },
+        invoices: { invoiceItems, invoiceData, items },
         customers: {
             customers,
             loading: { customersLoading, initInvoiceLoading, invoiceLoading, itemsLoading },
@@ -41,7 +39,6 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         customers,
         itemsLoading,
         language,
-        formValues: getFormValues(INVOICE_FORM)(state) || {},
         taxTypes,
         initialValues: !isLoading ? {
             due_date: moment().add(7, 'days'),
@@ -71,16 +68,10 @@ const mapDispatchToProps = {
     getCustomers: CustomersAction.getCustomers,
 };
 
-//  Redux Forms
-const addInvoiceReduxForm = reduxForm({
-    form: INVOICE_FORM,
-    validate,
-})(Invoice);
-
 //  connect
 const InvoiceContainer = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(addInvoiceReduxForm);
+)(Invoice);
 
 export default InvoiceContainer;

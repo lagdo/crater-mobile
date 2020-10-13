@@ -33,7 +33,6 @@ const All = ({
     loadMoreItems,
     onAddInvoice,
     filter,
-    isLoading,
 }: IProps) => {
     let items = [];
 
@@ -76,7 +75,7 @@ const All = ({
 
     return (
         <View style={styles.content}>
-            <Content loadingProps={{ is: isLoading || (refreshing && fresh) }}>
+            <Content loadingProps={{ is: loading || (refreshing && fresh) }}>
                 <ListView
                     items={items}
                     onPress={onInvoiceSelect}

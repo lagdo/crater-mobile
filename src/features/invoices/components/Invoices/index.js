@@ -1,8 +1,7 @@
 // @flow
 
 import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
-import { change } from 'redux-form';
+import { View } from 'react-native';
 import styles from './styles';
 import { Tabs, MainLayout } from '../../../../components';
 import Due from '../Tab/Due';
@@ -14,7 +13,6 @@ import {
     INVOICES_TABS,
     INVOICE_ADD,
     INVOICE_EDIT,
-    INVOICE_SEARCH,
     FILTER_INVOICE_STATUS,
     TAB_NAME,
     FILTER_INVOICE_PAID_STATUS,
@@ -22,13 +20,15 @@ import {
 import Lng from '../../../../api/lang/i18n';
 import { IMAGES } from '../../../../config';
 
-let params = {
+const defaultParams = {
     search: '',
     customer_id: '',
     invoice_number: '',
     from_date: '',
     to_date: '',
 }
+
+let filterRefs = {};
 
 type IProps = {
     navigation: Object,
@@ -43,30 +43,17 @@ export const Invoices = (props: IProps) => {
     const {
         navigation,
         loading,
-        handleSubmit,
         invoices,
         getInvoices,
         customers,
         getCustomers,
-        formValues: {
-            filterStatus = '',
-            paid_status = '',
-            from_date = '',
-            to_date = '',
-            invoice_number = '',
-            customer_id = '',
-        },
-        route: { params = {} },
     } = props;
 
     const [activeTab, setActiveTab] = useState(INVOICES_TABS.DUE);
     const [refreshing, setRefreshing] = useState(false);
     const [fresh, setFresh] = useState(true);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        limit: 10,
-        lastPage: 1,
-    });
+    const [pagination, setPagination] = useState({ page: 1, limit: 10, lastPage: 1 });
+
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(false);
     const [selectedFromDate, setSelectedFromDate] = useState('');
@@ -79,16 +66,16 @@ export const Invoices = (props: IProps) => {
     }, []);
 
     const onSetActiveTab = (tab) => {
-        setFilter(false)
+        setFilter(false);
 
         if (!refreshing) {
-            const type = getActiveTab(tab)
+            const type = getActiveTab(tab);
 
             getItems({ fresh: true, type, q: search });
 
             setActiveTab(tab);
 
-            props.setInvoiceActiveTab({ activeTab: type })
+            props.setInvoiceActiveTab({ activeTab: type });
         }
     };
 
@@ -98,7 +85,7 @@ export const Invoices = (props: IProps) => {
         }
 
         if (resetFilter)
-            setFilter(false)
+            setFilter(false);
 
         setRefreshing(true);
         setFresh(fresh);
@@ -113,7 +100,7 @@ export const Invoices = (props: IProps) => {
             fresh,
             type,
             pagination: paginationParams,
-            params: { ...params, search: q },
+            params: { ...defaultParams, search: q },
             onMeta: ({ last_page, current_page }) => {
                 setPagination({
                     ...paginationParams,
@@ -129,22 +116,22 @@ export const Invoices = (props: IProps) => {
         });
     };
 
-    const setFormField = (field, value) => {
-        props.dispatch(change(INVOICE_SEARCH, field, value));
-    };
+    const onAddInvoice = () => {
+        onSetActiveTab(INVOICES_TABS.ALL);
+        onResetFilter(INVOICES_TABS.ALL);
+        navigation.navigate(ROUTES.INVOICE, { type: INVOICE_ADD });
+    }
 
     const onInvoiceSelect = (invoice) => {
-        onSetActiveTab(INVOICES_TABS.ALL)
-        onResetFilter(INVOICES_TABS.ALL)
-        navigation.navigate(ROUTES.INVOICE,
-            { id: invoice.id, type: INVOICE_EDIT }
-        )
+        onSetActiveTab(INVOICES_TABS.ALL);
+        onResetFilter(INVOICES_TABS.ALL);
+        navigation.navigate(ROUTES.INVOICE, { id: invoice.id, type: INVOICE_EDIT });
     };
 
     const onSearch = (keywords) => {
-        const type = getActiveTab()
-        setSearch(keywords)
-        getItems({ fresh: true, type, q: keywords })
+        const type = getActiveTab();
+        setSearch(keywords);
+        getItems({ fresh: true, type, q: keywords });
     };
 
     const getActiveTab = (activeTab = state.activeTab) => {
@@ -175,7 +162,6 @@ export const Invoices = (props: IProps) => {
 
     const onSubmitFilter = ({ filterStatus = '', paid_status = '', from_date = '', to_date = '', invoice_number = '', customer_id = '' }) => {
         if (filterStatus || paid_status || from_date || to_date || invoice_number || customer_id) {
-
             if (filterStatus === INVOICES_TABS.DUE)
                 setActiveTab(INVOICES_TABS.DUE);
             else if (filterStatus === INVOICES_TABS.DRAFT)
@@ -185,16 +171,20 @@ export const Invoices = (props: IProps) => {
 
             setFilter(true);
 
+            filterRefs.params = {
+                customer_id,
+                invoice_number,
+                from_date,
+                to_date,
+            };
+            filterRefs.status = filterStatus ? getFilterStatusType(filterStatus) : paid_status;
             getItems({
                 fresh: true,
                 params: {
-                    ...params,
-                    customer_id,
-                    invoice_number,
-                    from_date,
-                    to_date
+                    ...defaultParams,
+                    ...filterRefs.params,
                 },
-                type: filterStatus ? getFilterStatusType(filterStatus) : paid_status,
+                type: filterRefs.status,
             });
             return;
         }
@@ -209,32 +199,18 @@ export const Invoices = (props: IProps) => {
         }
 
         getItems({
+            filter: true,
             params: {
-                ...params,
-                customer_id,
-                invoice_number,
-                from_date,
-                to_date
+                ...defaultParams,
+                ...filterRefs.params,
             },
-            type: filterStatus ? getFilterStatusType(filterStatus) : paid_status,
-            filter: true
+            type: filterRefs.status,
         });
     }
 
-    const onAddInvoice = () => {
-        onSetActiveTab(INVOICES_TABS.ALL)
-        onResetFilter(INVOICES_TABS.ALL)
-        navigation.navigate(ROUTES.INVOICE, { type: INVOICE_ADD })
-    }
-
-    const {
-        lastPage,
-        page,
-    } = pagination;
+    const { lastPage, page } = pagination;
 
     const canLoadMore = lastPage >= page;
-
-    let filterRefs = {}
 
     let selectFields = [
         {
@@ -249,20 +225,18 @@ export const Invoices = (props: IProps) => {
             placeholder: Lng.t("customers.placeholder"),
             navigation: navigation,
             compareField: "id",
-            onSelect: (item) => setFormField('customer_id', item.id),
+            // onSelect: (item) => setFormField('customer_id', item.id),
             headerProps: {
                 title: Lng.t("customers.title"),
                 rightIconPress: null
             },
-            listViewProps: {
-                hasAvatar: true,
-            },
+            listViewProps: { hasAvatar: true },
             emptyContentProps: {
                 contentType: "customers",
                 image: IMAGES.EMPTY_CUSTOMERS,
             }
         }
-    ]
+    ];
 
     let datePickerFields = [
         {
@@ -286,7 +260,7 @@ export const Invoices = (props: IProps) => {
             selectedDate: selectedToDate,
             selectedDateValue: selectedToDateValue
         }
-    ]
+    ];
 
     let inputFields = [{
         name: 'invoice_number',
@@ -296,10 +270,8 @@ export const Invoices = (props: IProps) => {
             autoCapitalize: 'none',
             autoCorrect: true,
         },
-        refLinkFn: (ref) => {
-            filterRefs.invNumber = ref;
-        }
-    }]
+        refLinkFn: (ref) => filterRefs.invNumber = ref,
+    }];
 
     let dropdownFields = [
         {
@@ -307,53 +279,45 @@ export const Invoices = (props: IProps) => {
             label: Lng.t("invoices.status"),
             fieldIcon: 'align-center',
             items: FILTER_INVOICE_STATUS,
-            onChangeCallback: (val) => {
-                setFormField('filterStatus', val)
-            },
+            // onChangeCallback: (val) => setFormField('filterStatus', val),
             defaultPickerOptions: {
                 label: Lng.t("invoices.statusPlaceholder"),
                 value: '',
             },
-            containerStyle: styles.selectPicker
+            containerStyle: styles.selectPicker,
         },
         {
             name: "paid_status",
             label: Lng.t("invoices.paidStatus"),
             fieldIcon: 'align-center',
             items: FILTER_INVOICE_PAID_STATUS,
-            onChangeCallback: (val) => {
-                setFormField('paid_status', val)
-            },
+            // onChangeCallback: (val) => setFormField('paid_status', val),
             defaultPickerOptions: {
                 label: Lng.t("invoices.paidStatusPlaceholder"),
                 value: '',
             },
             onDonePress: () => filterRefs.invNumber.focus(),
-            containerStyle: styles.selectPicker
+            containerStyle: styles.selectPicker,
         }
-    ]
-
-    const { isLoading } = params;
+    ];
 
     return (
         <View style={styles.container}>
             <MainLayout
                 headerProps={{
                     rightIcon: 'plus',
-                    rightIconPress: () => {
-                        onAddInvoice()
-                    },
+                    rightIconPress: onAddInvoice,
                     title: Lng.t("header.invoices"),
                 }}
                 onSearch={onSearch}
                 filterProps={{
-                    onSubmitFilter: handleSubmit(onSubmitFilter),
+                    onSubmitFilter: onSubmitFilter,
                     selectFields: selectFields,
                     datePickerFields: datePickerFields,
                     inputFields: inputFields,
                     dropdownFields: dropdownFields,
                     clearFilter: props,
-                    onResetFilter: () => onResetFilter()
+                    onResetFilter: onResetFilter,
                 }}
             >
                 <Tabs
@@ -378,7 +342,6 @@ export const Invoices = (props: IProps) => {
                                     loadMoreItems={loadMoreItems}
                                     onAddInvoice={onAddInvoice}
                                     filter={filter}
-                                    isLoading={isLoading}
                                 />
                             ),
                         },
@@ -399,7 +362,6 @@ export const Invoices = (props: IProps) => {
                                     onAddInvoice={onAddInvoice}
                                     fresh={fresh}
                                     filter={filter}
-                                    isLoading={isLoading}
                                 />
                             ),
                         },
@@ -420,7 +382,6 @@ export const Invoices = (props: IProps) => {
                                     loadMoreItems={loadMoreItems}
                                     onAddInvoice={onAddInvoice}
                                     filter={filter}
-                                    isLoading={isLoading}
                                 />
                             ),
                         },
