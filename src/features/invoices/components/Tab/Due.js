@@ -34,33 +34,6 @@ const Due = ({
     onAddInvoice,
     filter,
 }: IProps) => {
-    let items = [];
-
-    if (typeof invoices !== 'undefined' && invoices.length != 0) {
-        items = invoices.map((item) => {
-            const {
-                invoice_number,
-                user: { name, currency } = {},
-                status,
-                formattedInvoiceDate,
-                total,
-            } = item;
-
-            return {
-                title: name,
-                subtitle: {
-                    title: invoice_number,
-                    label: status,
-                    labelBgColor: INVOICES_STATUS_BG_COLOR[status],
-                    labelTextColor: INVOICES_STATUS_TEXT_COLOR[status],
-                },
-                amount: total,
-                currency,
-                rightSubtitle: formattedInvoiceDate,
-                fullItem: item,
-            };
-        });
-    }
 
     let empty = (!filter && !search) ? {
         description: Lng.t("invoices.empty.due.description"),
@@ -76,11 +49,11 @@ const Due = ({
         <View style={styles.content}>
             <Content loadingProps={{ is: loading || (refreshing && fresh) }}>
                 <ListView
-                    items={items}
+                    items={invoices}
                     onPress={onInvoiceSelect}
                     refreshing={refreshing}
                     loading={loading}
-                    isEmpty={items.length <= 0}
+                    isEmpty={invoices.length <= 0}
                     canLoadMore={canLoadMore}
                     getFreshItems={(onHide) => {
                         getInvoices({

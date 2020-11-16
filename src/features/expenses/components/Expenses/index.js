@@ -31,7 +31,6 @@ export const Expenses = (props: IProps) => {
         expenses,
         filterExpenses,
         loading,
-        currency,
         categories,
         getExpenses,
     } = props
@@ -146,61 +145,16 @@ export const Expenses = (props: IProps) => {
         });
     }
 
-    const getExpensesList = (expenses) => {
-        let expensesList = []
-
-        if (typeof expenses !== 'undefined' && expenses.length != 0) {
-            expensesList = expenses.map((expense) => {
-                const {
-                    notes,
-                    formattedExpenseDate,
-                    amount,
-                    category
-                } = expense;
-
-                return {
-                    title: category.name ? category.name[0].toUpperCase() +
-                        category.name.slice(1) : '',
-                    subtitle: {
-                        title: notes,
-                    },
-                    amount,
-                    currency,
-                    rightSubtitle: formattedExpenseDate,
-                    fullItem: expense,
-                };
-            });
-        }
-        return expensesList
-    }
-
-    const getCategoriesList = (categories) => {
-        let CategoriesList = []
-        if (typeof categories !== 'undefined' && categories.length != 0) {
-            CategoriesList = categories.map((category) => {
-                return {
-                    label: category.name,
-                    value: category.id
-                }
-            })
-        }
-        return CategoriesList
-    }
-
     const { lastPage, page } = pagination;
 
     const canLoadMore = lastPage >= page;
-
-    let expensesItem = getExpensesList(expenses);
-    let filterExpensesItem = getExpensesList(filterExpenses);
-    let CategoriesList = getCategoriesList(categories);
 
     let dropdownFields = [
         {
             name: "expense_category_id",
             label: Lng.t("expenses.category"),
             fieldIcon: 'align-center',
-            items: CategoriesList,
+            items: categories,
             onChangeCallback: setSelectedCategory,
             defaultPickerOptions: {
                 label: Lng.t("expenses.categoryPlaceholder"),
@@ -264,12 +218,12 @@ export const Expenses = (props: IProps) => {
             >
                 <View style={styles.listViewContainer} >
                     <ListView
-                        items={!filter ? expensesItem : filterExpensesItem}
+                        items={!filter ? expenses : filterExpenses}
                         onPress={onExpenseSelect}
                         refreshing={refreshing}
                         loading={loading}
-                        isEmpty={!filter ? expensesItem.length <= 0 :
-                            filterExpensesItem.length <= 0
+                        isEmpty={!filter ? expenses.length <= 0 :
+                            filterExpenses.length <= 0
                         }
                         canLoadMore={canLoadMore}
                         getFreshItems={(onHide) => {

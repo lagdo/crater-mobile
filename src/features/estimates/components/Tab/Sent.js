@@ -35,33 +35,6 @@ const Sent = ({
     loadMoreItems,
     filter
 }: IProps) => {
-    let items = [];
-
-    if (typeof estimates !== 'undefined' && estimates.length != 0) {
-        items = estimates.map((item) => {
-            const {
-                estimate_number,
-                user: { name, currency } = {},
-                status,
-                formattedEstimateDate,
-                total,
-            } = item;
-
-            return {
-                title: name,
-                subtitle: {
-                    title: estimate_number,
-                    label: status,
-                    labelBgColor: ESTIMATES_STATUS_BG_COLOR[status],
-                    labelTextColor: ESTIMATES_STATUS_TEXT_COLOR[status],
-                },
-                amount: total,
-                currency,
-                rightSubtitle: formattedEstimateDate,
-                fullItem: item,
-            };
-        });
-    }
 
     let empty = (!filter && !search) ? {
         description: Lng.t("estimates.empty.sent.description"),
@@ -77,11 +50,11 @@ const Sent = ({
         <View style={styles.content}>
             <Content loadingProps={{ is: refreshing && fresh }}>
                 <ListView
-                    items={items}
+                    items={estimates}
                     onPress={onEstimateSelect}
                     refreshing={refreshing}
                     loading={loading}
-                    isEmpty={items.length <= 0}
+                    isEmpty={estimates.length <= 0}
                     canLoadMore={canLoadMore}
                     getFreshItems={(onHide) => {
                         getEstimates({

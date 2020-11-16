@@ -3,25 +3,22 @@ import { connect } from 'react-redux';
 import * as ExpensesAction from '../../actions'
 import * as CategoriesAction from '~/features/categories/actions';
 import { Expenses } from '../../components/Expenses';
+import { getExpenses, getFilterExpenses, getCategories } from '../../selectors';
 
 const mapStateToProps = (state) => {
     const {
-        global: { language, currency },
+        global: { language },
         expenses: {
-            expenses,
-            filterExpenses,
             loading: { expensesLoading }
         },
-        settings: { categories }
     } = state;
 
     return {
         loading: expensesLoading,
-        expenses,
-        filterExpenses,
         language,
-        currency,
-        categories,
+        expenses: getExpenses(state),
+        filterExpenses: getFilterExpenses(state),
+        categories: getCategories(state),
     };
 };
 

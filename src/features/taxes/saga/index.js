@@ -60,7 +60,7 @@ function* addTax({ payload: { tax, onResult } }) {
 
         const response = yield call([Request, 'post'], options);
 
-        yield put(setTax({ taxType: [response.taxType] }));
+        yield put(setTax({ taxType: response.taxType }));
 
         onResult && onResult(response.taxType);
     } catch (error) {
@@ -83,7 +83,7 @@ function* editTaxType({ payload: { tax, onResult } }) {
 
         const response = yield call([Request, 'put'], options);
 
-        yield put(setEditTax({ taxType: [response.taxType], taxId: tax.id }));
+        yield put(setEditTax({ taxType: response.taxType, taxId: tax.id }));
 
         onResult && onResult(response);
     } catch (error) {

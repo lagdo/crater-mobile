@@ -125,30 +125,6 @@ export const Items = (props: IProps) => {
         getItems({ fresh: true, params: { ...defaultParams, search: keywords } })
     };
 
-    const getItemList = (items) => {
-        let itemList = []
-
-        if (typeof items !== 'undefined' && items.length != 0) {
-
-            itemList = items.map((item) => {
-
-                let { name, description, price, title } = item
-
-                return {
-                    title: title || name,
-                    subtitle: {
-                        title: description,
-                    },
-                    amount: price,
-                    currency,
-                    fullItem: item,
-                };
-            });
-        }
-
-        return itemList
-    }
-
     const loadMoreItems = () => {
         if (!filter) {
             getItems({ params: { ...defaultParams, search } });
@@ -252,9 +228,7 @@ export const Items = (props: IProps) => {
             >
                 <View style={styles.listViewContainer} >
                     <ListView
-                        items={!filter ? getItemList(items) :
-                            getItemList(filterItems)
-                        }
+                        items={!filter ? items : filterItems}
                         onPress={onItemSelect}
                         refreshing={refreshing}
                         loading={loading}
