@@ -1,16 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Address } from '../../components/Address';
+import { getCountries } from '~/selectors/index';
 
 const mapStateToProps = (state) => {
     const {
         global: { language },
-        customers: { countries }
-    } = state
+        customers: {
+            loading: {
+                countriesLoading,
+            }
+        },
+    } = state;
 
     return {
         language,
-        countries
+        countries: getCountries(state),
+        countriesLoading,
     };
 };
 

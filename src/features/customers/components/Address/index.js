@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { Form, Field } from 'react-final-form';
 import styles from './styles';
@@ -13,7 +13,7 @@ import {
 } from '~/components';
 import Lng from '~/api/lang/i18n';
 import { colors } from '~/styles/colors';
-import { MAX_LENGTH, formatCountries } from '~/api/global';
+import { MAX_LENGTH } from '~/api/global';
 
 type IProps = {
     label: String,
@@ -68,11 +68,18 @@ export const Address = (props: IProps) => {
         autoFillValue,
         onChangeCallback,
         countries,
+        getCountries,
+        countriesLoading,
     } = props
 
     const [visible, setVisible] = useState(false);
     const [values, setValues] = useState('');
     const [status, setStatus] = useState(false);
+
+    useEffect(() => {
+        // Country
+        countries || getCountries();
+    }, []);
 
     const fillShippingAddress = (st) => {
         if (st) {
@@ -136,6 +143,7 @@ export const Address = (props: IProps) => {
                     <CtButton
                         onPress={handleSubmit}
                         btnTitle={Lng.t("button.done")}
+                        loading={countriesLoading}
                         containerStyle={styles.handleBtn}
                     />
                 </View>
@@ -174,7 +182,7 @@ export const Address = (props: IProps) => {
 
                 <Field
                     name={country}
-                    items={formatCountries(countries)}
+                    items={countries}
                     displayName="name"
                     component={SelectField}
                     label={Lng.t("customers.address.country")}

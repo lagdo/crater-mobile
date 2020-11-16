@@ -53,10 +53,7 @@ export const Customer = (props: IProps) =>  {
         onSelect,
         currencies,
         currency,
-        getCountries,
-        countries,
         getEditCustomerLoading,
-        countriesLoading,
         customerLoading,
         initialValues,
     } = props;
@@ -66,11 +63,6 @@ export const Customer = (props: IProps) =>  {
     // const [currencyList, setCurrencyList] = useState(currencies);
 
     useEffect(() => {
-        // Country
-        let hasCountryApiCalled = countries ? (typeof countries === 'undefined' || countries.length === 0) : true
-
-        hasCountryApiCalled && getCountries()
-
         if (type === CUSTOMER_EDIT) {
             getEditCustomer({
                 id,
@@ -222,7 +214,7 @@ export const Customer = (props: IProps) =>  {
                 }}
                 bottomAction={BOTTOM_ACTION(handleSubmit)}
                 loadingProps={{
-                    is: getEditCustomerLoading || typeof enable_portal === 'undefined' || countriesLoading
+                    is: getEditCustomerLoading || typeof enable_portal === 'undefined'
                 }}
                 dropdownProps={drownDownProps}
             >

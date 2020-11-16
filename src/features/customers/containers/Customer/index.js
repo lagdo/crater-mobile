@@ -9,11 +9,9 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { language, currencies, currency },
         customers: {
-            countries,
             loading: {
                 customerLoading,
                 getEditCustomerLoading,
-                countriesLoading
             }
         }
     } = state;
@@ -27,10 +25,8 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         language,
         currencies,
         currency,
-        countries,
         customerLoading,
         getEditCustomerLoading,
-        countriesLoading,
         initialValues: {
             enable_portal: false,
             currency_id: null,
