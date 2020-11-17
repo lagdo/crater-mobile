@@ -24,7 +24,7 @@ import { BUTTON_COLOR } from '~/api/consts/core';
 import { colors } from '~/styles/colors';
 import Lng from '~/api/lang/i18n';
 import { ADD_TAX } from '~/features/settings/constants';
-import { MAX_LENGTH, formatSelectPickerName, alertMe } from '~/api/global';
+import { MAX_LENGTH, alertMe } from '~/api/global';
 import { validate } from '../../containers/Item/validation';
 
 let itemRefs = {
@@ -393,7 +393,7 @@ export const InvoiceItem = (props) => {
                             name="unit_id"
                             label={Lng.t("items.unit")}
                             component={SelectPickerField}
-                            items={formatSelectPickerName(units)}
+                            items={units}
                             defaultPickerOptions={{
                                 label: Lng.t("items.unitPlaceholder"),
                                 value: '',

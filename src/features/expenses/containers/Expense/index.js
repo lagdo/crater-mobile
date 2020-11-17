@@ -8,7 +8,8 @@ import { EXPENSE_EDIT, EXPENSE_ADD } from '../../constants';
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { company, endpointURL, language },
-        expenses: { loading, categories, expense } = {}
+        expenses: { loading, expense } = {},
+        categories: { categories } = {},
     } = state;
 
     const { id = null, type = EXPENSE_ADD } = params;

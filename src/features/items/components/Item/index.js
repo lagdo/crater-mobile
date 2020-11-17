@@ -19,7 +19,7 @@ import { BUTTON_COLOR } from '~/api/consts/core';
 import { colors } from '~/styles/colors';
 import Lng from '~/api/lang/i18n';
 import { ADD_TAX } from '~/features/settings/constants';
-import { MAX_LENGTH, alertMe, formatSelectPickerName, hasValue } from '~/api/global';
+import { MAX_LENGTH, alertMe, hasValue } from '~/api/global';
 import { validate } from '../../containers/Item/validation';
 
 let itemRefs = {
@@ -363,7 +363,7 @@ export const Item = (props) => {
                         name="unit_id"
                         component={SelectPickerField}
                         label={Lng.t("items.unit")}
-                        items={formatSelectPickerName(units)}
+                        items={units}
                         fieldIcon={'balance-scale'}
                         containerStyle={styles.selectPicker}
                         defaultPickerOptions={{

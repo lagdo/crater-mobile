@@ -3,12 +3,13 @@ import { connect } from 'react-redux';
 import { InvoiceItem } from '../../components/Item';
 import * as InvoicesAction from '../../actions';
 import { getItemUnits } from '~/features/settings/actions';
+import { getTaxTypes } from '~/features/taxes/selectors';
+import { getUnitsForSelect } from '~/selectors/index';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
-        global: { language, taxTypes },
+        global: { language },
         settings: {
-            units,
             loading: { itemUnitsLoading, editItemLoading, removeItemLoading }
         }
     } = state;
@@ -26,13 +27,13 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
     return {
         loading: isLoading,
         itemId: item && (item.item_id || item.id),
-        taxTypes,
+        taxTypes: getTaxTypes(state),
         currency,
         language,
         discountPerItem,
         taxPerItem,
         type,
-        units,
+        units: getUnitsForSelect(state),
         initialValues: {
             price: null,
             quantity: 1,

@@ -2,12 +2,26 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as CategoriesAction from '../../actions';
 import { Categories } from '../../components/Categories';
+import { getCategories } from '../../selectors';
 
-const mapStateToProps = ({ global, settings, categories }) => ({
-    language: global.language,
-    loading: settings.loading.expensesCategoryLoading,
-    categories: categories.categories
-});
+const mapStateToProps = (state) => {
+    const {
+        global: {
+            language
+        },
+        settings: {
+            loading: {
+                expensesCategoryLoading
+            }
+        },
+    } = state;
+
+    return {
+        language,
+        loading: expensesCategoryLoading,
+        categories: getCategories(state),
+    };
+};
 
 const mapDispatchToProps = {
     getExpenseCategories: CategoriesAction.getExpenseCategories,

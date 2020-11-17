@@ -196,9 +196,6 @@ export const Estimates = (props: IProps) => {
 
     const canLoadMore = lastPage >= page;
 
-    let estimateItem = [];
-    typeof estimates !== 'undefined' && (estimateItem = estimates);
-
     let selectFields = [
         {
             name: "customer_id",
@@ -303,7 +300,7 @@ export const Estimates = (props: IProps) => {
                             tabName: TAB_NAME(ESTIMATES_TABS.DRAFT),
                             render: (
                                 <Draft
-                                    estimates={estimateItem}
+                                    estimates={estimates}
                                     getEstimates={getItems}
                                     canLoadMore={canLoadMore}
                                     onEstimateSelect={onEstimateSelect}
@@ -323,7 +320,7 @@ export const Estimates = (props: IProps) => {
                             tabName: TAB_NAME(ESTIMATES_TABS.SENT),
                             render: (
                                 <Sent
-                                    estimates={estimateItem}
+                                    estimates={estimates}
                                     getEstimates={getItems}
                                     canLoadMore={canLoadMore}
                                     onEstimateSelect={onEstimateSelect}
@@ -343,7 +340,7 @@ export const Estimates = (props: IProps) => {
                             tabName: TAB_NAME(ESTIMATES_TABS.ALL),
                             render: (
                                 <All
-                                    estimates={estimateItem}
+                                    estimates={estimates}
                                     getEstimates={getItems}
                                     canLoadMore={canLoadMore}
                                     onEstimateSelect={onEstimateSelect}

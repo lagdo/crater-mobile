@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Company } from '../../components/Company';
 import * as CompanyAction from '../../actions';
 import * as AddressAction from '~/features/customers/actions';
+import { getCountries } from '~/selectors/index';
 
 const mapStateToProps = (state) => {
     const {
@@ -14,18 +15,17 @@ const mapStateToProps = (state) => {
         },
         global: { language },
         customers: {
-            countries,
             loading: {
                 countriesLoading,
             }
         },
-    } = state
+    } = state;
 
     return {
         language,
         editCompanyLoading: editCompanyInfoLoading,
         getCompanyInfoLoading,
-        countries,
+        countries: getCountries(state),
         countriesLoading,
     };
 };

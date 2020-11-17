@@ -2,14 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as customizeAction from '../../actions'
 import { Customize } from '../../components/Customize';
+import { getPaymentMethods, getUnits } from '~/selectors/index';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { language },
         settings: {
             customizes,
-            paymentMethods,
-            units,
             loading: {
                 getCustomizeLoading,
                 paymentModesLoading,
@@ -27,8 +26,8 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         language,
         type,
         customizes,
-        paymentMethods,
-        units,
+        paymentMethods: getPaymentMethods(state),
+        units: getUnits(state),
         isLoading,
         loading: customizeLoading,
         paymentModeLoading,

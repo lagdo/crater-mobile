@@ -1,17 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import * as PaymentsAction from '../../actions';
+import * as PaymentActions from '../../actions';
 import { Payments } from '../../components/Payments';
 import { getCustomers } from '~/features/customers/actions';
 import { getPaymentModes } from '~/features/settings/actions';
+import { getPayments, getFilterPayments } from '../../selectors';
 
 const mapStateToProps = (state) => {
     const {
         global: { language },
         customers: { customers },
         payments: {
-            payments,
-            filterPayments,
             loading: { paymentsLoading }
         },
         settings: {
@@ -21,8 +20,8 @@ const mapStateToProps = (state) => {
     } = state;
 
     return {
-        payments,
-        filterPayments,
+        payments: getPayments(state),
+        filterPayments: getFilterPayments(state),
         loading: paymentsLoading,
         paymentModesLoading,
         language,
@@ -32,7 +31,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-    getPayments: PaymentsAction.getPayments,
+    getPayments: PaymentActions.getPayments,
     getCustomers: getCustomers,
     getPaymentModes: getPaymentModes
 };

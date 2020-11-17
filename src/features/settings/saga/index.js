@@ -219,7 +219,7 @@ function* getSettingItem(payloadData) {
 
 function* editPreferences(payloadData) {
     const {
-        payload: { params, navigation, currencies },
+        payload: { params, navigation },
     } = payloadData;
 
     yield put(settingsTriggerSpinner({ editPreferencesLoading: true }));
@@ -233,18 +233,7 @@ function* editPreferences(payloadData) {
 
         const response = yield call([Request, 'put'], options);
         if (response.success) {
-            let newData = currencies.filter((item) => {
-                let filterData = false
-                if (item['id'].toString() === params.currency.toString())
-                    filterData = true
-
-                return filterData
-            });
-
-            yield put(setSettings({
-                settings: params,
-                currency: newData.length !== 0 ? newData[0] : []
-            }));
+            yield put(setSettings({ settings: params }));
             navigation.goBack(null)
         }
 

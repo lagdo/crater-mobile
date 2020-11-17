@@ -44,7 +44,7 @@ export const Categories = (props: IProps) => {
 
         if (typeof categories !== 'undefined' && categories.length != 0) {
 
-            let newData = categories.filter((category) => {
+            let newData = categories.filter(({ fullItem: category }) => {
                 let filterData = false
 
                 searchFields.filter((field) => {
@@ -63,29 +63,11 @@ export const Categories = (props: IProps) => {
                 return filterData
             });
 
-            setCategoriesFilter(itemList(newData))
-            setFound(categoriesFilter.length != 0 ? true : false)
-            setSearch(keywords)
+            setCategoriesFilter(newData);
+            setFound(categoriesFilter.length != 0 ? true : false);
+            setSearch(keywords);
         }
     };
-
-    const itemList = (categories) => {
-        let categoriesList = []
-        if (typeof categories !== 'undefined' && categories.length != 0) {
-            categoriesList = categories.map((category) => {
-                const { name, description } = category;
-
-                return {
-                    title: name || '',
-                    subtitle: {
-                        title: description,
-                    },
-                    fullItem: category,
-                };
-            });
-        }
-        return categoriesList
-    }
 
     const getFreshItems = (onHide) => {
         getExpenseCategories()
@@ -94,8 +76,6 @@ export const Categories = (props: IProps) => {
             onHide && onHide()
         }, 400);
     }
-
-    let categoriesList = itemList(categories)
 
     let empty = (!search) ? {
         description: Lng.t("categories.empty.description"),
@@ -123,13 +103,13 @@ export const Categories = (props: IProps) => {
                 <View style={styles.listViewContainer}>
                     <ListView
                         items={categoriesFilter.length != 0 ?
-                            categoriesFilter : found ? categoriesList : []
+                            categoriesFilter : found ? categories : []
                         }
                         refreshing={refreshing}
                         getFreshItems={(onHide) =>  getFreshItems(onHide)}
                         onPress={onSelectCategory}
                         loading={loading}
-                        isEmpty={found ? categoriesList.length <= 0 : true}
+                        isEmpty={found ? categories.length <= 0 : true}
                         bottomDivider
                         emptyContentProps={{
                             title: found ?

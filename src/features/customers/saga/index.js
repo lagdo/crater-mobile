@@ -169,7 +169,7 @@ function* createCustomer(payloadData) {
             alertMe({ desc: getTitleByLanguage('customers.alertEmailAlreadyInUse') })
         }
 
-        yield put(setCreateCustomer({ customers: [response.customer] }));
+        yield put(setCreateCustomer({ customer: response.customer }));
         onResult && onResult(response.customer)
 
     } catch (error) {
@@ -237,7 +237,7 @@ function* editCustomer(payloadData) {
 
         if (response.success) {
             navigation.navigate(ROUTES.MAIN_CUSTOMERS)
-            yield put(setEditCustomer({ customers: [response.customer], id: id }));
+            yield put(setEditCustomer({ customer: response.customer, id: id }));
         }
     } catch (error) {
         // console.log(error);

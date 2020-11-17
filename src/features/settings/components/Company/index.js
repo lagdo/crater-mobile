@@ -6,7 +6,7 @@ import { Form, Field } from 'react-final-form';
 import styles from './styles';
 import { DefaultLayout, CtButton, InputField, FilePicker, AssetImage, SelectField } from '~/components';
 import Lng from '~/api/lang/i18n';
-import { MAX_LENGTH, formatCountries } from '~/api/global';
+import { MAX_LENGTH } from '~/api/global';
 import { validate } from '../../containers/Company/validation';
 
 type IProps = {
@@ -48,10 +48,7 @@ export const Company = (props: IProps) => {
     const [company, setCompany] = useState({});
 
     useEffect(() => {
-        let hasCountryApiCalled = countries ?
-            (typeof countries === 'undefined' || countries.length === 0) : true
-
-        hasCountryApiCalled && getCountries()
+        countries || getCountries();
 
         getCompanyInformation({
             onResult: (company) => {
@@ -160,7 +157,7 @@ export const Company = (props: IProps) => {
 
                     <Field
                         name={"country_id"}
-                        items={formatCountries(countries)}
+                        items={countries}
                         displayName="name"
                         component={SelectField}
                         label={Lng.t("customers.address.country")}

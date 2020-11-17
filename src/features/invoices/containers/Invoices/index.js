@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Invoices } from '../../components/Invoices';
+import { getInvoices } from '../../selectors';
 import * as InvoicesAction from '../../actions';
 import { getCustomers } from '~/features/customers/actions';
 
@@ -10,13 +11,12 @@ const mapStateToProps = (state) => {
         global: { language },
         customers: { customers },
         invoices: {
-            invoices,
             loading: { invoicesLoading }
         }
     } = state;
 
     return {
-        invoices,
+        invoices: getInvoices(state),
         loading: invoicesLoading,
         language,
         customers,

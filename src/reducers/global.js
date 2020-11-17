@@ -6,12 +6,16 @@ import {
     SAVE_ENDPOINT_API,
     SET_APP_VERSION,
 } from '../api/consts';
+import { SET_PREFERENCES } from '../features/settings/constants';
 import { SET_TAX, SET_EDIT_TAX, SET_REMOVE_TAX, SET_TAXES, SET_COMPANY_INFO } from '../features/taxes/constants';
-import { formatTaxTypes } from '../api/global';
 
 const initialState = {
     customers: [],
     currencies: [],
+    languages: [],
+    timezones: [],
+    dateFormats: [],
+    fiscalYears: [],
     language: 'en',
     timeZone: null,
     discountPerItem: false,
@@ -57,7 +61,6 @@ export default function globalReducer(state = initialState, action) {
             return { ...state, appVersion: app_version }
 
         case SET_GLOBAL_BOOTSTRAP:
-
             const {
                 currencies,
                 customers,
@@ -69,8 +72,6 @@ export default function globalReducer(state = initialState, action) {
                 default_language = 'en'
             } = payload
 
-            const taxList = formatTaxTypes(taxTypes)
-
             return {
                 ...state,
                 currencies,
@@ -78,47 +79,36 @@ export default function globalReducer(state = initialState, action) {
                 currency: default_currency,
                 company,
                 dateFormat: moment_date_format,
-                taxTypes: taxList,
+                taxTypes,
                 fiscalYear: fiscal_year,
                 language: default_language
             };
 
         case SET_TAXES:
-
-            const taxes = formatTaxTypes(payload.taxTypes)
-
-            return { ...state, taxTypes: taxes };
+            return { ...state, taxTypes: payload.taxTypes };
 
         case SET_TAX:
-
-            const tax = formatTaxTypes(payload.taxType)
-
             return {
                 ...state,
-                taxTypes: [...tax, ...state.taxTypes]
+                taxTypes: [payload.taxType, ...state.taxTypes]
             };
 
         case SET_EDIT_TAX:
-
-            let editTax = formatTaxTypes(payload.taxType)
-            const taxTypeList = state.taxTypes.filter(({ fullItem }) =>
-                (fullItem.id !== payload.taxId))
+            const taxTypeList = state.taxTypes.filter((item) => (item.id !== payload.taxId))
 
             return {
                 ...state,
-                taxTypes: [...editTax, ...taxTypeList]
+                taxTypes: [payload.taxType, ...taxTypeList]
             };
 
         case SET_REMOVE_TAX:
-
             const remainTaxes = state.taxTypes.filter(({ fullItem }) =>
                 (fullItem.id !== payload.taxId))
 
             return { ...state, taxTypes: remainTaxes };
 
         case SET_SETTINGS:
-
-            let { key, value } = payload.settings
+            const { key, value } = payload.settings;
 
             if (key) {
                 if (key === 'discount_per_item') {
@@ -146,15 +136,30 @@ export default function globalReducer(state = initialState, action) {
                     };
                 }
             }
-            else
+            else {
+                const { settings: { currency, language, time_zone, moment_date_format, fiscal_year } } = payload;
+                const newCurrency = state.currencies.find((item) => item.id.toString() === currency.toString());
+
                 return {
                     ...state,
-                    language: payload.settings.language,
-                    timeZone: payload.settings.time_zone,
-                    dateFormat: payload.settings.moment_date_format,
-                    fiscalYear: payload.settings.fiscal_year,
-                    currency: payload.currency,
+                    language,
+                    timeZone: time_zone,
+                    dateFormat: moment_date_format,
+                    fiscalYear: fiscal_year,
+                    currency: newCurrency,
                 };
+            }
+
+        case SET_PREFERENCES:
+            const { preferences } = payload;
+            return {
+                ...state,
+                currencies: preferences.currencies,
+                languages: preferences.languages,
+                timezones: preferences.time_zones,
+                dateFormats: preferences.date_formats,
+                fiscalYears: preferences.fiscal_years,
+            };
 
         default:
             return state;

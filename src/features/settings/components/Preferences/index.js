@@ -29,53 +29,45 @@ export const Preferences = (props: IProps) => {
     const {
         navigation,
         isLoading,
+        timezones,
+        dateFormats,
+        fiscalYears,
         getPreferences,
         getSettingItem,
         editPreferences,
         clearPreferences,
-        currencies,
         editPreferencesLoading,
         editSettingItemLoading,
         editSettingItem,
         initialValues,
     } = props
 
-    const [timezoneList, setTimezoneList] = useState([]);
-    const [dateFormatList, setDateFormatList] = useState([]);
-    const [fiscalYearList, setFiscalYearList] = useState([]);
     const [discountPerItem, setDiscountPerItem] = useState(null);
     const [taxPerItem, setTaxPerItem] = useState(null);
     const [visibleToast, setVisibleToast] = useState(false);
 
+    const hasEmptyList = timezones.length === 0 || dateFormats.length === 0 || fiscalYears.length === 0;
+
     useEffect(() => {
-        getPreferences({
-            onResult: (val) => {
-                const { time_zones, date_formats, fiscal_years } = val;
-                setFiscalYearList(getFiscalYearList(fiscal_years));
-                setTimezoneList(getTimeZoneList(time_zones));
-                setDateFormatList(getDateFormatList(date_formats));
-            }
-        });
+        if (hasEmptyList) {
+            getPreferences({ onResult: null });
+        }
 
         getSettingItem({
             key: 'discount_per_item',
-            onResult: (val) => {
-                setDiscountPerItem(val !== null ? val : 'NO')
-            }
+            onResult: (val) => setDiscountPerItem(val !== null ? val : 'NO')
         });
 
         getSettingItem({
             key: 'tax_per_item',
-            onResult: (val) => {
-                setTaxPerItem(val !== null ? val : 'NO')
-            }
+            onResult: (val) => setTaxPerItem(val !== null ? val : 'NO')
         });
     }, []);
 
     const onSubmitPreferences = (values) => {
         if (!(editPreferencesLoading || editSettingItemLoading)) {
             clearPreferences()
-            editPreferences({ params: values, navigation, currencies })
+            editPreferences({ params: values, navigation })
         }
     }
 
@@ -89,51 +81,6 @@ export const Preferences = (props: IProps) => {
                 />
             </View>
         )
-    }
-
-    const getTimeZoneList = (timezones) => {
-        let timeZoneList = []
-        if (typeof timezones !== 'undefined') {
-
-            timeZoneList = timezones.map((timezone) => {
-
-                return {
-                    title: timezone.key,
-                    fullItem: timezone
-                }
-            })
-        }
-
-        return timeZoneList;
-    }
-
-    const getFiscalYearList = (fiscalYears) => {
-        let years = []
-        if (typeof fiscalYears !== 'undefined') {
-            years = fiscalYears.map((year) => {
-                const { key } = year
-                return {
-                    title: key,
-                    fullItem: year
-                }
-            })
-        }
-        return years;
-    }
-
-    const getDateFormatList = (dateFormats) => {
-        let dateFormatList = []
-        if (typeof dateFormats !== 'undefined') {
-            dateFormatList = dateFormats.map((dateformat) => {
-
-                const { display_date } = dateformat
-                return {
-                    title: display_date,
-                    fullItem: dateformat
-                }
-            })
-        }
-        return dateFormatList;
     }
 
     const saveDiscountPerItem = (val) => {
@@ -174,9 +121,7 @@ export const Preferences = (props: IProps) => {
                 }}
                 bottomAction={BOTTOM_ACTION(handleSubmit)}
                 loadingProps={{
-                    is: isLoading ||
-                        timezoneList.length === 0 || dateFormatList.length === 0 ||
-                        discountPerItem === null || taxPerItem === null
+                    is: isLoading || hasEmptyList || discountPerItem === null || taxPerItem === null
                 }}
                 toastProps={{
                     message: Lng.t("settings.preferences.settingUpdate"),
@@ -186,7 +131,7 @@ export const Preferences = (props: IProps) => {
                 <View style={styles.mainContainer}>
                     <Field
                         name="time_zone"
-                        items={timezoneList}
+                        items={timezones}
                         displayName="key"
                         component={SelectField}
                         label={Lng.t("settings.preferences.timeZone")}
@@ -217,7 +162,7 @@ export const Preferences = (props: IProps) => {
 
                     <Field
                         name="date_format"
-                        items={dateFormatList}
+                        items={dateFormats}
                         displayName="display_date"
                         component={SelectField}
                         label={Lng.t("settings.preferences.dateFormat")}
@@ -249,7 +194,7 @@ export const Preferences = (props: IProps) => {
 
                     <Field
                         name="fiscal_year"
-                        items={fiscalYearList}
+                        items={fiscalYears}
                         displayName="key"
                         component={SelectField}
                         label={Lng.t("settings.preferences.fiscalYear")}

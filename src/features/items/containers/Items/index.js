@@ -3,25 +3,29 @@ import { connect } from 'react-redux';
 import * as ItemsAction from '../../actions'
 import { Items } from '../../components/Items';
 import { getItemUnits } from '~/features/settings/actions';
+import { getProducts, getFilterProducts } from '../../selectors';
+import { getUnitsForSelect } from '~/selectors/index';
 
 const mapStateToProps = (state) => {
     const {
-        more: { loading },
-        items: { items, filterItems },
+        more: {
+            loading: {
+                itemsLoading
+            }
+        },
         global: { currency, language },
         settings: {
-            units,
             loading: { itemUnitsLoading }
         }
     } = state;
 
     return {
-        items,
-        filterItems,
-        loading: loading.itemsLoading,
+        items: getProducts(state),
+        filterItems: getFilterProducts(state),
+        loading: itemsLoading,
         language,
         currency,
-        units,
+        units: getUnitsForSelect(state),
         itemUnitsLoading,
     };
 };

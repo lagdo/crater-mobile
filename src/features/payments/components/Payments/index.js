@@ -131,33 +131,6 @@ export const Payments = (props: IProps) => {
         onResetFilter();
     }
 
-    const getPaymentsList = (payments) => {
-        let paymentList = []
-        if (typeof payments !== 'undefined' && payments.length != 0) {
-            paymentList = payments.map((payment) => {
-                const {
-                    notes,
-                    formattedPaymentDate,
-                    amount,
-                    payment_mode,
-                    user: { name, currency }
-                } = payment;
-
-                return {
-                    title: `${name}`,
-                    subtitle: {
-                        title: `${payment_mode ? '(' + payment_mode + ')' : ''}`,
-                    },
-                    amount,
-                    currency,
-                    rightSubtitle: formattedPaymentDate,
-                    fullItem: payment,
-                };
-            });
-        }
-        return paymentList
-    }
-
     const loadMoreItems = () => {
         if (!filter) {
             getItems({ params: { ...defaultParams, search } });
@@ -176,9 +149,6 @@ export const Payments = (props: IProps) => {
     const { lastPage, page } = pagination;
 
     const canLoadMore = lastPage >= page;
-
-    let paymentsItem = getPaymentsList(payments)
-    let filterPaymentItem = getPaymentsList(filterPayments)
 
     let selectFields = [
         {
@@ -266,13 +236,11 @@ export const Payments = (props: IProps) => {
             >
                 <View style={styles.listViewContainer}>
                     <ListView
-                        items={!filter ? paymentsItem : filterPaymentItem}
+                        items={!filter ? payments : filterPayments}
                         onPress={onPaymentSelect}
                         refreshing={refreshing}
                         loading={loading}
-                        isEmpty={!filter ? paymentsItem.length <= 0 :
-                            filterPaymentItem.length <= 0
-                        }
+                        isEmpty={!filter ? payments.length <= 0 : filterPayments.length <= 0}
                         canLoadMore={canLoadMore}
                         getFreshItems={(onHide) => {
                             onResetFilter()

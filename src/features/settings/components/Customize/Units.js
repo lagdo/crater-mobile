@@ -2,7 +2,7 @@ import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { View, Text } from 'react-native';
 import styles from './styles';
 import { ListView, InputModal, CtDivider } from '~/components';
-import { formatListByName, alertMe } from '~/api/global';
+import { alertMe } from '~/api/global';
 import Lng from '~/api/lang/i18n';
 
 export const Units = forwardRef((props, ref) => {
@@ -89,7 +89,7 @@ export const Units = forwardRef((props, ref) => {
 
             <View>
                 <ListView
-                    items={formatListByName(units)}
+                    items={units}
                     getFreshItems={(onHide) => {
                         onHide && onHide()
                     }}

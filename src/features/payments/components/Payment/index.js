@@ -21,7 +21,7 @@ import Lng from '~/api/lang/i18n';
 import { IMAGES } from '~/config';
 import { CUSTOMER_ADD } from '~/features/customers/constants';
 import { INVOICES_STATUS_BG_COLOR, INVOICES_STATUS_TEXT_COLOR } from '~/features/invoices/constants';
-import { MAX_LENGTH, alertMe, formatSelectPickerName } from '~/api/global';
+import { MAX_LENGTH, alertMe } from '~/api/global';
 import { validate } from '../../containers/Payment/validation';
 
 let paymentRefs = {}
@@ -63,6 +63,9 @@ export const Payment = (props: IProps) => {
         initPaymentLoading,
         getUnpaidInvoicesLoading,
         getCustomers,
+        paymentMethods,
+        paymentModesLoading,
+        getPaymentMethods,
         submitFailed = false,
         createPayment,
         editPayment,
@@ -91,6 +94,10 @@ export const Payment = (props: IProps) => {
     };
 
     useEffect(() => {
+        if (paymentMethods.length === 0) {
+            getPaymentMethods();
+        }
+
         if (type === PAYMENT_EDIT) {
             setFormField('id', id)
 
@@ -101,7 +108,6 @@ export const Payment = (props: IProps) => {
                     invoices,
                     nextPaymentNumber,
                     payment_prefix,
-                    paymentMethods
                 }) => {
                     let { user_id, payment_method_id, invoice_id, invoice, amount } = payment
 
@@ -121,7 +127,6 @@ export const Payment = (props: IProps) => {
                     setSelectedCustomer(user_id ? payment.user : '')
                     setSelectedInvoice(invoice_id ? payment.invoice.invoice_number : '')
                     setSelectedPaymentMode(payment_method_id)
-                    setMethods(paymentMethods)
 
                     if (user_id)
                         setInvoice(invoices)
@@ -135,13 +140,10 @@ export const Payment = (props: IProps) => {
                 onResult: ({
                     nextPaymentNumberAttribute = '',
                     payment_prefix = '',
-                    paymentMethods
                 }) => {
                     setFormField('payment_number', nextPaymentNumberAttribute)
                     setFormField('payment_date', moment())
                     setFormField('payment_prefix', payment_prefix)
-
-                    setMethods(paymentMethods)
 
                     hasRecordPayment ?
                         setRecordPaymentField() :
@@ -333,7 +335,7 @@ export const Payment = (props: IProps) => {
                     rightIconPress: handleSubmit,
                 }}
                 bottomAction={BOTTOM_ACTION(handleSubmit)}
-                loadingProps={{ is: isLoading || initPaymentLoading }}
+                loadingProps={{ is: isLoading || initPaymentLoading || paymentModesLoading }}
                 dropdownProps={drownDownProps}
             >
                 <View style={styles.bodyContainer}>
@@ -467,7 +469,7 @@ export const Payment = (props: IProps) => {
                         component={SelectPickerField}
                         label={Lng.t("payments.mode")}
                         fieldIcon='align-center'
-                        items={formatSelectPickerName(methods)}
+                        items={paymentMethods}
                         selectedItem={selectedPaymentMode}
                         onChangeCallback={(val) => {
                             setFormField('payment_method_id', val)

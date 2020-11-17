@@ -3,20 +3,20 @@ import { connect } from 'react-redux';
 import { Estimates } from '../../components/Estimates';
 import * as EstimatesAction from '../../actions';
 import { getCustomers } from '~/features/customers/actions';
+import { getEstimates } from '../../selectors';
 
 const mapStateToProps = (state) => {
 
     const {
         global: { language },
         estimates: {
-            estimates,
             loading: { estimatesLoading }
         },
         customers: { customers },
     } = state;
 
     return {
-        estimates,
+        estimates: getEstimates(state),
         customers,
         loading: estimatesLoading,
         language,

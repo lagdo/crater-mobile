@@ -8,25 +8,6 @@ import {
     SET_FILTER_CUSTOMERS
 } from '../constants';
 
-const formatCustomers = (customers) => {
-
-    let customerList = []
-    if (typeof customers !== 'undefined' && customers.length != 0) {
-        customerList = customers.map((customer) => {
-
-            return {
-                title: customer.name,
-                subtitle: {
-                    title: customer.contact_name || '',
-                },
-                leftAvatar: customer.name.toUpperCase().charAt(0),
-                fullItem: customer,
-            }
-        })
-    }
-    return customerList
-}
-
 const initialState = {
     customers: [],
     filterCustomers: [],
@@ -49,52 +30,40 @@ export default function customersReducer(state = initialState, action) {
         case SET_CUSTOMERS:
 
             let { customers, fresh } = payload;
-            let customerList = formatCustomers(customers)
             if (!fresh) {
                 return {
                     ...state,
-                    customers: [...state.customers, ...customerList]
+                    customers: [...state.customers, ...customers]
                 };
             }
 
-            return { ...state, customers: customerList };
+            return { ...state, customers: customers };
 
         case SET_FILTER_CUSTOMERS:
-
-            let filterCustomerList = formatCustomers(payload.customers)
-
             if (!payload.fresh) {
                 return {
                     ...state,
-                    filterCustomers: [...state.filterCustomers, ...filterCustomerList]
+                    filterCustomers: [...state.filterCustomers, ...payload.customers]
                 };
             }
 
             return { ...state, filterCustomers: filterCustomerList };
 
         case SET_EDIT_CUSTOMER:
-
-            let editCustomer = formatCustomers(payload.customers)
-
-            const customersList = state.customers.filter(({ fullItem }) =>
-                (fullItem.id !== payload.id))
+            const customersList = state.customers.filter((item) => (item.id !== payload.id));
 
             return {
                 ...state,
-                customers: [...editCustomer, ...customersList]
+                customers: [payload.customer, ...customersList]
             };
 
         case SET_CREATE_CUSTOMER:
-
-            let newCustomer = formatCustomers(payload.customers)
-
             return {
                 ...state,
-                customers: [...newCustomer, ...state.customers]
+                customers: [payload.customer, ...state.customers]
             };
 
         case SET_REMOVE_CUSTOMER:
-
             const remainCustomers = state.customers.filter(({ fullItem }) =>
                 (fullItem.id !== payload.id))
 

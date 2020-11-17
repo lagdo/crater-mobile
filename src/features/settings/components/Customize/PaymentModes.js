@@ -2,7 +2,7 @@ import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { View, ScrollView } from 'react-native';
 import styles from './styles';
 import { ListView, InputModal } from '~/components';
-import { formatListByName, alertMe } from '~/api/global';
+import { alertMe } from '~/api/global';
 import Lng from '~/api/lang/i18n';
 
 export const PaymentModes = forwardRef((props, ref) => {
@@ -89,7 +89,7 @@ export const PaymentModes = forwardRef((props, ref) => {
 
             <View>
                 <ListView
-                    items={formatListByName(paymentMethods)}
+                    items={paymentMethods}
                     getFreshItems={(onHide) => {
                         onHide && onHide()
                     }}

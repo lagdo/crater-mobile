@@ -2,18 +2,22 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Customers } from '../../components/Customers';
 import * as CustomersAction from '../../actions';
+import { getCustomers, getFilterCustomers } from '../../selectors';
 
 const mapStateToProps = (state) => {
-
     const {
-        customers: { customers, filterCustomers, loading },
-        global: { language }
+        global: { language },
+        customers: {
+            loading: {
+                customersLoading,
+            }
+        },
     } = state;
 
     return {
-        customers,
-        filterCustomers,
-        loading: loading.customersLoading,
+        customers: getCustomers(state),
+        filterCustomers: getFilterCustomers(state),
+        loading: customersLoading,
         language,
     };
 };

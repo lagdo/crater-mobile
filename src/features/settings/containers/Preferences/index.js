@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as PreferencesAction from '../../actions';
 import { Preferences } from '../../components/Preferences';
+import { getTimezones, getDateFormats, getFiscalYears } from '~/selectors/index';
 
 const mapStateToProps = (state) => {
     const {
@@ -14,7 +15,7 @@ const mapStateToProps = (state) => {
             },
             preferences,
         },
-        global: { language, currencies }
+        global: { language }
     } = state
 
     let isLoading = getPreferencesLoading || typeof preferences === 'undefined' || preferences === null || getSettingItemLoading
@@ -22,7 +23,9 @@ const mapStateToProps = (state) => {
     return {
         language,
         isLoading,
-        currencies,
+        timezones: getTimezones(state),
+        dateFormats: getDateFormats(state),
+        fiscalYears: getFiscalYears(state),
         editPreferencesLoading,
         editSettingItemLoading,
         initialValues: !isLoading ? {

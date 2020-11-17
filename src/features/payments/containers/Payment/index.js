@@ -3,13 +3,20 @@ import { connect } from 'react-redux';
 import * as PaymentAction from '../../actions';
 import { PAYMENT_ADD } from '../../constants';
 import { Payment } from '../../components/Payment';
-import { getCustomers } from '~/features/customers/actions';
+import * as CustomersAction from '~/features/customers/actions';
+import * as SettingsAction from '~/features/settings/actions';
+import { getPaymentMethods } from '../../selectors';
+import { getCustomers } from '~/features/customers/selectors';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
 
     const {
-        customers: { customers },
         global: { language },
+        settings: {
+            loading: {
+                paymentModesLoading
+            }
+        },
         payments: {
             loading: {
                 initPaymentLoading,
@@ -29,10 +36,12 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
     return {
         id,
         type,
-        customers,
+        customers: getCustomers(state),
+        paymentMethods: getPaymentMethods(state),
         language,
         invoice,
         hasRecordPayment,
+        paymentModesLoading,
         initPaymentLoading,
         paymentLoading,
         getUnpaidInvoicesLoading,
@@ -51,7 +60,8 @@ const mapDispatchToProps = {
     editPayment: PaymentAction.editPayment,
     removePayment: PaymentAction.removePayment,
     sendPaymentReceipt: PaymentAction.sendPaymentReceipt,
-    getCustomers: getCustomers,
+    getCustomers: CustomersAction.getCustomers,
+    getPaymentMethods: SettingsAction.getPaymentModes,
 };
 
 //  connect
