@@ -6,10 +6,11 @@ import { ESTIMATE_EDIT } from '../../constants';
 import moment from 'moment';
 import * as CustomersAction from '~/features/customers/actions';
 import { getCustomers } from '~/features/customers/selectors';
+import { getTaxTypes } from '~/features/taxes/selectors';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
-        global: { language, taxTypes },
+        global: { language },
         estimates: { loading, estimateItems, estimateData, items },
     } = state;
 
@@ -36,7 +37,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         customers: getCustomers(state),
         itemsLoading: loading.itemsLoading,
         language,
-        taxTypes,
+        taxTypes: getTaxTypes(state),
         initialValues: !isLoading ? {
             expiry_date: moment().add(7, 'days'),
             estimate_date: moment(),

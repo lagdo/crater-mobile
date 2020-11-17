@@ -125,9 +125,6 @@ function* getEditInvoice(payloadData) {
     yield put(invoiceTriggerSpinner({ initInvoiceLoading: true }));
 
     try {
-
-        const { settings: { taxTypes } } = store.getState();
-
         const options = {
             path: GET_EDIT_INVOICE_URL(id),
         };

@@ -3,11 +3,12 @@ import { connect } from 'react-redux';
 import { EstimateItem } from '../../components/Item';
 import * as EstimatesAction from '../../actions';
 import { getItemUnits } from '~/features/settings/actions';
+import { getTaxTypes } from '~/features/taxes/selectors';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         estimates: { loading },
-        global: { language, taxTypes },
+        global: { language },
         settings: {
             units,
             loading: { itemUnitsLoading, editItemLoading, removeItemLoading }
@@ -27,7 +28,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
     return {
         loading: isLoading,
         itemId: item && (item.item_id || item.id),
-        taxTypes,
+        taxTypes: getTaxTypes(state),
         currency,
         language,
         discountPerItem,

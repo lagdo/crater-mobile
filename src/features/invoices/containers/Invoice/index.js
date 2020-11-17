@@ -6,10 +6,11 @@ import { INVOICE_EDIT } from '../../constants';
 import moment from 'moment';
 import * as CustomersAction from '~/features/customers/actions';
 import { getCustomers } from '~/features/customers/selectors';
+import { getTaxTypes } from '~/features/taxes/selectors';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
-        global: { language, taxTypes },
+        global: { language },
         invoices: { invoiceItems, invoiceData, items },
         customers: {
             loading: { customersLoading, initInvoiceLoading, invoiceLoading, itemsLoading },
@@ -39,7 +40,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         customers: getCustomers(state),
         itemsLoading,
         language,
-        taxTypes,
+        taxTypes: getTaxTypes(state),
         initialValues: !isLoading ? {
             due_date: moment().add(7, 'days'),
             invoice_date: moment(),

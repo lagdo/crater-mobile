@@ -4,6 +4,7 @@ import { Item } from '../../components/Item';
 import * as ItemAction from '../../actions';
 import { EDIT_ITEM } from '../../constants';
 import { getItemUnits, getSettingItem } from '~/features/settings/actions';
+import { getTaxTypes } from '~/features/taxes/selectors';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
@@ -14,7 +15,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
             units,
             loading: { itemUnitsLoading, itemLoading }
         },
-        global: { language, currency, taxTypes },
+        global: { language, currency },
     } = state;
 
     const { id: itemId = {}, type } = params;
@@ -24,7 +25,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
     return {
         loading: isLoading,
         itemId,
-        taxTypes,
+        taxTypes: getTaxTypes(state),
         taxByItems,
         language,
         type,
