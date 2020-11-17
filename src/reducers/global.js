@@ -6,11 +6,13 @@ import {
     SAVE_ENDPOINT_API,
     SET_APP_VERSION,
 } from '../api/consts';
+import { SET_PREFERENCES } from '../features/settings/constants';
 import { SET_TAX, SET_EDIT_TAX, SET_REMOVE_TAX, SET_TAXES, SET_COMPANY_INFO } from '../features/taxes/constants';
 
 const initialState = {
     customers: [],
     currencies: [],
+    languages: [],
     language: 'en',
     timeZone: null,
     discountPerItem: false,
@@ -56,7 +58,6 @@ export default function globalReducer(state = initialState, action) {
             return { ...state, appVersion: app_version }
 
         case SET_GLOBAL_BOOTSTRAP:
-
             const {
                 currencies,
                 customers,
@@ -145,6 +146,10 @@ export default function globalReducer(state = initialState, action) {
                     currency: newCurrency,
                 };
             }
+
+        case SET_PREFERENCES:
+            const { preferences } = payload;
+            return { ...state, currencies: preferences.currencies, languages: preferences.languages };
 
         default:
             return state;
