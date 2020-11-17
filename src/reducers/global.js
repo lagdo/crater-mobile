@@ -104,7 +104,7 @@ export default function globalReducer(state = initialState, action) {
             return { ...state, taxTypes: remainTaxes };
 
         case SET_SETTINGS:
-            let { key, value } = payload.settings
+            const { key, value } = payload.settings;
 
             if (key) {
                 if (key === 'discount_per_item') {
@@ -132,15 +132,19 @@ export default function globalReducer(state = initialState, action) {
                     };
                 }
             }
-            else
+            else {
+                const { settings: { currency, language, time_zone, moment_date_format, fiscal_year } } = payload;
+                const newCurrency = state.currencies.find((item) => item.id.toString() === currency.toString());
+
                 return {
                     ...state,
-                    language: payload.settings.language,
-                    timeZone: payload.settings.time_zone,
-                    dateFormat: payload.settings.moment_date_format,
-                    fiscalYear: payload.settings.fiscal_year,
-                    currency: payload.currency,
+                    language,
+                    timeZone: time_zone,
+                    dateFormat: moment_date_format,
+                    fiscalYear: fiscal_year,
+                    currency: newCurrency,
                 };
+            }
 
         default:
             return state;
