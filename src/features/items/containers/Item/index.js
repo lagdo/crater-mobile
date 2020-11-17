@@ -5,14 +5,13 @@ import * as ItemAction from '../../actions';
 import { EDIT_ITEM } from '../../constants';
 import { getItemUnits, getSettingItem } from '~/features/settings/actions';
 import { getTaxTypes } from '~/features/taxes/selectors';
+import { getUnitsForSelect } from '~/selectors/index';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
-        more: { loading },
         items: { item },
         settings: {
             taxByItems,
-            units,
             loading: { itemUnitsLoading, itemLoading }
         },
         global: { language, currency },
@@ -30,7 +29,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         language,
         type,
         currency,
-        units,
+        units: getUnitsForSelect(state),
         initialValues: {
             taxes: [],
             quantity: 1,

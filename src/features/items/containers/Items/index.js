@@ -4,6 +4,7 @@ import * as ItemsAction from '../../actions'
 import { Items } from '../../components/Items';
 import { getItemUnits } from '~/features/settings/actions';
 import { getProducts, getFilterProducts } from '../../selectors';
+import { getUnitsForSelect } from '~/selectors/index';
 
 const mapStateToProps = (state) => {
     const {
@@ -14,7 +15,6 @@ const mapStateToProps = (state) => {
         },
         global: { currency, language },
         settings: {
-            units,
             loading: { itemUnitsLoading }
         }
     } = state;
@@ -25,7 +25,7 @@ const mapStateToProps = (state) => {
         loading: itemsLoading,
         language,
         currency,
-        units,
+        units: getUnitsForSelect(state),
         itemUnitsLoading,
     };
 };

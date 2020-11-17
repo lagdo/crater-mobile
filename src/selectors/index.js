@@ -7,6 +7,8 @@ const languageList = (state) => state.global.languages;
 const timezoneList = (state) => state.global.timezones;
 const dateFormatList = (state) => state.global.dateFormats;
 const fiscalYearList = (state) => state.global.fiscalYears;
+const paymentMethodList = (state) => state.settings.paymentMethods;
+const unitList = (state) => state.settings.units;
 
 export const getCountries = createSelector(
     [ countryList ],
@@ -68,6 +70,39 @@ export const getFiscalYears = createSelector(
         return {
             title: key,
             fullItem: year
+        };
+    }): []
+);
+
+export const getPaymentMethods = createSelector(
+    [ paymentMethodList ],
+    (paymentMethods) => paymentMethods ? paymentMethods.map((method) => {
+        const { name } = method;
+        return {
+            title: name,
+            fullItem: method,
+        }
+    }): []
+);
+
+export const getUnits = createSelector(
+    [ unitList ],
+    (units) => units ? units.map((unit) => {
+        const { name } = unit;
+        return {
+            title: name,
+            fullItem: unit,
+        };
+    }): []
+);
+
+export const getUnitsForSelect = createSelector(
+    [ unitList ],
+    (units) => units ? units.map((unit) => {
+        const { id, name } = unit;
+        return {
+            label: name,
+            value: id
         };
     }): []
 );

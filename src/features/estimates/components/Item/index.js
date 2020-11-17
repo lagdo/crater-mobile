@@ -24,7 +24,7 @@ import { BUTTON_COLOR } from '~/api/consts/core';
 import { colors } from '~/styles/colors';
 import Lng from '~/api/lang/i18n';
 import { ADD_TAX } from '~/features/settings/constants';
-import { MAX_LENGTH, formatSelectPickerName, alertMe } from '~/api/global';
+import { MAX_LENGTH, alertMe } from '~/api/global';
 import { validate } from '../../containers/Item/validation';
 
 let itemRefs = {
@@ -121,7 +121,7 @@ export const EstimateItem = (props) => {
     const totalDiscount = () => {
         let discountPrice = 0
 
-        if (discount_type === 'percentage') {
+        if (itemRefs.discount_type === 'percentage') {
             discountPrice = ((itemRefs.discount * itemSubTotal()) / 100)
         } else if (itemRefs.discount_type === 'fixed') {
             discountPrice = (itemRefs.discount * 100)
@@ -392,7 +392,7 @@ export const EstimateItem = (props) => {
                             name="unit_id"
                             label={Lng.t("items.unit")}
                             component={SelectPickerField}
-                            items={formatSelectPickerName(units)}
+                            items={units}
                             defaultPickerOptions={{
                                 label: Lng.t("items.unitPlaceholder"),
                                 value: '',
@@ -422,7 +422,7 @@ export const EstimateItem = (props) => {
                                     autoCorrect: true,
                                     keyboardType: 'numeric'
                                 }}
-                                disabled={discount_type === 'none'}
+                                disabled={initialValues.discount_type === 'none'}
                             />
                         </View>
                     )}

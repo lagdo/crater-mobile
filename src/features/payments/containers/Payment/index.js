@@ -4,12 +4,19 @@ import * as PaymentAction from '../../actions';
 import { PAYMENT_ADD } from '../../constants';
 import { Payment } from '../../components/Payment';
 import * as CustomersAction from '~/features/customers/actions';
+import * as SettingsAction from '~/features/settings/actions';
+import { getPaymentMethods } from '../../selectors';
 import { getCustomers } from '~/features/customers/selectors';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
 
     const {
         global: { language },
+        settings: {
+            loading: {
+                paymentModesLoading
+            }
+        },
         payments: {
             loading: {
                 initPaymentLoading,
@@ -30,9 +37,11 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         id,
         type,
         customers: getCustomers(state),
+        paymentMethods: getPaymentMethods(state),
         language,
         invoice,
         hasRecordPayment,
+        paymentModesLoading,
         initPaymentLoading,
         paymentLoading,
         getUnpaidInvoicesLoading,
@@ -52,6 +61,7 @@ const mapDispatchToProps = {
     removePayment: PaymentAction.removePayment,
     sendPaymentReceipt: PaymentAction.sendPaymentReceipt,
     getCustomers: CustomersAction.getCustomers,
+    getPaymentMethods: SettingsAction.getPaymentModes,
 };
 
 //  connect

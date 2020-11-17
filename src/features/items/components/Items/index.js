@@ -12,7 +12,6 @@ import { IMAGES } from '~/config';
 import Lng from '~/api/lang/i18n';
 import { ADD_ITEM, EDIT_ITEM } from '../../constants';
 import { itemsDescriptionStyle } from '~/features/invoices/components/Invoice/styles';
-import { formatSelectPickerName } from '~/api/global';
 
 type IProps = {
     navigation: Object,
@@ -172,7 +171,7 @@ export const Items = (props: IProps) => {
         name: "unit_id",
         label: Lng.t("items.unit"),
         fieldIcon: 'align-center',
-        items: formatSelectPickerName(units),
+        items: units,
         onChangeCallback: setSelectedUnitId,
         defaultPickerOptions: {
             label: Lng.t("items.unitPlaceholder"),
