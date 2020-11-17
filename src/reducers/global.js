@@ -13,6 +13,9 @@ const initialState = {
     customers: [],
     currencies: [],
     languages: [],
+    timezones: [],
+    dateFormats: [],
+    fiscalYears: [],
     language: 'en',
     timeZone: null,
     discountPerItem: false,
@@ -149,7 +152,13 @@ export default function globalReducer(state = initialState, action) {
 
         case SET_PREFERENCES:
             const { preferences } = payload;
-            return { ...state, currencies: preferences.currencies, languages: preferences.languages };
+            return { ...state,
+                currencies: preferences.currencies,
+                languages: preferences.languages,
+                timezones: preferences.time_zones,
+                dateFormats: preferences.date_formats,
+                fiscalYears: preferences.fiscal_years,
+            };
 
         default:
             return state;

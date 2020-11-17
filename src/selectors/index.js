@@ -4,6 +4,9 @@ import { formatCountries } from '~/api/global';
 const countryList = (state) => state.customers.countries;
 const currencyList = (state) => state.global.currencies;
 const languageList = (state) => state.global.languages;
+const timezoneList = (state) => state.global.timezones;
+const dateFormatList = (state) => state.global.dateFormats;
+const fiscalYearList = (state) => state.global.fiscalYears;
 
 export const getCountries = createSelector(
     [ countryList ],
@@ -33,6 +36,38 @@ export const getLanguages = createSelector(
             title: name,
             leftAvatar: name.toUpperCase().charAt(0),
             fullItem: language
+        };
+    })
+);
+
+export const getTimezones = createSelector(
+    [ timezoneList ],
+    (timezones) => timezones.map((timezone) => {
+        return {
+            title: timezone.key,
+            fullItem: timezone
+        };
+    })
+);
+
+export const getDateFormats = createSelector(
+    [ dateFormatList ],
+    (dateFormats) => dateFormats.map((format) => {
+        const { display_date } = format;
+        return {
+            title: display_date,
+            fullItem: format
+        };
+    })
+);
+
+export const getFiscalYears = createSelector(
+    [ fiscalYearList ],
+    (fiscalYears) => fiscalYears.map((year) => {
+        const { key } = year;
+        return {
+            title: key,
+            fullItem: year
         };
     })
 );
