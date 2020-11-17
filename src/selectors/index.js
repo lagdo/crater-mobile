@@ -15,7 +15,7 @@ export const getCountries = createSelector(
 
 export const getCurrencies = createSelector(
     [ currencyList ],
-    (currencies) => currencies.map((currency) => {
+    (currencies) => currencies ? currencies.map((currency) => {
         const { name, code, symbol } = currency;
         return {
             title: name,
@@ -25,49 +25,49 @@ export const getCurrencies = createSelector(
             rightTitle: symbol || '-',
             fullItem: currency
         };
-    })
+    }) : []
 );
 
 export const getLanguages = createSelector(
     [ languageList ],
-    (languages) => languages.map((language) => {
+    (languages) => languages ? languages.map((language) => {
         const { name } = language;
         return {
             title: name,
             leftAvatar: name.toUpperCase().charAt(0),
             fullItem: language
         };
-    })
+    }) : []
 );
 
 export const getTimezones = createSelector(
     [ timezoneList ],
-    (timezones) => timezones.map((timezone) => {
+    (timezones) => timezones ? timezones.map((timezone) => {
         return {
             title: timezone.key,
             fullItem: timezone
         };
-    })
+    }) : []
 );
 
 export const getDateFormats = createSelector(
     [ dateFormatList ],
-    (dateFormats) => dateFormats.map((format) => {
+    (dateFormats) => dateFormats ? dateFormats.map((format) => {
         const { display_date } = format;
         return {
             title: display_date,
             fullItem: format
         };
-    })
+    }) : []
 );
 
 export const getFiscalYears = createSelector(
     [ fiscalYearList ],
-    (fiscalYears) => fiscalYears.map((year) => {
+    (fiscalYears) => fiscalYears ? fiscalYears.map((year) => {
         const { key } = year;
         return {
             title: key,
             fullItem: year
         };
-    })
+    }): []
 );

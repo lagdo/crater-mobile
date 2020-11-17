@@ -5,12 +5,12 @@ import * as EstimatesAction from '../../actions';
 import { ESTIMATE_EDIT } from '../../constants';
 import moment from 'moment';
 import * as CustomersAction from '~/features/customers/actions';
+import { getCustomers } from '~/features/customers/selectors';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { language, taxTypes },
         estimates: { loading, estimateItems, estimateData, items },
-        customers: { customers },
     } = state;
 
     const {
@@ -33,7 +33,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         estimateData,
         items,
         type,
-        customers,
+        customers: getCustomers(state),
         itemsLoading: loading.itemsLoading,
         language,
         taxTypes,

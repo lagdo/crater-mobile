@@ -152,7 +152,8 @@ export default function globalReducer(state = initialState, action) {
 
         case SET_PREFERENCES:
             const { preferences } = payload;
-            return { ...state,
+            return {
+                ...state,
                 currencies: preferences.currencies,
                 languages: preferences.languages,
                 timezones: preferences.time_zones,

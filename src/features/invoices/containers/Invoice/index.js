@@ -5,13 +5,13 @@ import * as InvoicesAction from '../../actions';
 import { INVOICE_EDIT } from '../../constants';
 import moment from 'moment';
 import * as CustomersAction from '~/features/customers/actions';
+import { getCustomers } from '~/features/customers/selectors';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
         global: { language, taxTypes },
         invoices: { invoiceItems, invoiceData, items },
         customers: {
-            customers,
             loading: { customersLoading, initInvoiceLoading, invoiceLoading, itemsLoading },
         },
     } = state;
@@ -36,7 +36,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         invoiceData,
         items,
         type,
-        customers,
+        customers: getCustomers(state),
         itemsLoading,
         language,
         taxTypes,

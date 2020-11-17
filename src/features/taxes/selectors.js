@@ -5,5 +5,5 @@ const taxTypeList = (state) => state.global.taxTypes;
 
 export const getTaxTypes = createSelector(
     [ taxTypeList ],
-    (taxTypes) => taxTypes.map((taxType) => formatTaxTypes(taxType))
+    (taxTypes) => formatTaxTypes(taxTypes)
 );

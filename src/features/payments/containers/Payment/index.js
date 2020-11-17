@@ -3,12 +3,12 @@ import { connect } from 'react-redux';
 import * as PaymentAction from '../../actions';
 import { PAYMENT_ADD } from '../../constants';
 import { Payment } from '../../components/Payment';
-import { getCustomers } from '~/features/customers/actions';
+import * as CustomersAction from '~/features/customers/actions';
+import { getCustomers } from '~/features/customers/selectors';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
 
     const {
-        customers: { customers },
         global: { language },
         payments: {
             loading: {
@@ -29,7 +29,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
     return {
         id,
         type,
-        customers,
+        customers: getCustomers(state),
         language,
         invoice,
         hasRecordPayment,
@@ -51,7 +51,7 @@ const mapDispatchToProps = {
     editPayment: PaymentAction.editPayment,
     removePayment: PaymentAction.removePayment,
     sendPaymentReceipt: PaymentAction.sendPaymentReceipt,
-    getCustomers: getCustomers,
+    getCustomers: CustomersAction.getCustomers,
 };
 
 //  connect

@@ -5,7 +5,7 @@ const currentCurrency = (state) => state.global.currency;
 
 const expenseList = (state) => state.expenses.expenses;
 const filterExpenseList = (state) => state.expenses.filterExpenses;
-const categoryList = (state) => state.settings.categories;
+const categoryList = (state) => state.categories.categories;
 
 export const getExpenses = createSelector(
     [ expenseList, currentCurrency ],
