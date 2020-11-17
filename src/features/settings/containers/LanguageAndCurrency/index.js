@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import * as PreferencesAction from '../../actions';
 import { LanguageAndCurrency } from '../../components/LanguageAndCurrency';
+import { getCurrencies, getLanguages } from '~/selectors/index';
 
 const mapStateToProps = (state) => {
     const {
@@ -12,7 +13,7 @@ const mapStateToProps = (state) => {
             },
             preferences
         },
-        global: { language, currencies }
+        global: { language }
     } = state
 
     let isLoading = getPreferencesLoading || typeof preferences === 'undefined' || preferences === null
@@ -20,7 +21,8 @@ const mapStateToProps = (state) => {
     return {
         language,
         isLoading,
-        currencies,
+        currencies: getCurrencies(state),
+        languages: getLanguages(state),
         editPreferencesLoading,
         initialValues: !isLoading ? {
             currency: preferences.selectedCurrency,

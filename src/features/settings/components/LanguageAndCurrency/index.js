@@ -34,26 +34,20 @@ export const LanguageAndCurrency = (props: IProps) => {
         clearPreferences,
         editPreferencesLoading,
         currencies,
+        languages,
         isLoading,
         initialValues,
     } = props;
 
-    const [currencyList, setCurrencyList] = useState([]);
-    const [languageList, setLanguageList] = useState([]);
-
     useEffect(() => {
-        getPreferences({
-            onResult: (val) => {
-                const { currencies, languages } = val;
-                setCurrencyList(getCurrenciesList(currencies));
-                setLanguageList(getLanguagesList(languages));
-            }
-        })
+        if (currencies.length === 0 || languages.length === 0) {
+            getPreferences({ onResult: null });
+        }
     }, []);
 
     const onSubmit = (values) => {
         clearPreferences()
-        editPreferences({ params: values, navigation, currencies })
+        editPreferences({ params: values, navigation })
     }
 
     const BOTTOM_ACTION = (handleSubmit) => {
@@ -66,41 +60,6 @@ export const LanguageAndCurrency = (props: IProps) => {
                 />
             </View>
         )
-    }
-
-    const getCurrenciesList = (currencies) => {
-        let currencyList = []
-        if (typeof currencies !== 'undefined' && currencies.length != 0) {
-            currencyList = currencies.map((currency) => {
-
-                const { name, code, symbol } = currency
-                return {
-                    title: name,
-                    subtitle: {
-                        title: code,
-                    },
-                    rightTitle: symbol || '-',
-                    fullItem: currency
-                }
-            })
-        }
-        return currencyList;
-    }
-
-    const getLanguagesList = (languages) => {
-        let languageList = []
-        if (typeof languages !== 'undefined' && languages) {
-            languageList = languages.map((language) => {
-
-                let { name } = language
-                return {
-                    title: name,
-                    leftAvatar: name.toUpperCase().charAt(0),
-                    fullItem: language
-                }
-            })
-        }
-        return languageList;
     }
 
     const getSelectedField = (items, find, field) => {
@@ -144,20 +103,20 @@ export const LanguageAndCurrency = (props: IProps) => {
                 }}
                 bottomAction={BOTTOM_ACTION(handleSubmit)}
                 loadingProps={{
-                    is: isLoading || currencyList.length === 0 || languageList.length === 0
+                    is: isLoading || currencies.length === 0 || languages.length === 0
                 }}
             >
                 <View style={styles.mainContainer}>
                     <Field
                         name="language"
-                        items={languageList}
+                        items={languages}
                         component={SelectField}
                         label={Lng.t("settings.preferences.language")}
                         icon='language'
                         rightIcon='angle-right'
                         displayName="name"
                         placeholder={form.getState().values?.language ?
-                            getSelectedField(languageList, form.getState().values.language, 'code') :
+                            getSelectedField(languages, form.getState().values.language, 'code') :
                             Lng.t("settings.preferences.languagePlaceholder")
                         }
                         navigation={navigation}
@@ -185,14 +144,14 @@ export const LanguageAndCurrency = (props: IProps) => {
 
                     <Field
                         name="currency"
-                        items={currencyList}
+                        items={currencies}
                         displayName="name"
                         component={SelectField}
                         label={Lng.t("settings.preferences.currency")}
                         icon='dollar-sign'
                         rightIcon='angle-right'
                         placeholder={form.getState().values?.currency ?
-                            getSelectedField(currencyList, form.getState().values.currency, 'id') :
+                            getSelectedField(currencies, form.getState().values.currency, 'id') :
                             Lng.t("settings.preferences.currencyPlaceholder")
                         }
                         navigation={navigation}

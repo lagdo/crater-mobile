@@ -3,11 +3,11 @@ import { connect } from 'react-redux';
 import { CUSTOMER_ADD } from '../../constants';
 import * as customerAction from '../../actions'
 import { Customer } from '../../components/Customer';
-
+import { getCurrencies } from '~/selectors/index';
 
 const mapStateToProps = (state, { route: { params = {} } }) => {
     const {
-        global: { language, currencies, currency },
+        global: { language, currency },
         customers: {
             loading: {
                 customerLoading,
@@ -23,7 +23,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         onSelect,
         type,
         language,
-        currencies,
+        currencies: getCurrencies(state),
         currency,
         customerLoading,
         getEditCustomerLoading,

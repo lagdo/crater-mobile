@@ -59,8 +59,7 @@ export const Customer = (props: IProps) =>  {
     } = props;
 
     const [selectedCurrency, setSelectedCurrency] = useState('');
-    const [portal, setPortal] = useState(false);
-    // const [currencyList, setCurrencyList] = useState(currencies);
+    // const [portal, setPortal] = useState(false);
 
     useEffect(() => {
         if (type === CUSTOMER_EDIT) {
@@ -107,13 +106,13 @@ export const Customer = (props: IProps) =>  {
         customerRefs.form.change(field, value);
     };
 
-    const onTogglePortal = (status) => {
-        setFormField('enable_portal', status)
-        setPortal(status)
+    // const onTogglePortal = (status) => {
+    //     setFormField('enable_portal', status)
+    //     setPortal(status)
 
-        if (!status)
-            setFormField('password', '')
-    }
+    //     if (!status)
+    //         setFormField('password', '')
+    // }
 
     const onCustomerSubmit = (values) => {
         if (type === CUSTOMER_ADD)
@@ -150,25 +149,6 @@ export const Customer = (props: IProps) =>  {
                 />
             </View>
         )
-    }
-
-    const getCurrenciesList = () => {
-        let currencyList = []
-        if (typeof currencies !== 'undefined' && currencies.length != 0) {
-            currencyList = currencies.map((currency) => {
-
-                const { name, code, symbol } = currency
-                return {
-                    title: name,
-                    subtitle: {
-                        title: code,
-                    },
-                    rightTitle: symbol || '-',
-                    fullItem: currency
-                }
-            })
-        }
-        return currencyList
     }
 
     const onOptionSelect = (action) => {
@@ -318,7 +298,7 @@ export const Customer = (props: IProps) =>  {
 
                         <Field
                             name="currency_id"
-                            items={getCurrenciesList()}
+                            items={currencies}
                             displayName="name"
                             component={SelectField}
                             icon='dollar-sign'

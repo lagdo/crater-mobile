@@ -33,7 +33,6 @@ export const Preferences = (props: IProps) => {
         getSettingItem,
         editPreferences,
         clearPreferences,
-        currencies,
         editPreferencesLoading,
         editSettingItemLoading,
         editSettingItem,
@@ -75,7 +74,7 @@ export const Preferences = (props: IProps) => {
     const onSubmitPreferences = (values) => {
         if (!(editPreferencesLoading || editSettingItemLoading)) {
             clearPreferences()
-            editPreferences({ params: values, navigation, currencies })
+            editPreferences({ params: values, navigation })
         }
     }
 

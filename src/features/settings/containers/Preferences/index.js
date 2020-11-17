@@ -14,7 +14,7 @@ const mapStateToProps = (state) => {
             },
             preferences,
         },
-        global: { language, currencies }
+        global: { language }
     } = state
 
     let isLoading = getPreferencesLoading || typeof preferences === 'undefined' || preferences === null || getSettingItemLoading
@@ -22,7 +22,6 @@ const mapStateToProps = (state) => {
     return {
         language,
         isLoading,
-        currencies,
         editPreferencesLoading,
         editSettingItemLoading,
         initialValues: !isLoading ? {
