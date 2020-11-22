@@ -37,6 +37,7 @@ import { ADD_TAX } from '~/features/settings/constants';
 import { PAYMENT_ADD } from '~/features/payments/constants';
 import { MAX_LENGTH, alertMe } from '~/api/global';
 import { validate } from '../../containers/Invoice/validation';
+import { useProductHolder } from '~/selectors/product/holder';
 
 type IProps = {
     navigation: Object,
@@ -60,14 +61,7 @@ type IProps = {
     type: String
 }
 
-const invoiceRefs = {
-    taxes: [],
-    discount: 0,
-    discount_type: 'none',
-    status: 'draft',
-};
-
-export const Invoice = (props: IProps) => {
+const InvoiceContent = (props: IProps) => {
     const {
         navigation,
         loading,
@@ -91,31 +85,37 @@ export const Invoice = (props: IProps) => {
         customers,
         customersLoading,
         taxTypes,
-        createInvoice,
-        editInvoice,
         changeInvoiceStatus,
-        initialValues,
+        form,
+        handleSubmit,
     } = props;
 
-    // const [taxTypeList, setTaxTypeList] = useState([]);
-    const [currency, setCurrency] = useState({});
-    // const [itemList, setItemList] = useState([]);
+    const [currency, setCurrency] = useState(null);
     const [customerName, setCustomerName] = useState('');
     const [markAsStatus, setMarkAsStatus] = useState(null);
+
+    const invoice = useProductHolder(form.getState().values, invoiceItems, items);
+
+    const formValues = form.getState().values || {};
+
+    const setFormField = (field, value) => form.change(field, value);
+
+    const setCurrencyValue = (value) => {
+        setCurrency(value);
+        setFormField('currency', value);
+    };
 
     useEffect(() => {
         type === INVOICE_EDIT ?
             getEditInvoice({
                 id,
                 onResult: ({ user, status }) => {
-                    setCurrency(user.currency);
+                    setCurrencyValue(user.currency);
                     setCustomerName(user.name);
                     setMarkAsStatus(status);
                 }
             }) :
-            getCreateInvoice({ onResult: (val) => setCurrency(val.currency) });
-
-        getInvoiceItemList(invoiceItems);
+            getCreateInvoice({ onResult: (val) => setCurrencyValue(val.currency) });
 
         setOnBackHandler(onDraft);
 
@@ -125,10 +125,6 @@ export const Invoice = (props: IProps) => {
             removeBackHandler();
         }
     }, []);
-
-    const setFormField = (field, value) => {
-        invoiceRefs.form.change(field, value);
-    };
 
     const onEditItem = (item) => {
         navigation.navigate(ROUTES.INVOICE_ITEM,
@@ -152,177 +148,46 @@ export const Invoice = (props: IProps) => {
     }
 
     const onSaveInvoice = (status = 'draft') => {
-        invoiceRefs.status = status;
-        invoiceRefs.handleSubmit();
-    }
-
-    const onSubmitInvoice = (values) => {
-        if (finalAmount() < 0) {
+        if (invoice.amounts.final < 0) {
             alert(Lng.t("invoices.alert.lessAmount"));
             return;
         }
 
-        let invoice = {
-            ...values,
-            invoice_number: `${invoice_prefix}-${values.invoice_number}`,
-            total: finalAmount(),
-            sub_total: invoiceSubTotal(),
-            tax: invoiceTax() + invoiceCompoundTax(),
-            discount_val: totalDiscount(),
-            taxes: values.taxes ? values.taxes.map(val => {
-                return {
-                    ...val,
-                    amount: val.compound_tax ?
-                        getCompoundTaxValue(val.percent) : getTaxValue(val.percent),
-                }
-            }) : [],
+        if (status === 'send') {
+            setFormField('invoiceSend', true);
         }
+        setFormField('total', invoice.amounts.final);
+        setFormField('sub_total', invoice.amounts.gross);
+        setFormField('tax', invoice.amounts.tax);
+        setFormField('discount_val', invoice.amounts.discount);
+        setFormField('items', invoiceItems);
+        setFormField('taxes', [ ...invoice.taxes.simple, ...invoice.taxes.compound ]);
 
-        if (invoiceRefs.status === 'send') {
-            invoice.invoiceSend = true
-        }
-
-        type === INVOICE_ADD ?
-            createInvoice({
-                invoice,
-                onResult: (url) => {
-                    if (invoiceRefs.status === 'download') {
-                        Linking.openURL(url);
-                    }
-                    navigation.goBack();
-                }
-            }) :
-            editInvoice({
-                invoice: { ...invoice, id },
-                onResult: (url) => {
-                    if (invoiceRefs.status === 'download') {
-                        Linking.openURL(url);
-                    }
-                    navigation.goBack();
-                }
-            })
+        handleSubmit();
     };
 
-    const invoiceSubTotal = () => {
-        let subTotal = 0
-        invoiceItems.map(val => {
-            subTotal += JSON.parse(val.total)
-        })
+    const getAmountView = ({ label, amount }, style, index) => (
+        <View style={styles.subContainer} key={index}>
+            <View>
+                <Text style={styles.amountHeading}> {label}</Text>
+            </View>
+            <View>
+                <CurrencyFormat amount={amount} currency={currency} style={style} />
+            </View>
+        </View>
+    );
 
-        return JSON.parse(subTotal)
-    }
-
-    const subTotal = () => {
-        let invoiceTax = 0
-        invoiceItemTotalTaxes().filter(val => {
-            invoiceTax += val.amount
-        })
-        return (invoiceSubTotal() + invoiceTax) - totalDiscount()
-    }
-
-    const invoiceTax = () => {
-        let totalTax = 0
-
-        invoiceRefs.taxes && invoiceRefs.taxes.map(val => {
-            if (!val.compound_tax) {
-                totalTax += getTaxValue(val.percent)
-            }
-        })
-
-        return totalTax
-    }
-
-    const invoiceCompoundTax = () => {
-        let totalTax = 0
-
-        invoiceRefs.taxes && invoiceRefs.taxes.map(val => {
-            if (val.compound_tax) {
-                totalTax += getCompoundTaxValue(val.percent)
-            }
-        })
-
-        return totalTax
-    }
-
-    const getTaxValue = (tax) => {
-        return (tax * JSON.parse(subTotal())) / 100
-    }
-
-    const getCompoundTaxValue = (tax) => {
-        return (tax * JSON.parse(totalAmount())) / 100
-    }
-
-    const getTaxName = (tax) => {
-        let taxName = ''
-        const type = taxTypes.filter(val => val.fullItem.id === tax.tax_type_id)
-
-        if (type.length > 0) {
-            taxName = type[0]['fullItem'].name
-        }
-        return taxName
-    }
-
-    const totalDiscount = () => {
-        return invoiceRefs.discount_type === 'percentage' ?
-            (invoiceRefs.discount * invoiceSubTotal()) / 100 : invoiceRefs.discount * 100;
-    }
-
-    const totalAmount = () => {
-        return subTotal() + invoiceTax()
-    }
-
-    const finalAmount = () => {
-        return totalAmount() + invoiceCompoundTax()
-    }
-
-    const invoiceItemTotalTaxes = () => {
-        let taxes = []
-        invoiceItems.map(val => {
-            val.taxes && val.taxes.filter(tax => {
-                let hasSame = false
-                const { tax_type_id, id, amount } = tax
-
-                taxes = taxes.map(tax2 => {
-                    if ((tax_type_id || id) === tax2.tax_type_id) {
-                        hasSame = true
-                        return {
-                            ...tax2,
-                            amount: amount + tax2.amount,
-                            tax_type_id: tax2.tax_type_id
-                        }
-                    }
-                    return tax2
-                })
-
-                if (!hasSame) {
-                    taxes.push({ ...tax, tax_type_id: (tax_type_id || id) })
-                }
-            })
-        })
-        return taxes
-    }
-
-    const FINAL_AMOUNT = (form) => {
+    const FINAL_AMOUNT = () => {
         let taxPerItem = !(tax_per_item === 'NO' || typeof tax_per_item === 'undefined' || tax_per_item === null)
 
         let discountPerItem = !(discount_per_item === 'NO' || typeof discount_per_item === 'undefined' || discount_per_item === null)
 
         return (
             <View style={styles.amountContainer}>
-                <View style={styles.subContainer}>
-                    <View>
-                        <Text style={styles.amountHeading}>
-                            {Lng.t("invoices.subtotal")}
-                        </Text>
-                    </View>
-                    <View>
-                        <CurrencyFormat
-                            amount={invoiceSubTotal()}
-                            currency={currency}
-                            style={styles.subAmount}
-                        />
-                    </View>
-                </View>
+                {getAmountView({
+                    label: Lng.t("invoices.subtotal"),
+                    amount: invoice.amounts.subTotal,
+                }, styles.subAmount, 'subTotal')}
 
                 {(!discountPerItem) && (
                     <View style={[styles.subContainer, styles.discount]}>
@@ -348,7 +213,7 @@ export const Invoice = (props: IProps) => {
                                 component={SelectPickerField}
                                 items={INVOICE_DISCOUNT_OPTION}
                                 onChangeCallback={(val) => {
-                                    form.change('discount_type', val)
+                                    setFormField('discount_type', val)
                                 }}
                                 isFakeInput
                                 defaultPickerOptions={{
@@ -365,50 +230,7 @@ export const Invoice = (props: IProps) => {
                     </View>
                 )}
 
-                {invoiceRefs.taxes &&
-                    invoiceRefs.taxes.map((val, index) => !val.compound_tax ? (
-                        <View style={styles.subContainer} key={index}>
-                            <View>
-                                <Text style={styles.amountHeading}>
-                                    {getTaxName(val)} ({val.percent} %)
-                                </Text>
-                            </View>
-                            <View>
-                                <CurrencyFormat
-                                    amount={getTaxValue(val.percent)}
-                                    currency={currency}
-                                    style={styles.subAmount}
-                                />
-                            </View>
-                        </View>
-                    ) : null
-                    )
-                }
-
-                {invoiceRefs.taxes &&
-                    invoiceRefs.taxes.map((val, index) => val.compound_tax ? (
-                        <View
-                            style={styles.subContainer}
-                            key={index}
-                        >
-                            <View>
-                                <Text style={styles.amountHeading}>
-                                    {getTaxName(val)} ({val.percent} %)
-                                </Text>
-                            </View>
-                            <View>
-                                <CurrencyFormat
-                                    amount={getCompoundTaxValue(val.percent)}
-                                    currency={currency}
-                                    style={styles.subAmount}
-                                />
-                            </View>
-                        </View>
-                    ) : null
-                    )
-                }
-
-                {DISPLAY_ITEM_TAX()}
+                {invoice.taxes.all.map((tax, index) => getAmountView(tax, styles.subAmount, index))}
 
                 {(!taxPerItem) && (
                     <Field
@@ -437,7 +259,7 @@ export const Invoice = (props: IProps) => {
                         rightIconPress={
                             () => navigation.navigate(ROUTES.TAX, {
                                 type: ADD_TAX,
-                                onSelect: (val) => form.change('taxes', [...val, ...invoiceRefs.taxes])
+                                onSelect: (val) => setFormField('taxes', [...val, ...taxes])
                             })
                         }
                         listViewProps={{
@@ -451,20 +273,10 @@ export const Invoice = (props: IProps) => {
 
                 <CtDivider dividerStyle={styles.divider} />
 
-                <View style={styles.subContainer}>
-                    <View>
-                        <Text style={styles.amountHeading}>
-                            {Lng.t("invoices.totalAmount")}:
-                        </Text>
-                    </View>
-                    <View>
-                        <CurrencyFormat
-                            amount={finalAmount()}
-                            currency={currency}
-                            style={styles.finalAmount}
-                        />
-                    </View>
-                </View>
+                {getAmountView({
+                    label: Lng.t("invoices.totalAmount"),
+                    amount: invoice.amounts.final,
+                }, styles.finalAmount, 'totalAmount')}
             </View>
         )
     };
@@ -491,89 +303,6 @@ export const Invoice = (props: IProps) => {
 
             </View>
         )
-    }
-
-    const DISPLAY_ITEM_TAX = () => {
-        let taxes = invoiceItemTotalTaxes()
-
-        return taxes ? (
-            taxes.map((val, index) => (
-                <View style={styles.subContainer} key={index}>
-                    <View>
-                        <Text style={styles.amountHeading}>
-                            {getTaxName(val)} ({val.percent} %)
-                        </Text>
-                    </View>
-                    <View>
-                        <CurrencyFormat
-                            amount={val.amount}
-                            currency={currency}
-                            style={styles.subAmount}
-                        />
-                    </View>
-                </View>
-            )
-            )
-        ) : null
-    }
-
-    const getInvoiceItemList = (invoiceItems) => {
-        setFormField('items', invoiceItems)
-
-        let invoiceItemList = []
-
-        if (typeof invoiceItems !== 'undefined' && invoiceItems.length != 0) {
-
-            invoiceItemList = invoiceItems.map((item) => {
-
-                let { name, description, price, quantity, total } = item
-
-                return {
-                    title: name,
-                    subtitle: {
-                        title: description,
-                        labelComponent: (
-                            <CurrencyFormat
-                                amount={price}
-                                currency={currency}
-                                preText={`${quantity} * `}
-                                style={styles.itemLeftSubTitle}
-                                containerStyle={styles.itemLeftSubTitleLabel}
-                            />
-                        ),
-                    },
-                    amount: total,
-                    currency,
-                    fullItem: item,
-                };
-            });
-        }
-
-        return invoiceItemList
-    }
-
-    const getItemList = (items) => {
-        let itemList = []
-
-        if (typeof items !== 'undefined' && items.length != 0) {
-
-            itemList = items.map((item) => {
-
-                let { name, description, price } = item
-
-                return {
-                    title: name,
-                    subtitle: {
-                        title: description,
-                    },
-                    amount: price,
-                    currency,
-                    fullItem: item,
-                };
-            });
-        }
-
-        return itemList
     }
 
     const onOptionSelect = (action) => {
@@ -605,7 +334,7 @@ export const Invoice = (props: IProps) => {
                     user_id,
                     due_amount,
                     invoice_number,
-                } = invoiceRefs.form.getState().values;
+                } = form.getState().values;
                 const invoice = {
                     id,
                     user,
@@ -669,213 +398,248 @@ export const Invoice = (props: IProps) => {
     } : null;
 
     return (
-        <Form validate={validate} initialValues={initialValues} onSubmit={onSubmitInvoice}>
-        {({ handleSubmit, form }) => {
-            const formValues = form.getState().values || {};
-            const { taxes, discount, discount_type } = formValues;
-            invoiceRefs.handleSubmit = handleSubmit;
-            invoiceRefs.form = form;
-            invoiceRefs.taxes = taxes;
-            invoiceRefs.discount = discount;
-            invoiceRefs.discount_type = discount_type;
-
-            return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: onDraft,
-                    title: isEditInvoice ? Lng.t("header.editInvoice") : Lng.t("header.addInvoice"),
-                    rightIcon: !isEditInvoice ? 'save' : null,
-                    rightIconPress: () => onSaveInvoice('save'),
-                    rightIconProps: { solid: true },
-                    placement: "center",
-                }}
-                bottomAction={BOTTOM_ACTION()}
-                loadingProps={{ is: initLoading }}
-                dropdownProps={drownDownProps}
-            >
-                <View style={styles.bodyContainer}>
-                    <View style={styles.dateFieldContainer}>
-                        <View style={styles.dateField}>
-                            <Field
-                                name={'invoice_date'}
-                                isRequired
-                                component={DatePickerField}
-                                label={Lng.t("invoices.invoiceDate")}
-                                icon={'calendar-alt'}
-                                onChangeCallback={(val) => form.change('invoice_date', val)}
-                            />
-                        </View>
-                        <View style={styles.dateField}>
-                            <Field
-                                name="due_date"
-                                isRequired
-                                component={DatePickerField}
-                                label={Lng.t("invoices.dueDate")}
-                                icon={'calendar-alt'}
-                                onChangeCallback={(val) => form.change('due_date', val)}
-                            />
-                        </View>
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: onDraft,
+                title: isEditInvoice ? Lng.t("header.editInvoice") : Lng.t("header.addInvoice"),
+                rightIcon: !isEditInvoice ? 'save' : null,
+                rightIconPress: () => onSaveInvoice('save'),
+                rightIconProps: { solid: true },
+                placement: "center",
+            }}
+            bottomAction={BOTTOM_ACTION()}
+            loadingProps={{ is: initLoading }}
+            dropdownProps={drownDownProps}
+        >
+            <View style={styles.bodyContainer}>
+                <View style={styles.dateFieldContainer}>
+                    <View style={styles.dateField}>
+                        <Field
+                            name={'invoice_date'}
+                            isRequired
+                            component={DatePickerField}
+                            label={Lng.t("invoices.invoiceDate")}
+                            icon={'calendar-alt'}
+                            onChangeCallback={(val) => setFormField('invoice_date', val)}
+                        />
                     </View>
+                    <View style={styles.dateField}>
+                        <Field
+                            name="due_date"
+                            isRequired
+                            component={DatePickerField}
+                            label={Lng.t("invoices.dueDate")}
+                            icon={'calendar-alt'}
+                            onChangeCallback={(val) => setFormField('due_date', val)}
+                        />
+                    </View>
+                </View>
 
-                    <Field
-                        name="invoice_number"
-                        component={FakeInput}
-                        label={Lng.t("invoices.invoiceNumber")}
-                        isRequired
-                        prefixProps={{
-                            fieldName: "invoice_number",
-                            prefix: invoice_prefix,
-                            icon: 'hashtag',
-                            iconSolid: false,
-                        }}
-                    />
+                <Field
+                    name="invoice_number"
+                    component={FakeInput}
+                    label={Lng.t("invoices.invoiceNumber")}
+                    isRequired
+                    prefixProps={{
+                        fieldName: "invoice_number",
+                        prefix: invoice_prefix,
+                        icon: 'hashtag',
+                        iconSolid: false,
+                    }}
+                />
 
-                    <Field
-                        name="user_id"
-                        items={customers}
-                        apiSearch
-                        hasPagination
-                        isRequired
-                        getItems={getCustomers}
-                        displayName="name"
-                        component={SelectField}
-                        label={Lng.t("invoices.customer")}
-                        icon={'user'}
-                        placeholder={customerName ? customerName :
-                            Lng.t("invoices.customerPlaceholder")
-                        }
-                        navigation={navigation}
-                        compareField="id"
-                        onSelect={(item) => {
-                            form.change('user_id', item.id)
-                            setCurrency(item.currency)
-                        }}
-                        rightIconPress={
-                            () => navigation.navigate(ROUTES.CUSTOMER, {
-                                type: CUSTOMER_ADD,
-                                currency,
-                                onSelect: (val) => {
-                                    form.change('user_id', val.id)
-                                    setCurrency(val.currency)
-                                }
-                            })
-                        }
-                        headerProps={{ title: Lng.t("customers.title") }}
-                        listViewProps={{ hasAvatar: true }}
-                        emptyContentProps={{
-                            contentType: "customers",
-                            image: IMAGES.EMPTY_CUSTOMERS,
-                        }}
-                        fakeInputProps={{ loading: customersLoading }}
-                    />
-
-                    <Text style={[styles.inputTextStyle, styles.label]}>
-                        {Lng.t("invoices.items")}
-                        <Text style={styles.required}> *</Text>
-                    </Text>
-
-                    <ListView
-                        items={getInvoiceItemList(invoiceItems)}
-                        itemContainer={styles.itemContainer}
-                        leftTitleStyle={styles.itemLeftTitle}
-                        leftSubTitleLabelStyle={[styles.itemLeftSubTitle, styles.itemLeftSubTitleLabel]}
-                        leftSubTitleStyle={styles.itemLeftSubTitle}
-                        rightTitleStyle={styles.itemRightTitle}
-                        backgroundColor={colors.white}
-                        onPress={onEditItem}
-                    />
-
-                    <Field
-                        name="items"
-                        items={getItemList(items)}
-                        displayName="name"
-                        component={SelectField}
-                        hasPagination
-                        apiSearch
-                        getItems={getItems}
-                        compareField="id"
-                        valueCompareField="item_id"
-                        icon={'percent'}
-                        placeholder={Lng.t("invoices.addItem")}
-                        navigation={navigation}
-                        onlyPlaceholder
-                        isMultiSelect
-                        loading={itemsLoading}
-                        fakeInputProps={{
-                            icon: 'shopping-basket',
-                            rightIcon: 'angle-right',
-                            color: colors.primaryLight,
-                        }}
-                        onSelect={
-                            (item) => {
-                                navigation.navigate(ROUTES.INVOICE_ITEM, {
-                                    item,
-                                    currency,
-                                    type: ITEM_ADD,
-                                    discount_per_item,
-                                    tax_per_item
-                                })
+                <Field
+                    name="user_id"
+                    items={customers}
+                    apiSearch
+                    hasPagination
+                    isRequired
+                    getItems={getCustomers}
+                    displayName="name"
+                    component={SelectField}
+                    label={Lng.t("invoices.customer")}
+                    icon={'user'}
+                    placeholder={customerName ? customerName :
+                        Lng.t("invoices.customerPlaceholder")
+                    }
+                    navigation={navigation}
+                    compareField="id"
+                    onSelect={(user) => {
+                        setFormField('user_id', user.id)
+                        setCurrencyValue(user.currency)
+                    }}
+                    rightIconPress={
+                        () => navigation.navigate(ROUTES.CUSTOMER, {
+                            type: CUSTOMER_ADD,
+                            currency,
+                            onSelect: (val) => {
+                                setFormField('user_id', val.id)
+                                setCurrencyValue(val.currency)
                             }
-                        }
-                        rightIconPress={
-                            () => navigation.navigate(ROUTES.INVOICE_ITEM, {
-                                type: ITEM_ADD,
+                        })
+                    }
+                    headerProps={{ title: Lng.t("customers.title") }}
+                    listViewProps={{ hasAvatar: true }}
+                    emptyContentProps={{
+                        contentType: "customers",
+                        image: IMAGES.EMPTY_CUSTOMERS,
+                    }}
+                    fakeInputProps={{ loading: customersLoading }}
+                />
+
+                <Text style={[styles.inputTextStyle, styles.label]}>
+                    {Lng.t("invoices.items")}
+                    <Text style={styles.required}> *</Text>
+                </Text>
+
+                <ListView
+                    items={invoice.items.selected}
+                    itemContainer={styles.itemContainer}
+                    leftTitleStyle={styles.itemLeftTitle}
+                    leftSubTitleLabelStyle={[styles.itemLeftSubTitle, styles.itemLeftSubTitleLabel]}
+                    leftSubTitleStyle={styles.itemLeftSubTitle}
+                    rightTitleStyle={styles.itemRightTitle}
+                    backgroundColor={colors.white}
+                    onPress={onEditItem}
+                />
+
+                <Field
+                    name="items"
+                    items={invoice.items.available}
+                    displayName="name"
+                    component={SelectField}
+                    hasPagination
+                    apiSearch
+                    getItems={getItems}
+                    compareField="id"
+                    valueCompareField="item_id"
+                    icon={'percent'}
+                    placeholder={Lng.t("invoices.addItem")}
+                    navigation={navigation}
+                    onlyPlaceholder
+                    isMultiSelect
+                    loading={itemsLoading}
+                    fakeInputProps={{
+                        icon: 'shopping-basket',
+                        rightIcon: 'angle-right',
+                        color: colors.primaryLight,
+                    }}
+                    onSelect={
+                        (item) => {
+                            navigation.navigate(ROUTES.INVOICE_ITEM, {
+                                item,
                                 currency,
+                                type: ITEM_ADD,
                                 discount_per_item,
                                 tax_per_item
                             })
                         }
-                        headerProps={{ title: Lng.t("items.title") }}
-                        emptyContentProps={{
-                            contentType: "items",
-                            image: IMAGES.EMPTY_ITEMS,
-                        }}
-                        listViewProps={{ leftSubTitleStyle: itemsDescriptionStyle() }}
-                    />
+                    }
+                    rightIconPress={
+                        () => navigation.navigate(ROUTES.INVOICE_ITEM, {
+                            type: ITEM_ADD,
+                            currency,
+                            discount_per_item,
+                            tax_per_item
+                        })
+                    }
+                    headerProps={{ title: Lng.t("items.title") }}
+                    emptyContentProps={{
+                        contentType: "items",
+                        image: IMAGES.EMPTY_ITEMS,
+                    }}
+                    listViewProps={{ leftSubTitleStyle: itemsDescriptionStyle() }}
+                />
 
-                    {FINAL_AMOUNT(form)}
+                {FINAL_AMOUNT()}
 
-                    <Field
-                        name="reference_number"
-                        component={InputField}
-                        hint={Lng.t("invoices.referenceNumber")}
-                        leftIcon={'hashtag'}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                        }}
-                    />
+                <Field
+                    name="reference_number"
+                    component={InputField}
+                    hint={Lng.t("invoices.referenceNumber")}
+                    leftIcon={'hashtag'}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                    }}
+                />
 
-                    <Field
-                        name="notes"
-                        component={InputField}
-                        hint={Lng.t("invoices.notes")}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            placeholder: Lng.t("invoices.notePlaceholder"),
-                            autoCorrect: true,
-                            multiline: true,
-                            maxLength: MAX_LENGTH
-                        }}
-                        height={80}
-                        hintStyle={styles.noteHintStyle}
-                        autoCorrect={true}
-                    />
+                <Field
+                    name="notes"
+                    component={InputField}
+                    hint={Lng.t("invoices.notes")}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        placeholder: Lng.t("invoices.notePlaceholder"),
+                        autoCorrect: true,
+                        multiline: true,
+                        maxLength: MAX_LENGTH
+                    }}
+                    height={80}
+                    hintStyle={styles.noteHintStyle}
+                    autoCorrect={true}
+                />
 
-                    <Field
-                        name="invoice_template_id"
-                        templates={invoiceTemplates}
-                        component={TemplateField}
-                        label={Lng.t("invoices.template")}
-                        icon={'file-alt'}
-                        placeholder={Lng.t("invoices.templatePlaceholder")}
-                        navigation={navigation}
-                    />
-                </View>
-            </DefaultLayout>
-            );
-        }}
+                <Field
+                    name="invoice_template_id"
+                    templates={invoiceTemplates}
+                    component={TemplateField}
+                    label={Lng.t("invoices.template")}
+                    icon={'file-alt'}
+                    placeholder={Lng.t("invoices.templatePlaceholder")}
+                    navigation={navigation}
+                />
+            </View>
+        </DefaultLayout>
+        );
+}
+
+export const Invoice = (props: IProps) => {
+    const {
+        navigation,
+        id,
+        type,
+        initialValues,
+        createInvoice,
+        editInvoice,
+    } = props;
+
+    const onSaveInvoice = (invoice) => {
+        type === INVOICE_ADD ?
+            createInvoice({
+                invoice,
+                onResult: (url) => {
+                    if (status === 'download') {
+                        Linking.openURL(url);
+                    }
+                    navigation.goBack();
+                }
+            }) :
+            editInvoice({
+                invoice: { ...invoice, id },
+                onResult: (url) => {
+                    if (status === 'download') {
+                        Linking.openURL(url);
+                    }
+                    navigation.goBack();
+                }
+            })
+    };
+
+    return (
+        <Form
+            validate={validate}
+            initialValues={initialValues}
+            onSubmit={onSaveInvoice}
+        >
+            { ({ handleSubmit, form }) => (
+                <InvoiceContent
+                    {...props}
+                    form={form}
+                    handleSubmit={handleSubmit}
+                />
+            )}
         </Form>
     );
 }
