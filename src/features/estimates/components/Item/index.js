@@ -26,16 +26,9 @@ import Lng from '~/api/lang/i18n';
 import { ADD_TAX } from '~/features/settings/constants';
 import { MAX_LENGTH, alertMe } from '~/api/global';
 import { validate } from '../../containers/Item/validation';
+import { useProductItem } from '~/selectors/product/item';
 
-let itemRefs = {
-    quantity: 0,
-    price: 0,
-    discount: 0,
-    discount_type: 'none',
-    taxes: [],
-};
-
-export const EstimateItem = (props) => {
+const EstimateItemContent = (props) => {
     const {
         navigation,
         loading,
@@ -47,11 +40,14 @@ export const EstimateItem = (props) => {
         itemId,
         units,
         getItemUnits,
-        addItem,
         removeEstimateItem,
-        setEstimateItems,
-        initialValues,
+        form,
+        handleSubmit,
     } = props;
+
+    const product = useProductItem(form.getState().values);
+
+    const formValues = form.getState().values || {};
 
     const isCreateItem = (type === ITEM_ADD);
 
@@ -59,52 +55,29 @@ export const EstimateItem = (props) => {
         !itemId && getItemUnits && getItemUnits();
     }, []);
 
-    const setFormField = (field, value) => {
-        itemRefs.form.change(field, value);
-    };
+    const setFormField = (field, value) => form.change(field, value);
 
-    const saveItem = (values) => {
-        if (finalAmount() < 0) {
+    const onSaveItem = () => {
+        if (product.amounts.final < 0) {
             alert(Lng.t("items.lessAmount"));
             return;
         }
 
-        const item = {
-            ...values,
-            final_total: finalAmount(),
-            total: subTotal(),
-            discount_val: totalDiscount(),
-            tax: itemTax() + itemCompoundTax(),
-            taxes: values.taxes && values.taxes.map(val => {
-                return {
-                    ...val,
-                    amount: val.compound_tax ?
-                        getCompoundTaxValue(val.percent) :
-                        getTaxValue(val.percent),
-                }
-            }),
-        }
+        // Add additional data to the form
+        setFormField('final_total', product.amounts.final);
+        setFormField('total', product.amounts.total);
+        setFormField('tax', product.amounts.tax);
+        setFormField('taxes', product.taxes.all);
+        setFormField('discount_val', product.amounts.discount);
 
-        const callback = () => addItem({ item, onResult: navigation.goBack });
-
-        if (!itemId) {
-            callback();
-        } else {
-            const estimateItem = [{ ...item, item_id: itemId }];
-
-            if (type === ITEM_EDIT) {
-                removeEstimateItem({ id: itemId });
-            }
-
-            setEstimateItems({ estimateItem });
-
-            navigation.navigate(ROUTES.ESTIMATE);
-        }
+        handleSubmit();
     };
 
     const addTax = () => navigation.navigate(ROUTES.TAX, {
         type: ADD_TAX,
-        onSelect: (val) => itemRefs.form.change('taxes', [...val, ...itemRefs.taxes])
+        onSelect: (taxes) => {
+            return form.change('taxes', [...taxes, ...formValues.taxes]);
+        }
     });
 
     const removeItem = () => {
@@ -112,176 +85,64 @@ export const EstimateItem = (props) => {
             title: Lng.t("alert.title"),
             showCancel: true,
             okPress: () => {
-                navigation.navigate(ROUTES.ESTIMATE)
-                removeEstimateItem({ id: itemId })
+                navigation.navigate(ROUTES.ESTIMATE);
+                removeEstimateItem({ id: itemId });
             }
         })
     }
 
-    const totalDiscount = () => {
-        let discountPrice = 0
-
-        if (itemRefs.discount_type === 'percentage') {
-            discountPrice = ((itemRefs.discount * itemSubTotal()) / 100)
-        } else if (itemRefs.discount_type === 'fixed') {
-            discountPrice = (itemRefs.discount * 100)
-        }
-        else if (itemRefs.discount_type === 'none') {
-            discountPrice = 0
-            setFormField('discount', 0)
-        }
-
-        return discountPrice
-    }
-
-    const totalAmount = () => {
-        return subTotal() + itemTax()
-    }
-
-    const itemSubTotal = () => {
-        return (itemRefs.price * itemRefs.quantity)
-    }
-
-    const subTotal = () => {
-        return itemSubTotal() - totalDiscount()
-    }
-
-    const itemTax = () => {
-        let totalTax = 0
-
-        itemRefs.taxes && itemRefs.taxes.map(val => {
-            if (!val.compound_tax) {
-                totalTax += getTaxValue(val.percent)
-            }
-        })
-
-        return totalTax
-    }
-
-    const itemCompoundTax = () => {
-        let totalTax = 0
-
-        itemRefs.taxes && itemRefs.taxes.map(val => {
-            if (val.compound_tax) {
-                totalTax += getCompoundTaxValue(val.percent)
-            }
-        })
-
-        return totalTax
-    }
-
-    const getTaxValue = (tax) => {
-        return (tax * JSON.parse(subTotal())) / 100
-    }
-
-    const getCompoundTaxValue = (tax) => {
-        return (tax * JSON.parse(totalAmount())) / 100
-    }
-
-    const getTaxName = (tax) => {
-        let taxName = ''
-
-        const type = taxTypes.filter(val => val.fullItem.id === tax.tax_type_id)
-
-        if (taxTypes && type.length > 0) {
-            taxName = type[0]['fullItem'].name
-        }
-        return taxName
-    }
-
-    const finalAmount = () => {
-        return totalAmount() + itemCompoundTax()
-    }
+    const getAmountView = ({ label, amount }, index) => (
+        <View style={styles.subContainer} key={index}>
+            <View>
+                <Text style={styles.label}>{label}</Text>
+            </View>
+            <View>
+                <CurrencyFormat
+                    amount={amount}
+                    currency={currency}
+                    style={styles.price}
+                />
+            </View>
+        </View>
+    );
 
     const FINAL_AMOUNT = () => {
+        const { price = 0, quantity = 0 } = formValues;
         return (
             <View style={styles.amountContainer}>
                 <View style={styles.subContainer}>
                     <View>
                         <CurrencyFormat
-                            amount={itemRefs.price}
+                            amount={price}
                             currency={currency}
-                            preText={`${itemRefs.quantity} x `}
+                            preText={`${quantity} x `}
                             style={styles.label}
                         />
                     </View>
                     <View>
                         <CurrencyFormat
-                            amount={itemSubTotal()}
+                            amount={product.amounts.gross}
                             currency={currency}
                             style={styles.price}
                         />
                     </View>
                 </View>
-                {discountPerItem === 'YES' && (
-                    <View style={styles.subContainer}>
-                        <View>
-                            <Text style={styles.label}>
-                                {Lng.t("items.finalDiscount")}
-                            </Text>
-                        </View>
-                        <View>
-                            <CurrencyFormat
-                                amount={totalDiscount()}
-                                currency={currency}
-                                style={styles.price}
-                            />
-                        </View>
-                    </View>
-                )}
+                {discountPerItem === 'YES' && getAmountView({
+                    label: Lng.t("items.finalDiscount"),
+                    amount: product.amounts.discount,
+                })}
 
-                {itemRefs.taxes &&
-                    itemRefs.taxes.map((val, index) => !val.compound_tax ? (
-                        <View
-                            style={styles.subContainer}
-                            key={index}
-                        >
-                            <View>
-                                <Text style={styles.label}>
-                                    {getTaxName(val)} ({val.percent} %)
-                            </Text>
-                            </View>
-                            <View>
-                                <CurrencyFormat
-                                    amount={getTaxValue(val.percent)}
-                                    currency={currency}
-                                    style={styles.price}
-                                />
-                            </View>
-                        </View>
-                    ) : null)
-                }
-
-                {itemRefs.taxes &&
-                    itemRefs.taxes.map(val => val.compound_tax ? (
-                        <View style={styles.subContainer}>
-                            <View>
-                                <Text style={styles.label}>
-                                    {getTaxName(val)} ({val.percent} %)
-                            </Text>
-                            </View>
-                            <View>
-                                <CurrencyFormat
-                                    amount={getCompoundTaxValue(val.percent)}
-                                    currency={currency}
-                                    style={styles.price}
-                                />
-                            </View>
-                        </View>
-                    ) : null)
-                }
+                {product.taxes.all && product.taxes.all.map((tax, index) => getAmountView(tax, index))}
 
                 <CtDivider dividerStyle={styles.divider} />
 
                 <View style={styles.subContainer}>
                     <View>
-                        <Text style={styles.label}>
-                            {Lng.t("items.finalAmount")}
-                        </Text>
+                        <Text style={styles.label}>{Lng.t("items.finalAmount")}</Text>
                     </View>
                     <View>
                         <CurrencyFormat
-                            amount={finalAmount()}
+                            amount={product.amounts.final}
                             currency={currency}
                             style={styles.totalPrice}
                             currencyStyle={styles.finalAmountCurrency}
@@ -292,11 +153,11 @@ export const EstimateItem = (props) => {
         )
     };
 
-    const BOTTOM_ACTION = (handleSubmit) => {
+    const BOTTOM_ACTION = () => {
         return (
             <View style={styles.submitButton}>
                 <CtButton
-                    onPress={handleSubmit}
+                    onPress={onSaveItem}
                     btnTitle={Lng.t("button.save")}
                     containerStyle={styles.handleBtn}
                     buttonContainerStyle={styles.buttonContainer}
@@ -317,163 +178,190 @@ export const EstimateItem = (props) => {
         )
     }
 
+    const itemRefs = {};
+
     return (
-        <Form validate={validate} initialValues={initialValues} onSubmit={saveItem}>
-        {({ handleSubmit, form }) => {
-            const formValues = form.getState().values || {};
-            const { quantity, price, discount, discount_type, taxes } = formValues;
-            itemRefs.form = form;
-            itemRefs.quantity = quantity;
-            itemRefs.price = price;
-            itemRefs.discount = discount;
-            itemRefs.discount_type = discount_type;
-            itemRefs.taxes = taxes;
+        <DefaultLayout
+            headerProps={{
+                leftIconPress: navigation.goBack,
+                title: isCreateItem ? Lng.t("header.addItem") : Lng.t("header.editItem"),
+                placement: "center",
+                rightIcon: 'save',
+                rightIconProps: { solid: true },
+                rightIconPress: onSaveItem,
+            }}
+            loadingProps={{ is: loading }}
+            bottomAction={BOTTOM_ACTION()}
+        >
+            <View style={styles.bodyContainer}>
+                <Field
+                    name="name"
+                    component={InputField}
+                    isRequired
+                    hint={Lng.t("items.name")}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        onSubmitEditing: () => itemRefs.quantity.focus(),
+                    }}
+                />
 
-            return (
-            <DefaultLayout
-                headerProps={{
-                    leftIconPress: navigation.goBack,
-                    title: isCreateItem ? Lng.t("header.addItem") : Lng.t("header.editItem"),
-                    placement: "center",
-                    rightIcon: 'save',
-                    rightIconProps: { solid: true },
-                    rightIconPress: handleSubmit,
-                }}
-                loadingProps={{ is: loading }}
-                bottomAction={BOTTOM_ACTION(handleSubmit)}
-            >
-                <View style={styles.bodyContainer}>
-                    <Field
-                        name="name"
-                        component={InputField}
-                        isRequired
-                        hint={Lng.t("items.name")}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            onSubmitEditing: () => itemRefs.quantity.focus(),
-                        }}
-                    />
-
-                    <View style={styles.dateFieldContainer}>
-                        <View style={styles.dateField}>
-                            <Field
-                                name={'quantity'}
-                                isRequired
-                                component={InputField}
-                                hint={Lng.t("items.quantity")}
-                                inputProps={{
-                                    returnKeyType: 'next',
-                                    keyboardType: 'numeric',
-                                    onSubmitEditing: () => itemRefs.price.focus(),
-                                }}
-                                refLinkFn={(ref) => itemRefs.quantity = ref}
-                            />
-                        </View>
-                        <View style={styles.dateField}>
-                            <Field
-                                name="price"
-                                isRequired
-                                component={InputField}
-                                hint={Lng.t("items.price")}
-                                inputProps={{
-                                    returnKeyType: 'next',
-                                    keyboardType: 'numeric'
-                                }}
-                                refLinkFn={(ref) => itemRefs.price = ref}
-                                isCurrencyInput
-                            />
-                        </View>
+                <View style={styles.dateFieldContainer}>
+                    <View style={styles.dateField}>
+                        <Field
+                            name={'quantity'}
+                            isRequired
+                            component={InputField}
+                            hint={Lng.t("items.quantity")}
+                            inputProps={{
+                                returnKeyType: 'next',
+                                keyboardType: 'numeric',
+                                onSubmitEditing: () => itemRefs.price.focus(),
+                            }}
+                            refLinkFn={(ref) => itemRefs.quantity = ref}
+                        />
                     </View>
-
-                    {(initialValues.unit || !itemId) && (
+                    <View style={styles.dateField}>
                         <Field
-                            name="unit_id"
-                            label={Lng.t("items.unit")}
-                            component={SelectPickerField}
-                            items={units}
-                            defaultPickerOptions={{
-                                label: Lng.t("items.unitPlaceholder"),
-                                value: '',
+                            name="price"
+                            isRequired
+                            component={InputField}
+                            hint={Lng.t("items.price")}
+                            inputProps={{
+                                returnKeyType: 'next',
+                                keyboardType: 'numeric'
                             }}
-                            disabled={itemId ? true : false}
-                            fieldIcon={'balance-scale'}
+                            refLinkFn={(ref) => itemRefs.price = ref}
+                            isCurrencyInput
                         />
-                    )}
-
-                    {discountPerItem == 'YES' && (
-                        <View>
-                            <Field
-                                name="discount_type"
-                                component={RadioButtonGroup}
-                                hint={Lng.t("items.discountType")}
-                                options={ITEM_DISCOUNT_OPTION}
-                                initialValue={initialValues.discount_type}
-                            />
-
-                            <Field
-                                name="discount"
-                                component={InputField}
-                                hint={Lng.t("items.discount")}
-                                inputProps={{
-                                    returnKeyType: 'next',
-                                    autoCapitalize: 'none',
-                                    autoCorrect: true,
-                                    keyboardType: 'numeric'
-                                }}
-                                disabled={initialValues.discount_type === 'none'}
-                            />
-                        </View>
-                    )}
-
-                    {taxPerItem === 'YES' && (
-                        <Field
-                            name="taxes"
-                            items={taxTypes}
-                            displayName="name"
-                            label={Lng.t("items.taxes")}
-                            component={SelectField}
-                            searchFields={['name', 'percent']}
-                            placeholder={Lng.t("items.selectTax")}
-                            onlyPlaceholder
-                            fakeInputProps={{
-                                icon: 'percent',
-                                rightIcon: 'angle-right',
-                                color: colors.gray,
-                            }}
-                            navigation={navigation}
-                            isMultiSelect
-                            isInternalSearch
-                            concurrentMultiSelect
-                            compareField="id"
-                            valueCompareField="tax_type_id"
-                            listViewProps={{ contentContainerStyle: { flex: 2 } }}
-                            headerProps={{ title: Lng.t("taxes.title") }}
-                            rightIconPress={addTax}
-                            emptyContentProps={{ contentType: "taxes" }}
-                        />
-                    )}
-
-                    {FINAL_AMOUNT()}
-
-                    <Field
-                        name="description"
-                        component={InputField}
-                        hint={Lng.t("items.description")}
-                        inputProps={{
-                            returnKeyType: 'next',
-                            autoCapitalize: 'none',
-                            autoCorrect: true,
-                            multiline: true,
-                            maxLength: MAX_LENGTH
-                        }}
-                        height={80}
-                    />
+                    </View>
                 </View>
-            </DefaultLayout>
-            );
-        }}
+
+                {(formValues.unit || !itemId) && (
+                    <Field
+                        name="unit_id"
+                        label={Lng.t("items.unit")}
+                        component={SelectPickerField}
+                        items={units}
+                        defaultPickerOptions={{
+                            label: Lng.t("items.unitPlaceholder"),
+                            value: '',
+                        }}
+                        disabled={itemId ? true : false}
+                        fieldIcon={'balance-scale'}
+                    />
+                )}
+
+                {discountPerItem == 'YES' && (
+                    <View>
+                        <Field
+                            name="discount_type"
+                            component={RadioButtonGroup}
+                            hint={Lng.t("items.discountType")}
+                            options={ITEM_DISCOUNT_OPTION}
+                            initialValue={formValues.discount_type}
+                        />
+
+                        <Field
+                            name="discount"
+                            component={InputField}
+                            hint={Lng.t("items.discount")}
+                            inputProps={{
+                                returnKeyType: 'next',
+                                autoCapitalize: 'none',
+                                autoCorrect: true,
+                                keyboardType: 'numeric'
+                            }}
+                            disabled={formValues.discount_type === 'none'}
+                        />
+                    </View>
+                )}
+
+                {taxPerItem === 'YES' && (
+                    <Field
+                        name="taxes"
+                        items={taxTypes}
+                        displayName="name"
+                        label={Lng.t("items.taxes")}
+                        component={SelectField}
+                        searchFields={['name', 'percent']}
+                        placeholder={Lng.t("items.selectTax")}
+                        onlyPlaceholder
+                        fakeInputProps={{
+                            icon: 'percent',
+                            rightIcon: 'angle-right',
+                            color: colors.gray,
+                        }}
+                        navigation={navigation}
+                        isMultiSelect
+                        isInternalSearch
+                        concurrentMultiSelect
+                        compareField="id"
+                        valueCompareField="tax_type_id"
+                        listViewProps={{ contentContainerStyle: { flex: 2 } }}
+                        headerProps={{ title: Lng.t("taxes.title") }}
+                        rightIconPress={addTax}
+                        emptyContentProps={{ contentType: "taxes" }}
+                    />
+                )}
+
+                {FINAL_AMOUNT()}
+
+                <Field
+                    name="description"
+                    component={InputField}
+                    hint={Lng.t("items.description")}
+                    inputProps={{
+                        returnKeyType: 'next',
+                        autoCapitalize: 'none',
+                        autoCorrect: true,
+                        multiline: true,
+                        maxLength: MAX_LENGTH
+                    }}
+                    height={80}
+                />
+            </View>
+        </DefaultLayout>
+        );
+}
+
+export const EstimateItem = (props: IProps) => {
+    const {
+        initialValues,
+        navigation,
+        type,
+        itemId,
+        addItem,
+        removeEstimateItem,
+        setEstimateItems,
+    } = props;
+
+    const onSaveItem = (item) => {
+        if (type === ITEM_ADD) {
+            addItem({ item, onResult: () => navigation.goBack() });
+            return;
+        }
+
+        const estimateItem = [{ ...item, item_id: itemId }];
+        removeEstimateItem({ id: itemId });
+        setEstimateItems({ estimateItem });
+        navigation.navigate(ROUTES.ESTIMATE);
+};
+
+    return (
+        <Form
+            validate={validate}
+            initialValues={initialValues}
+            onSubmit={onSaveItem}
+        >
+            { ({ handleSubmit, form }) => (
+                <EstimateItemContent
+                    {...props}
+                    form={form}
+                    handleSubmit={handleSubmit}
+                />
+            )}
         </Form>
     );
 }

@@ -17,7 +17,7 @@ const mapStateToProps = (state, { route: { params = {} } }) => {
         global: { language, currency },
     } = state;
 
-    const { id: itemId = {}, type } = params;
+    const { id: itemId = 0, type } = params;
 
     const isLoading = itemLoading || itemUnitsLoading || (type === EDIT_ITEM && !item)
 
