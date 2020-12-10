@@ -53,23 +53,23 @@ export const ItemContent = (props) => {
     const setFormField = (field, value) => form.change(field, value);
 
     useEffect(() => {
-        getItemUnits()
+        getItemUnits();
 
         type === ADD_ITEM && getSettingItem({
             key: 'tax_per_item',
             onResult: (res) => setTaxPerItem(res === 'YES')
-        })
+        });
 
-        const isEdit = (type === EDIT_ITEM)
-        isEdit && getEditItem({ id: itemId })
+        const isEdit = (type === EDIT_ITEM);
+        isEdit && getEditItem({ id: itemId });
 
         return () => clearItem();
     }, []);
 
     const onSaveItem = () => {
         if (product.amounts.final < 0) {
-            alert(Lng.t("items.lessAmount"))
-            return
+            alert(Lng.t("items.lessAmount"));
+            return;
         }
 
         // Add additional data to the form
