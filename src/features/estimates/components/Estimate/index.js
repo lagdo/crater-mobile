@@ -96,9 +96,9 @@ const EstimateContent = (props: IProps) => {
     const [customerName, setCustomerName] = useState('');
     const [markAsStatus, setMarkAsStatus] = useState(null);
 
-    const estimate = useProductHolder(form.getState().values, estimateItems, items);
-
     const formValues = form.getState().values || {};
+
+    const estimate = useProductHolder(formValues, estimateItems, items);
 
     const setFormField = (field, value) => form.change(field, value);
 
@@ -180,9 +180,9 @@ const EstimateContent = (props: IProps) => {
     );
 
     const FINAL_AMOUNT = () => {
-        let taxPerItem = !(tax_per_item === 'NO' || typeof tax_per_item === 'undefined' || tax_per_item === null)
+        const taxPerItem = !(tax_per_item === 'NO' || typeof tax_per_item === 'undefined' || tax_per_item === null)
 
-        let discountPerItem = !(discount_per_item === 'NO' || typeof discount_per_item === 'undefined' || discount_per_item === null)
+        const discountPerItem = !(discount_per_item === 'NO' || typeof discount_per_item === 'undefined' || discount_per_item === null)
 
         return (
             <View style={styles.amountContainer}>

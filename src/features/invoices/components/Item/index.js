@@ -45,15 +45,15 @@ const InvoiceItemContent = (props) => {
         handleSubmit,
     } = props;
 
-    const product = useProductItem(form.getState().values);
-
-    const formValues = form.getState().values || {};
-
-    const isCreateItem = (type === ITEM_ADD);
-
     useEffect(() => {
         !itemId && getItemUnits && getItemUnits();
     }, []);
+
+    const formValues = form.getState().values || {};
+
+    const product = useProductItem(formValues);
+
+    const isCreateItem = (type === ITEM_ADD);
 
     const setFormField = (field, value) => form.change(field, value);
 
