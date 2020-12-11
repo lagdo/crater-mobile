@@ -12,7 +12,7 @@ const taxTypeList = (state) => state.global.taxTypes;
 const paymentMethodList = (state) => state.settings.paymentMethods;
 const unitList = (state) => state.settings.units;
 
-const getEntities = (ids) => denormalize(ids, schemas, storage.entities);
+export const getEntities = (ids) => denormalize(ids, schemas, storage.entities);
 
 export const getCountries = createSelector(
     [ countryList ],

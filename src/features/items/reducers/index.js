@@ -5,7 +5,7 @@ import {
     DELETE_ITEM,
     SET_FILTER_ITEMS,
 } from '../constants';
-import { env } from '~/config';
+import { saveItems, deleteItem } from '~/selectors/schemas';
 
 const initialState = {
     items: [],
@@ -13,13 +13,13 @@ const initialState = {
     item: null
 };
 
-export default function moreReducer(state = initialState, action) {
+export default function itemReducer(state = initialState, action) {
     const { payload, type } = action;
 
     switch (type) {
         case SET_ITEMS:
-
-            const { items, fresh, prepend } = payload;
+        {
+            const { items, fresh, prepend } = saveItems(payload);
 
             if (prepend) {
                 return { ...state, items: [...items, ...state.items] };
@@ -30,26 +30,28 @@ export default function moreReducer(state = initialState, action) {
             }
 
             return { ...state, items };
-
+        }
         case SET_FILTER_ITEMS:
+        {
+            const { items, fresh } = saveItems(payload);
 
-            if (!payload.fresh) {
+            if (!fresh) {
                 return {
                     ...state,
-                    filterItems: [...state.filterItems, ...payload.items]
+                    filterItems: [...state.filterItems, ...items]
                 };
             }
 
-            return { ...state, filterItems: payload.items };
-
-
+            return { ...state, filterItems: items };
+        }
         case DELETE_ITEM:
+        {
             const { id } = payload
 
-            const remainItems = state.items.filter(val => val.id !== id)
+            deleteItem(id);
 
-            return { ...state, items: remainItems };
-
+            return { ...state, items: state.items.filter(val => val !== id) };
+        }
         case CLEAR_ITEM:
             return { ...state, item: null };
 
