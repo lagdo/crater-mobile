@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { getEntities } from '~/selectors/index';
 import { formatCustomer } from '~/selectors/format';
 
 const customerList = (state) => state.customers.customers;
@@ -10,11 +11,18 @@ export const getCustomers = createSelector(
         if(customers === null) {
             return [];
         }
-        return customers.map((customer) => formatCustomer(customer));
+        const entities = getEntities({ customers });
+        return entities.customers.map((customer) => formatCustomer(customer));
     }
 );
 
 export const getFilterCustomers = createSelector(
     [ filterCustomerList ],
-    (customers) => customers.map((customer) => formatCustomer(customer))
+    (customers) => {
+        if(customers === null) {
+            return [];
+        }
+        const entities = getEntities({ customers });
+        return entities.customers.map((customer) => formatCustomer(customer));
+    }
 );

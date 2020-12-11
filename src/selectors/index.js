@@ -16,7 +16,10 @@ export const getEntities = (ids) => denormalize(ids, schemas, storage.entities);
 
 export const getCountries = createSelector(
     [ countryList ],
-    (countries) => formatCountries(countries),
+    (countries) => {
+        const entities = getEntities({ countries });
+        return formatCountries(entities.countries);
+    },
 );
 
 export const getCurrencies = createSelector(

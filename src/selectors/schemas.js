@@ -82,7 +82,7 @@ export const saveCountries = (payload) => {
 
     storage.entities.countries = entities.countries;
     return result;
-}
+};
 
 /*
  * Global bootstrap

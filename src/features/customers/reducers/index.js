@@ -7,6 +7,8 @@ import {
     SET_REMOVE_CUSTOMER,
     SET_FILTER_CUSTOMERS
 } from '../constants';
+import { saveCustomers, saveCustomer, deleteCustomer } from '~/selectors/schemas';
+
 
 const initialState = {
     customers: [],
@@ -25,11 +27,9 @@ export default function customersReducer(state = initialState, action) {
     const { payload, type } = action;
 
     switch (type) {
-
-
         case SET_CUSTOMERS:
-
-            let { customers, fresh } = payload;
+        {
+            const { customers, fresh } = saveCustomers(payload);
             if (!fresh) {
                 return {
                     ...state,
@@ -38,40 +38,51 @@ export default function customersReducer(state = initialState, action) {
             }
 
             return { ...state, customers: customers };
-
+        }
         case SET_FILTER_CUSTOMERS:
-            if (!payload.fresh) {
+        {
+            const { customers, fresh } = saveCustomers(payload);
+            if (!fresh) {
                 return {
                     ...state,
-                    filterCustomers: [...state.filterCustomers, ...payload.customers]
+                    filterCustomers: [...state.filterCustomers, ...customers]
                 };
             }
 
-            return { ...state, filterCustomers: filterCustomerList };
-
+            return { ...state, filterCustomers: customers };
+        }
         case SET_EDIT_CUSTOMER:
-            const customersList = state.customers.filter((item) => (item.id !== payload.id));
+        {
+            const { customer } = payload;
+            saveCustomer(customer);
 
             return {
                 ...state,
-                customers: [payload.customer, ...customersList]
+                customers: [ ...state.customers ],
             };
-
+        }
         case SET_CREATE_CUSTOMER:
+        {
+            const { customer } = payload;
+            saveCustomer(customer);
+
             return {
                 ...state,
-                customers: [payload.customer, ...state.customers]
+                customers: [ customer.id, ...state.customers ],
             };
-
+        }
         case SET_REMOVE_CUSTOMER:
-            const remainCustomers = state.customers.filter(({ fullItem }) =>
-                (fullItem.id !== payload.id))
+        {
+            const { id } = payload;
+            deleteCustomer(id);
 
-            return { ...state, customers: remainCustomers };
-
+            return { ...state, customers: state.customers.filter(cId => cId !== id) };
+        }
         case SET_COUNTRIES:
-            return { ...state, ...payload };
-
+        {
+            const entities = saveCountries(payload);
+            return { ...state, countries: entities.countries };
+        }
         case CUSTOMERS_TRIGGER_SPINNER:
             return { ...state, loading: { ...payload } };
 
