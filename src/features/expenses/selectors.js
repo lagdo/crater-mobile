@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { getEntities } from '~/selectors/index';
 import { formatExpense, formatExpenseCategoryForSelect } from '~/selectors/format';
 
 const currentCurrency = (state) => state.global.currency;
@@ -9,15 +10,24 @@ const categoryList = (state) => state.categories.categories;
 
 export const getExpenses = createSelector(
     [ expenseList, currentCurrency ],
-    (expenses, currency) => expenses.map((expense) => formatExpense(expense, currency))
+    (expenses, currency) => {
+        const entities = getEntities({ expenses });
+        return entities.expenses.map((expense) => formatExpense(expense, currency));
+    }
 );
 
 export const getFilterExpenses = createSelector(
     [ filterExpenseList, currentCurrency ],
-    (expenses, currency) => expenses.map((expense) => formatExpense(expense, currency))
+    (expenses, currency) => {
+        const entities = getEntities({ expenses });
+        return entities.expenses.map((expense) => formatExpense(expense, currency));
+    },
 );
 
 export const getCategories = createSelector(
     [ categoryList ],
-    (categories) => categories.map((category) => formatExpenseCategoryForSelect(category))
+    (categories) => {
+        const entities = getEntities({ categories });
+        return entities.categories.map((category) => formatExpenseCategoryForSelect(category));
+    },
 );

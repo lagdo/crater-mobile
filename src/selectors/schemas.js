@@ -290,3 +290,56 @@ export const deleteEstimate = (id) => {
         storage.entities.estimates[id] = null;
     }
 };
+
+/*
+ * Expenses
+ */
+const mergeExpenses = ({ customers, categories }) => {
+    storage.entities.customers = {...storage.entities.customers, ...customers };
+    storage.entities.categories = { ...storage.entities.categories, ...categories };
+};
+
+export const saveExpenses = (payload) => {
+    const { entities, result } = normalize(payload, schemas);
+
+    mergeExpenses(entities);
+    return result;
+};
+
+export const saveExpense = (customer) => {
+    const { entities } = normalize({ customers: [customer] }, schemas);
+
+    mergeExpenses(entities);
+};
+
+export const deleteExpense = (id) => {
+    if (storage.entities.customers[id]) {
+        storage.entities.customers[id] = null;
+    }
+};
+
+/*
+ * Categories
+ */
+const mergeCategories = ({ categories }) => {
+    storage.entities.categories = {...storage.entities.categories, ...categories };
+};
+
+export const saveCategories = (payload) => {
+    const { entities, result } = normalize(payload, schemas);
+
+    mergeCategories(entities);
+    return result;
+};
+
+export const saveCategory = (category) => {
+    const { entities } = normalize({ categories: [category] }, schemas);
+
+    mergeCategories(entities);
+};
+
+export const deleteCategory = (id) => {
+    if (storage.entities.categories[id]) {
+        storage.entities.categories[id] = null;
+    }
+};
