@@ -15,6 +15,7 @@ import {
     SET_ESTIMATE,
     REMOVE_FROM_ESTIMATES
 } from '../constants';
+import { saveEstimates } from '~/selectors/schemas';
 
 const initialState = {
     estimates: [],
@@ -39,7 +40,8 @@ export default function estimatesReducer(state = initialState, action) {
 
     switch (type) {
         case SET_ESTIMATES:
-            let { estimates, fresh, prepend } = payload;
+        {
+            const { estimates, fresh, prepend } = saveEstimates(payload);
 
             if (prepend) {
                 return { ...state, estimates: [ ...estimates, ...state.estimates] };
@@ -50,7 +52,7 @@ export default function estimatesReducer(state = initialState, action) {
             }
 
             return { ...state, estimates };
-
+        }
         case CLEAR_ESTIMATES:
             return { ...state, estimates: [] };
 
@@ -64,9 +66,6 @@ export default function estimatesReducer(state = initialState, action) {
                     estimateTemplates: []
                 }
             };
-
-        case GET_ESTIMATES:
-            return { ...state };
 
         case SET_ESTIMATE:
 
