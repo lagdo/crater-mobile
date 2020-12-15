@@ -4,83 +4,94 @@ import { schema, normalize } from 'normalizr';
 const country = new schema.Entity('countries');
 const currency = new schema.Entity('currencies');
 const payment_method = new schema.Entity('payment_methods');
+
 const taxType = new schema.Entity('taxTypes');
+const tax = new schema.Entity('taxes', { taxType });
 
-const company_address = new schema.Entity('company_addresses', { country });
-const company = new schema.Entity('company', { address: company_address });
-
-const customer_address = new schema.Entity('customer_addresses', { country });
-const customer = new schema.Entity('customers',
-    { currency, billing_address: customer_address, shipping_address: customer_address });
+const company = new schema.Entity('company');
+const customer = new schema.Entity('customers', { currency });
 
 const unit = new schema.Entity('units');
-const item = new schema.Entity('items', { unit });
-// const item_tax = new schema.Entity('item_taxes', { taxType },
-//     { idAttribute: rate => `${rate.item_id}_${rate.tax_id}` });
+const item = new schema.Entity('items', { unit, taxes: [tax] });
 
 const invoice_template = new schema.Entity('invoice_templates');
-const invoice_item_tax = new schema.Entity('invoice_item_taxes', { taxType },
-    { idAttribute: rate => `${rate.invoice_item_id}_${rate.tax_id}` });
-const invoice_item = new schema.Entity('invoice_items', { item, taxes: [invoice_item_tax] });
-const invoice_tax = new schema.Entity('invoice_taxes', { taxType },
-    { idAttribute: rate => `${rate.invoice_id}_${rate.tax_id}` });
+const invoice_item = new schema.Entity('invoice_items', {},
+    { idAttribute: item => `${item.invoice_id}_${item.id}` });
 
 const invoiceEntities = {
-    currency,
-    customer,
-    template: invoice_template,
+    user: customer,
+    invoiceTemplate: invoice_template,
     items: [invoice_item],
-    taxes: [invoice_tax],
+    taxes: [tax],
 };
 const invoiceOptions = {};
 const invoice = new schema.Entity('invoices', invoiceEntities, invoiceOptions);
 
 const estimate_template = new schema.Entity('estimate_templates');
-const estimate_item_tax = new schema.Entity('estimate_item_taxes', { taxType },
-    { idAttribute: rate => `${rate.estimate_item_id}_${rate.tax_id}` });
-const estimate_item = new schema.Entity('estimate_items', { item, taxes: [estimate_item_tax] });
-const estimate_tax = new schema.Entity('estimate_taxes', { taxType },
-    { idAttribute: rate => `${rate.estimate_id}_${rate.tax_id}` });
+const estimate_item = new schema.Entity('estimate_items', {},
+    { idAttribute: item => `${item.estimate_id}_${item.id}` });
 
 const estimateEntities = {
-    currency,
-    customer,
-    template: estimate_template,
+    user: customer,
+    estimateTemplate: estimate_template,
     items: [estimate_item],
-    taxes: [estimate_tax],
+    taxes: [tax],
 };
 const estimateOptions = {};
 const estimate = new schema.Entity('estimates', estimateEntities, estimateOptions);
 
-const payment = new schema.Entity('payments', { customer, invoice, payment_method });
+const payment = new schema.Entity('payments', { user: customer, invoice, paymentMethod: payment_method });
 
-const expense_category = new schema.Entity('expense_categories');
-const expense = new schema.Entity('expenses', { category: expense_category });
+const category = new schema.Entity('categories');
+const expense = new schema.Entity('expenses', { category });
 
 export const schemas = {
     company,
     taxTypes: [taxType],
     units: [unit],
-    paymentMethods: [payment_method],
+    payment_methods: [payment_method],
     customers: [customer],
     items: [item],
     invoices: [invoice],
     payments: [payment],
     estimates: [estimate],
     expenses: [expense],
-    categories: [expense_category],
+    categories: [category],
     currencies: [currency],
     countries: [country],
     invoice_templates: [invoice_template],
     estimate_templates: [estimate_template],
 };
 
-export const storage = {};
+export const storage = {
+    entities: {
+        company: {},
+        taxTypes: {},
+        units: {},
+        payment_methods: {},
+        customers: {},
+        items: {},
+        invoices: {},
+        payments: {},
+        estimates: {},
+        expenses: {},
+        categories: {},
+        currencies: {},
+        countries: {},
+        invoice_templates: {},
+        estimate_templates: {},
+    },
+};
+
+const storeEntities = (entities) => {
+    for (field in entities) {
+        storage.entities[field] = { ...storage.entities[field], ...entities[field] };
+    }
+};
 
 export const saveCountries = (payload) => {
     const { entities, result } = normalize(payload, schemas);
-
-    storage.entities.countries = entities.countries;
+    storeEntities(entities);
     return result;
 };
 
@@ -89,9 +100,7 @@ export const saveCountries = (payload) => {
  */
 export const saveGlobalBootstrap = (payload) => {
     const { entities, result } = normalize(payload, schemas.global);
-
-    // Initial setup for entities
-    storage.entities = entities;
+    storeEntities(entities);
     return result;
 };
 
@@ -100,8 +109,7 @@ export const saveGlobalBootstrap = (payload) => {
  */
 export const savePreferences = ({ preferences }) => {
     const { entities, result } = normalize(preferences, schemas);
-
-    storage.entities.currencies = { ...storage.entities.currencies, ...entities.currencies };
+    storeEntities(entities);
     return result;
 };
 
@@ -113,21 +121,15 @@ export const getCurrency = (id) => storage.entities.currencies[id] || null;
 /*
  * Taxes
  */
-const mergeTaxes = ({ taxTypes }) => {
-    storage.entities.taxTypes = { ...storage.entities.taxTypes, ...taxTypes };
-};
-
 export const saveTaxes = (payload) => {
     const { entities, result } = normalize(payload, schemas);
-
-    mergeTaxes(entities);
+    storeEntities(entities);
     return result;
 };
 
 export const saveTax = (taxType) => {
     const { entities } = normalize({ taxTypes: [ taxType ] }, schemas);
-
-    mergeTaxes(entities);
+    storeEntities(entities);
 };
 
 export const deleteTax = (id) => {
@@ -137,22 +139,15 @@ export const deleteTax = (id) => {
 /*
  * Items
  */
-const mergeItems = ({ items/*, units*/ }) => {
-    storage.entities.items = { ...storage.entities.items, ...items };
-    // storage.entities.units = { ...storage.entities.units, ...units };
-};
-
 export const saveItems = (payload) => {
     const { entities, result } = normalize(payload, schemas);
-
-    mergeItems(entities);
+    storeEntities(entities);
     return result;
 };
 
 export const saveItem = (item) => {
     const { entities } = normalize({ items: [ item ] }, schemas);
-
-    mergeItems(entities);
+    storeEntities(entities);
 };
 
 export const deleteItem = (id) => {
@@ -162,23 +157,15 @@ export const deleteItem = (id) => {
 /*
  * Customers
  */
-const mergeCustomers = ({ customers, /*currencies, */customer_addresses }) => {
-    storage.entities.customers = {...storage.entities.customers, ...customers };
-    // storage.entities.currencies = {...storage.entities.currencies, ...currencies };
-    storage.entities.customer_addresses = { ...storage.entities.customer_address, ...customer_addresses };
-};
-
 export const saveCustomers = (payload) => {
     const { entities, result } = normalize(payload, schemas);
-
-    mergeCustomers(entities);
+    storeEntities(entities);
     return result;
 };
 
 export const saveCustomer = (customer) => {
     const { entities } = normalize({ customers: [customer] }, schemas);
-
-    mergeCustomers(entities);
+    storeEntities(entities);
 };
 
 export const deleteCustomer = (id) => {
@@ -190,31 +177,15 @@ export const deleteCustomer = (id) => {
 /*
  * Invoices
  */
-const mergeInvoices = (entities) => {
-    const { invoices, /*items, taxTypes, customers, currencies, templates,*/
-        invoice_items, invoice_item_taxes, invoice_taxes } = entities;
-    storage.entities.invoices = { ...storage.entities.invoices, ...invoices };
-    // storage.entities.items = { ...storage.entities.items, ...items };
-    // storage.entities.taxes = { ...storage.entities.taxes, ...taxes };
-    // storage.entities.customers = { ...storage.entities.customers, ...customers };
-    // storage.entities.currencies = { ...storage.entities.currencies, ...currencies };
-    // storage.entities.templates = { ...storage.entities.templates, ...templates };
-    storage.entities.invoice_items = { ...storage.entities.invoice_items, ...invoice_items };
-    storage.entities.invoice_item_taxes = { ...storage.entities.invoice_item_taxes, ...invoice_item_taxes };
-    storage.entities.invoice_taxes = { ...storage.entities.invoice_taxes, ...invoice_taxes };
-};
-
 export const saveInvoices = (payload) => {
     const { entities, result } = normalize(payload, schemas);
-
-    mergeInvoices(entities);
+    storeEntities(entities);
     return result;
 };
 
 export const saveInvoice = (invoice) => {
     const { entities } = normalize({ invoices: [ invoice ] }, schemas);
-
-    mergeInvoices(entities);
+    storeEntities(entities);
 };
 
 export const deleteInvoice = (id) => {
@@ -226,25 +197,15 @@ export const deleteInvoice = (id) => {
 /*
  * Payments
  */
-const mergePayments = ({ payments, invoices/*, customers, currencies, payment_methods*/ }) => {
-    storage.entities.payments = { ...storage.entities.payments, ...payments };
-    storage.entities.invoices = { ...invoices, ...storage.entities.invoices }; // !! Don't replace existing invoices.
-    // storage.entities.customers = { ...storage.entities.customers, ...customers };
-    // storage.entities.currencies = { ...storage.entities.currencies, ...currencies };
-    // storage.entities.payment_methods = { ...storage.entities.payment_methods, ...payment_methods };
-};
-
 export const savePayments = (payload) => {
     const { entities, result } = normalize(payload, schemas);
-
-    mergePayments(entities);
+    storeEntities(entities);
     return result;
 };
 
 export const savePayment = (payment, invoice) => {
     const { entities } = normalize({ payments: [ payment ] }, schemas);
-
-    mergePayments(entities);
+    storeEntities(entities);
     invoice && saveInvoice(invoice);
 };
 
@@ -258,31 +219,15 @@ export const deletePayment = (id, invoice) => {
 /*
  * Estimates
  */
-const mergeEstimates = (entities) => {
-    const { estimates, /*items, taxes, customers, currencies, templates,*/
-        estimate_items, estimate_item_taxes, estimate_taxes } = entities;
-    storage.entities.estimates = { ...storage.entities.estimates, ...estimates };
-    // storage.entities.items = { ...storage.entities.items, ...items };
-    // storage.entities.taxes = { ...storage.entities.taxes, ...taxes };
-    // storage.entities.customers = { ...storage.entities.customers, ...customers };
-    // storage.entities.currencies = { ...storage.entities.currencies, ...currencies };
-    // storage.entities.templates = { ...storage.entities.templates, ...templates };
-    storage.entities.estimate_items = { ...storage.entities.estimate_items, ...estimate_items };
-    storage.entities.estimate_item_taxes = { ...storage.entities.estimate_item_taxes, ...estimate_item_taxes };
-    storage.entities.estimate_taxes = { ...storage.entities.estimate_taxes, ...estimate_taxes };
-};
-
 export const saveEstimates = (payload) => {
     const { entities, result } = normalize(payload, schemas);
-
-    mergeEstimates(entities);
+    storeEntities(entities);
     return result;
 };
 
 export const saveEstimate = (estimate) => {
     const { entities } = normalize({ estimates: [ estimate ] }, schemas);
-
-    mergeEstimates(entities);
+    storeEntities(entities);
 };
 
 export const deleteEstimate = (id) => {
@@ -294,48 +239,34 @@ export const deleteEstimate = (id) => {
 /*
  * Expenses
  */
-const mergeExpenses = ({ customers, categories }) => {
-    storage.entities.customers = {...storage.entities.customers, ...customers };
-    storage.entities.categories = { ...storage.entities.categories, ...categories };
-};
-
 export const saveExpenses = (payload) => {
     const { entities, result } = normalize(payload, schemas);
-
-    mergeExpenses(entities);
+    storeEntities(entities);
     return result;
 };
 
-export const saveExpense = (customer) => {
-    const { entities } = normalize({ customers: [customer] }, schemas);
-
-    mergeExpenses(entities);
+export const saveExpense = (expense) => {
+    const { entities } = normalize({ expenses: [expense] }, schemas);
 };
 
 export const deleteExpense = (id) => {
-    if (storage.entities.customers[id]) {
-        storage.entities.customers[id] = null;
+    if (storage.entities.expenses[id]) {
+        storage.entities.expenses[id] = null;
     }
 };
 
 /*
  * Categories
  */
-const mergeCategories = ({ categories }) => {
-    storage.entities.categories = {...storage.entities.categories, ...categories };
-};
-
 export const saveCategories = (payload) => {
     const { entities, result } = normalize(payload, schemas);
-
-    mergeCategories(entities);
+    storeEntities(entities);
     return result;
 };
 
 export const saveCategory = (category) => {
     const { entities } = normalize({ categories: [category] }, schemas);
-
-    mergeCategories(entities);
+    storeEntities(entities);
 };
 
 export const deleteCategory = (id) => {

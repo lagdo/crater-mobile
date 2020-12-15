@@ -69,6 +69,7 @@ export default function globalReducer(state = initialState, action) {
             return { ...state, appVersion: app_version }
 
         case SET_GLOBAL_BOOTSTRAP:
+        {
             const {
                 currencies,
                 customers,
@@ -91,28 +92,32 @@ export default function globalReducer(state = initialState, action) {
                 fiscalYear: fiscal_year,
                 language: default_language
             };
-
+        }
         case SET_TAXES:
+        {
             const { taxTypes } = saveTaxes(payload);
             return { ...state, taxTypes };
-
+        }
         case SET_TAX:
+        {
             const { taxType: addedTaxType, taxType: { id: addedTaxId } } = payload;
             saveTax(addedTaxType);
             return { ...state, taxTypes: [addedTaxId, ...state.taxTypes] };
-
+        }
         case SET_EDIT_TAX:
+        {
             const { taxType: editedTaxType } = payload;
             saveTax(editedTaxType);
             // The tax id list content has not changed.
             // The trick here is just to change the object.
             return { ...state, taxTypes: [...state.taxTypes] };
-
+        }
         case SET_REMOVE_TAX:
+        {
             const { taxId: deletedTaxId } = payload;
             deleteTax(deletedTaxId);
             return { ...state, taxes: state.taxes.filter(id => id !== deletedTaxId) };
-
+        }
         case SET_SETTINGS:
             const { key, value } = payload.settings;
 
