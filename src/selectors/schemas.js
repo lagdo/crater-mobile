@@ -146,6 +146,7 @@ export const deleteTax = (id) => {
 export const saveItems = (payload) => {
     const { entities, result } = normalize(payload, storage.schemas);
     storeEntities(entities);
+    console.log({ storage });
     return result;
 };
 
