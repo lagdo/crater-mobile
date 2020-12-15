@@ -1,6 +1,4 @@
 import { createSelector } from 'reselect';
-import { denormalize } from 'normalizr';
-import { schemas, storage } from './schemas';
 import { formatCountries, formatTaxTypes } from '~/api/global';
 
 const countryList = (state) => state.customers.countries;
@@ -12,8 +10,6 @@ const fiscalYearList = (state) => state.global.fiscalYears;
 const taxTypeList = (state) => state.global.taxTypes;
 const paymentMethodList = (state) => state.settings.paymentMethods;
 const unitList = (state) => state.settings.units;
-
-export const getEntities = (ids) => denormalize(ids, schemas, storage.entities);
 
 export const getCountries = createSelector(
     [ countryList ],

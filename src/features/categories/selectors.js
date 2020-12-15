@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { getEntities } from '~/selectors/index';
+import { getEntities } from '~/selectors/schemas';
 import { formatExpenseCategory } from '~/selectors/format';
 
 const categoryList = (state) => state.categories.categories;

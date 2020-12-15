@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { getEntities } from '~/selectors/index';
+import { getEntities } from '~/selectors/schemas';
 import { formatProduct } from '~/selectors/format';
 
 const currentCurrency = (state) => state.global.currency;
