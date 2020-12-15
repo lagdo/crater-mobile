@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { getEntities } from '~/selectors/index';
+import { getEntities } from '~/selectors/schemas';
 import { formatCustomer } from '~/selectors/format';
 
 const customerList = (state) => state.customers.customers;

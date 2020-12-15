@@ -29,6 +29,7 @@ export default function customersReducer(state = initialState, action) {
     switch (type) {
         case SET_CUSTOMERS:
         {
+            console.log({ payload });
             const { customers, fresh } = saveCustomers(payload);
             if (!fresh) {
                 return {

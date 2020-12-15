@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { getEntities } from '~/selectors/index';
+import { getEntities } from '~/selectors/schemas';
 import { formatEstimate } from '~/selectors/format';
 
 const templateList = (state) => state.global.templates.estimate;
