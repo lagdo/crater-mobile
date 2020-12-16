@@ -10,6 +10,7 @@
     "lints": "yarn prettier-fix"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/datetimepicker": "2.2.2",
     "@react-native-community/eslint-config": "0.0.5",
     "@react-native-community/masked-view": "0.1.6",

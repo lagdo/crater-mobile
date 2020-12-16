@@ -4,7 +4,7 @@ import * as reduxStorage from 'redux-storage';
 import createSagaMiddleware from 'redux-saga';
 import sagas from './saga';
 import { persistStore, persistReducer } from 'redux-persist';
-import { AsyncStorage } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const persistConfig = {
     key: 'root',
