@@ -16,7 +16,7 @@ Here the changes I've planned (there's no change on the backend side).
 - [ ] Improve calls to the API (by caching for example)
 - [ ] Upgrade or remove deprecated packages
 - [x] Optimize data access in redux store  with memoization
-- [ ] Optimize data access in redux store  with normalization (use [normalizr](https://github.com/paularmstrong/normalizr))
+- [x] Optimize data access in redux store  with normalization (use [normalizr](https://github.com/paularmstrong/normalizr))
 - [ ] Add tests
 
 ## Introduction
