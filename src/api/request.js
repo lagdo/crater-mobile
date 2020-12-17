@@ -1,9 +1,4 @@
-// @flow
-
-import { AsyncStorage } from 'react-native';
-// import RNFetchBlob from 'rn-fetch-blob'
 import { env } from '../config';
-import { NAVIGATION_PERSIST_KEY } from './consts/core';
 import { ROUTES } from '../navigation/routes';
 import { navigate } from '../navigation/actions';
 import { isIosPlatform, checkConnection, checkExpiredToken } from './helper';
@@ -15,17 +10,11 @@ type IProps = {
     body?: Object,
 };
 
-let props = null;
+let props = {};
 
 export default class Request {
     static setProps(p) {
         props = p;
-    }
-
-    static async getIdToken() {
-        const data = await AsyncStorage.getItem(NAVIGATION_PERSIST_KEY);
-
-        return data ? JSON.parse(data).auth.idToken : null;
     }
 
     static get(params) {
@@ -61,21 +50,17 @@ export default class Request {
         type = 'create',
     }: IProps) {
         const {
+            company,
             idToken,
+            resetIdToken,
             expiresIn = null,
             endpointApi,
-            company,
         } = props;
 
-        let apiUrl = (endpointApi !== null && typeof endpointApi !== 'undefined') ? endpointApi : env.ENDPOINT_API
-
-        if (isPing) {
-            apiUrl = isPing
-        }
-
+        const apiUrl = isPing ? isPing:
+            (endpointApi !== null && endpointApi !== undefined) ? endpointApi : env.ENDPOINT_API;
         const url = `${apiUrl}${path}`;
         const isConnected = await checkConnection()
-
         const isExpired = checkExpiredToken(expiresIn)
 
         if (!isConnected) {
@@ -89,15 +74,14 @@ export default class Request {
             return
         }
 
-        const ID_TOKEN = await this.getIdToken();
         const defaultHeaders = image
             ? {
-                Authorization: `Bearer ${idToken}` || `Bearer ${ID_TOKEN}`,
+                Authorization: `Bearer ${idToken}`,
                 company: company ? company.id : 1,
                 Accept: 'application/json'
             }
             : {
-                Authorization: `Bearer ${idToken}` || `Bearer ${ID_TOKEN}`,
+                Authorization: `Bearer ${idToken}`,
                 'Content-Type': 'application/json',
                 company: company ? company.id : 1,
                 Accept: 'application/json'
@@ -124,7 +108,7 @@ export default class Request {
             }
         }
 
-        let options = {
+        const options = {
             method,
             body: image ? formData : JSON.stringify(body),
             headers: { ...defaultHeaders, ...headers },

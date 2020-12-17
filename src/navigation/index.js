@@ -1,14 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { resetIdToken, getBootstrap, getAppVersion } from '../features/authentication/actions'
+import Request from '~/api/request';
+import Lng from '~/api/lang/i18n';
+import { loadFonts } from '~/api/global';
+import { AppLoader } from '~/components';
+import compareVersion from '~/api/compareVersion';
+import { env } from '~/config';
 import { AuthNavigator } from './navigators/auth';
 import { HomeNavigator } from './navigators/home';
 import { ROUTES } from './routes';
-import { resetIdToken } from '../features/authentication/actions'
-import Request from '../api/request';
 import { navigationRef } from './actions';
-import Lng from '../api/lang/i18n';
 
 const Stack = createStackNavigator();
 const navigationOptions = {
@@ -23,11 +27,44 @@ type IProps = {
 };
 
 const AppNavigatorComponent = (props: IProps) => {
-    const { idToken, expiresIn, endpointApi, company, language } = props;
+    const {
+        company,
+        language,
+        endpointApi,
+        idToken,
+        expiresIn,
+        resetIdToken,
+        getBootstrap,
+        // navigation,
+        // getAppVersion,
+    } = props;
+
+    const [bootstrapped, setBootstrapped] = useState(false);
+    const [fontLoaded, setFontLoaded] = useState(false);
 
     useEffect(() => {
-        Request.setProps(props);
-    }, [idToken, expiresIn, endpointApi, company]);
+        loadFonts({ afterLoad: () => setFontLoaded(true) });
+    }, []);
+
+    useEffect(() => {
+        Request.setProps({ idToken, expiresIn, endpointApi, company });
+
+        if (!bootstrapped && idToken && company) {
+            setBootstrapped(true);
+            getBootstrap();
+
+            /*if (endpointApi) {
+                (endpointApi !== null && typeof endpointApi !== 'undefined') &&
+                getAppVersion({
+                    onResult: ({ version }) => {
+                        if (version && (parseInt(env.APP_VERSION) < parseInt(version))) {
+                            navigation.navigate({ routeName: ROUTES.UPDATE_APP_VERSION });
+                        }
+                    })
+                });
+            }*/
+    }
+    }, [idToken, expiresIn, resetIdToken, endpointApi, company]);
 
     useEffect(() => {
         // Save the language
@@ -37,7 +74,9 @@ const AppNavigatorComponent = (props: IProps) => {
     return (
     <NavigationContainer ref={navigationRef}>
         <Stack.Navigator screenOptions={navigationOptions}>
-        {(idToken) ? (
+        {(!fontLoaded) ? (
+            <Stack.Screen name={ROUTES.HOME} component={AppLoader} />
+        ) : (idToken) ? (
             <Stack.Screen name={ROUTES.HOME} component={HomeNavigator} />
         ) : (
             <Stack.Screen name={ROUTES.AUTH} component={AuthNavigator} />
@@ -55,7 +94,7 @@ const mapStateToProps = (state) => {
     return { idToken, expiresIn, endpointApi, company, language };
 };
 
-const mapDispatchToProps = { resetIdToken };
+const mapDispatchToProps = { resetIdToken, getBootstrap, getAppVersion };
 
 export const AppNavigator = connect(
     mapStateToProps,
