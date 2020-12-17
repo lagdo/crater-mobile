@@ -7,10 +7,10 @@ import Request from '~/api/request';
 import Lng from '~/api/lang/i18n';
 import { loadFonts } from '~/api/global';
 import { AppLoader } from '~/components';
-import compareVersion from '~/api/compareVersion';
 import { env } from '~/config';
 import { AuthNavigator } from './navigators/auth';
 import { HomeNavigator } from './navigators/home';
+import UpdateAppVersion from '~/components/UpdateAppVersion';
 import { ROUTES } from './routes';
 import { navigationRef } from './actions';
 
@@ -35,10 +35,10 @@ const AppNavigatorComponent = (props: IProps) => {
         expiresIn,
         resetIdToken,
         getBootstrap,
-        // navigation,
-        // getAppVersion,
+        getAppVersion,
     } = props;
 
+    const [newVersionAvailable, setNewVersionAvailable] = useState(false);
     const [bootstrapped, setBootstrapped] = useState(false);
     const [fontLoaded, setFontLoaded] = useState(false);
 
@@ -47,24 +47,21 @@ const AppNavigatorComponent = (props: IProps) => {
     }, []);
 
     useEffect(() => {
-        Request.setProps({ idToken, expiresIn, endpointApi, company });
+        Request.setProps({ idToken, expiresIn, endpointApi, company, resetIdToken });
 
         if (!bootstrapped && idToken && company) {
             setBootstrapped(true);
             getBootstrap();
 
-            /*if (endpointApi) {
-                (endpointApi !== null && typeof endpointApi !== 'undefined') &&
+            if (endpointApi !== null && endpointApi !== undefined) {
                 getAppVersion({
                     onResult: ({ version }) => {
-                        if (version && (parseInt(env.APP_VERSION) < parseInt(version))) {
-                            navigation.navigate({ routeName: ROUTES.UPDATE_APP_VERSION });
-                        }
-                    })
+                        setNewVersionAvailable(version && (parseInt(env.APP_VERSION) < parseInt(version)));
+                    }
                 });
-            }*/
-    }
-    }, [idToken, expiresIn, resetIdToken, endpointApi, company]);
+            }
+        }
+    }, [idToken, expiresIn, endpointApi, company]);
 
     useEffect(() => {
         // Save the language
@@ -76,6 +73,8 @@ const AppNavigatorComponent = (props: IProps) => {
         <Stack.Navigator screenOptions={navigationOptions}>
         {(!fontLoaded) ? (
             <Stack.Screen name={ROUTES.HOME} component={AppLoader} />
+        ) : (newVersionAvailable) ? (
+            <Stack.Screen name={ROUTES.UPDATE_APP_VERSION} component={UpdateAppVersion} />
         ) : (idToken) ? (
             <Stack.Screen name={ROUTES.HOME} component={HomeNavigator} />
         ) : (
