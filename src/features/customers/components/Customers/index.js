@@ -44,7 +44,6 @@ export const Customers = (props: IProps) => {
         getItems({ fresh: true });
     }, []);
 
-    console.log({ customers });
     const getItems = ({ fresh = false, params, onResult, filter = false } = {}) => {
         if (refreshing) {
             return;

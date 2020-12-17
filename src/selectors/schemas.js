@@ -50,7 +50,6 @@ const expense = new schema.Entity('expenses', { category });
 
 const storage = {
     schemas: {
-        company,
         taxTypes: [taxType],
         units: [unit],
         payment_methods: [payment_method],
@@ -67,7 +66,6 @@ const storage = {
         estimate_templates: [estimate_template],
     },
     entities: {
-        company: {},
         taxTypes: {},
         units: {},
         payment_methods: {},
@@ -136,9 +134,7 @@ export const saveTax = (taxType) => {
     storeEntities(entities);
 };
 
-export const deleteTax = (id) => {
-    delete storage.entities.taxTypes[id];
-};
+export const deleteTax = (id) => delete storage.entities.taxTypes[id];
 
 /*
  * Items
@@ -146,7 +142,6 @@ export const deleteTax = (id) => {
 export const saveItems = (payload) => {
     const { entities, result } = normalize(payload, storage.schemas);
     storeEntities(entities);
-    console.log({ storage });
     return result;
 };
 
@@ -155,9 +150,7 @@ export const saveItem = (item) => {
     storeEntities(entities);
 };
 
-export const deleteItem = (id) => {
-    delete storage.entities.items[id];
-};
+export const deleteItem = (id) => delete storage.entities.items[id];
 
 /*
  * Customers
@@ -173,9 +166,7 @@ export const saveCustomer = (customer) => {
     storeEntities(entities);
 };
 
-export const deleteCustomer = (id) => {
-    delete storage.entities.customers[id];
-};
+export const deleteCustomer = (id) => delete storage.entities.customers[id];
 
 /*
  * Invoices
@@ -191,9 +182,7 @@ export const saveInvoice = (invoice) => {
     storeEntities(entities);
 };
 
-export const deleteInvoice = (id) => {
-    delete storage.entities.invoices[id];
-};
+export const deleteInvoice = (id) => delete storage.entities.invoices[id];
 
 /*
  * Payments
@@ -204,16 +193,12 @@ export const savePayments = (payload) => {
     return result;
 };
 
-export const savePayment = (payment, invoice) => {
+export const savePayment = (payment) => {
     const { entities } = normalize({ payments: [ payment ] }, storage.schemas);
     storeEntities(entities);
-    invoice && saveInvoice(invoice);
 };
 
-export const deletePayment = (id, invoice) => {
-    delete storage.entities.payments[id];
-    invoice && saveInvoice(invoice);
-};
+export const deletePayment = (id) => delete storage.entities.payments[id];
 
 /*
  * Estimates
@@ -229,9 +214,7 @@ export const saveEstimate = (estimate) => {
     storeEntities(entities);
 };
 
-export const deleteEstimate = (id) => {
-    delete storage.entities.estimates[id];
-};
+export const deleteEstimate = (id) => delete storage.entities.estimates[id];
 
 /*
  * Expenses
@@ -247,9 +230,7 @@ export const saveExpense = (expense) => {
     storeEntities(entities);
 };
 
-export const deleteExpense = (id) => {
-    delete storage.entities.expenses[id];
-};
+export const deleteExpense = (id) => delete storage.entities.expenses[id];
 
 /*
  * Categories
@@ -265,6 +246,4 @@ export const saveCategory = (category) => {
     storeEntities(entities);
 };
 
-export const deleteCategory = (id) => {
-    delete storage.entities.categories[id];
-};
+export const deleteCategory = (id) => delete storage.entities.categories[id];
