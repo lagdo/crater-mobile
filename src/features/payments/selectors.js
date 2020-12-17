@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { getEntities } from '~/selectors/schemas';
 import { formatPayment } from '~/selectors/format';
 
 const paymentList = (state) => state.payments.payments;
@@ -7,12 +8,18 @@ const paymentMethodList = (state) => state.settings.paymentMethods;
 
 export const getPayments = createSelector(
     [ paymentList ],
-    (payments) => payments.map((payment) => formatPayment(payment))
+    (payments) => {
+        const entities = getEntities({ payments });
+        return entities.payments.map((payment) => formatPayment(payment));
+    },
 );
 
 export const getFilterPayments = createSelector(
     [ filterPaymentList ],
-    (payments) => payments.map((payment) => formatPayment(payment))
+    (payments) => {
+        const entities = getEntities({ payments });
+        return entities.payments.map((payment) => formatPayment(payment));
+    },
 );
 
 export const getPaymentMethods = createSelector(

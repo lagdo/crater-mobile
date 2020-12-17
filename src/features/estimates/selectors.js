@@ -1,5 +1,5 @@
-import React from 'react';
 import { createSelector } from 'reselect';
+import { getEntities } from '~/selectors/schemas';
 import { formatEstimate } from '~/selectors/format';
 
 const templateList = (state) => state.global.templates.estimate;
@@ -15,11 +15,15 @@ export const getTemplates = createSelector(
 export const getEstimates = createSelector(
     [ estimateList ],
     (estimates) => {
-        return estimates.map((estimate) => formatEstimate(estimate));
-    }
+        const entities = getEntities({ estimates });
+        return entities.estimates.map((estimate) => formatEstimate(estimate));
+    },
 );
 
 export const getFilterEstimates = createSelector(
     [ filterEstimateList ],
-    (estimates) => estimates.map((estimate) => formatEstimate(estimate))
+    (estimates) => {
+        const entities = getEntities({ estimates });
+        return entities.estimates.map((estimate) => formatEstimate(estimate));
+    },
 );

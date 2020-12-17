@@ -17,6 +17,7 @@ import {
     SET_ACTIVE_TAB,
     INVOICES_TABS
 } from '../constants';
+import { saveInvoices } from '~/selectors/schemas';
 
 const initialState = {
     invoices: [],
@@ -47,7 +48,8 @@ export default function invoicesReducer(state = initialState, action) {
 
     switch (type) {
         case SET_INVOICES:
-            let { invoices, fresh, prepend } = payload;
+        {
+            const { invoices, fresh, prepend } = saveInvoices(payload);
 
             if (prepend) {
                 return { ...state, invoices: [...invoices, ...state.invoices] };
@@ -58,7 +60,7 @@ export default function invoicesReducer(state = initialState, action) {
             }
 
             return { ...state, invoices };
-
+        }
         case CLEAR_INVOICES:
             return { ...state, invoices: [] };
 

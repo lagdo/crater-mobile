@@ -1,21 +1,29 @@
 import { createSelector } from 'reselect';
+import { getEntities } from '~/selectors/schemas';
 import { formatProduct } from '~/selectors/format';
 
 const currentCurrency = (state) => state.global.currency;
-const productList = (state) => state.items.items;
-const filterProductList = (state) => state.items.filterItems;
+const itemList = (state) => state.items.items;
+const filterItemList = (state) => state.items.filterItems;
 
 export const getProducts = createSelector(
-    [ productList, currentCurrency ],
-    (products, currency) => {
-        if(products === null) {
+    [ itemList, currentCurrency ],
+    (items, currency) => {
+        if(items === null) {
             return [];
         }
-        return products.map((product) => formatProduct(product, currency));
+        const entities = getEntities({ items });
+        return entities.items.map((item) => formatProduct(item, currency));
     }
 );
 
 export const getFilterProducts = createSelector(
-    [ filterProductList, currentCurrency ],
-    (products, currency) => products.map((product) => formatProduct(product, currency))
+    [ filterItemList, currentCurrency ],
+    (items, currency) => {
+        if(items === null) {
+            return [];
+        }
+        const entities = getEntities({ items });
+        return entities.items.map((item) => formatProduct(item, currency));
+    }
 );

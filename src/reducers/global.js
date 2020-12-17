@@ -8,6 +8,14 @@ import {
 } from '../api/consts';
 import { SET_PREFERENCES } from '../features/settings/constants';
 import { SET_TAX, SET_EDIT_TAX, SET_REMOVE_TAX, SET_TAXES, SET_COMPANY_INFO } from '../features/taxes/constants';
+import {
+    saveGlobalBootstrap,
+    getCurrency,
+    savePreferences,
+    saveTaxes,
+    saveTax,
+    deleteTax,
+} from '~/selectors/schemas';
 
 const initialState = {
     customers: [],
@@ -61,6 +69,7 @@ export default function globalReducer(state = initialState, action) {
             return { ...state, appVersion: app_version }
 
         case SET_GLOBAL_BOOTSTRAP:
+        {
             const {
                 currencies,
                 customers,
@@ -70,7 +79,7 @@ export default function globalReducer(state = initialState, action) {
                 moment_date_format,
                 fiscal_year,
                 default_language = 'en'
-            } = payload
+            } = saveGlobalBootstrap(payload);
 
             return {
                 ...state,
@@ -83,30 +92,32 @@ export default function globalReducer(state = initialState, action) {
                 fiscalYear: fiscal_year,
                 language: default_language
             };
-
+        }
         case SET_TAXES:
-            return { ...state, taxTypes: payload.taxTypes };
-
+        {
+            const { taxTypes } = saveTaxes(payload);
+            return { ...state, taxTypes };
+        }
         case SET_TAX:
-            return {
-                ...state,
-                taxTypes: [payload.taxType, ...state.taxTypes]
-            };
-
+        {
+            const { taxType: addedTaxType, taxType: { id: addedTaxId } } = payload;
+            saveTax(addedTaxType);
+            return { ...state, taxTypes: [addedTaxId, ...state.taxTypes] };
+        }
         case SET_EDIT_TAX:
-            const taxTypeList = state.taxTypes.filter((item) => (item.id !== payload.taxId))
-
-            return {
-                ...state,
-                taxTypes: [payload.taxType, ...taxTypeList]
-            };
-
+        {
+            const { taxType: editedTaxType } = payload;
+            saveTax(editedTaxType);
+            // The tax id list content has not changed.
+            // The trick here is just to change the object.
+            return { ...state, taxTypes: [...state.taxTypes] };
+        }
         case SET_REMOVE_TAX:
-            const remainTaxes = state.taxTypes.filter(({ fullItem }) =>
-                (fullItem.id !== payload.taxId))
-
-            return { ...state, taxTypes: remainTaxes };
-
+        {
+            const { taxId: deletedTaxId } = payload;
+            deleteTax(deletedTaxId);
+            return { ...state, taxes: state.taxes.filter(id => id !== deletedTaxId) };
+        }
         case SET_SETTINGS:
             const { key, value } = payload.settings;
 
@@ -137,8 +148,15 @@ export default function globalReducer(state = initialState, action) {
                 }
             }
             else {
-                const { settings: { currency, language, time_zone, moment_date_format, fiscal_year } } = payload;
-                const newCurrency = state.currencies.find((item) => item.id.toString() === currency.toString());
+                const {
+                    settings: {
+                        currency,
+                        language,
+                        time_zone,
+                        moment_date_format,
+                        fiscal_year,
+                    },
+                } = payload;
 
                 return {
                     ...state,
@@ -146,19 +164,25 @@ export default function globalReducer(state = initialState, action) {
                     timeZone: time_zone,
                     dateFormat: moment_date_format,
                     fiscalYear: fiscal_year,
-                    currency: newCurrency,
+                    currency: getCurrency(currency.toString()),
                 };
             }
 
         case SET_PREFERENCES:
-            const { preferences } = payload;
+            const {
+                currencies,
+                languages,
+                timezones,
+                dateFormats,
+                fiscalYears,
+            } = savePreferences(payload);
             return {
                 ...state,
-                currencies: preferences.currencies,
-                languages: preferences.languages,
-                timezones: preferences.time_zones,
-                dateFormats: preferences.date_formats,
-                fiscalYears: preferences.fiscal_years,
+                currencies,
+                languages,
+                timezones,
+                dateFormats,
+                fiscalYears,
             };
 
         default:

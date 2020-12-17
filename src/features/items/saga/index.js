@@ -23,8 +23,6 @@ import {
     REMOVE_ITEM_URL,
 } from '../constants';
 import Request from '~/api/request';
-import { resetIdToken } from '~/features/authentication/actions';
-import { ROUTES } from '~/navigation/routes';
 
 /**
  * Global Items.

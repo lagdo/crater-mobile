@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Taxes } from '../../components/Taxes';
 import * as TaxesAction from '../../actions';
-import { getTaxTypes } from '../../selectors';
+import { getTaxTypes } from '~/selectors/index';
 
 const mapStateToProps = (state) => {
     const {

@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { formatCountries } from '~/api/global';
+import { formatCountries, formatTaxTypes } from '~/api/global';
 
 const countryList = (state) => state.customers.countries;
 const currencyList = (state) => state.global.currencies;
@@ -7,27 +7,34 @@ const languageList = (state) => state.global.languages;
 const timezoneList = (state) => state.global.timezones;
 const dateFormatList = (state) => state.global.dateFormats;
 const fiscalYearList = (state) => state.global.fiscalYears;
+const taxTypeList = (state) => state.global.taxTypes;
 const paymentMethodList = (state) => state.settings.paymentMethods;
 const unitList = (state) => state.settings.units;
 
 export const getCountries = createSelector(
     [ countryList ],
-    (countries) => formatCountries(countries),
+    (countries) => {
+        const entities = getEntities({ countries });
+        return formatCountries(entities.countries);
+    },
 );
 
 export const getCurrencies = createSelector(
     [ currencyList ],
-    (currencies) => currencies ? currencies.map((currency) => {
-        const { name, code, symbol } = currency;
-        return {
-            title: name,
-            subtitle: {
-                title: code,
-            },
-            rightTitle: symbol || '-',
-            fullItem: currency
-        };
-    }) : []
+    (currencies) => {
+        const entities = getEntities({ currencies });
+        return entities.currencies.map((currency) => {
+            const { name, code, symbol } = currency;
+            return {
+                title: name,
+                subtitle: {
+                    title: code,
+                },
+                rightTitle: symbol || '-',
+                fullItem: currency
+            };
+        });
+    }
 );
 
 export const getLanguages = createSelector(
@@ -105,4 +112,12 @@ export const getUnitsForSelect = createSelector(
             value: id
         };
     }): []
+);
+
+export const getTaxTypes = createSelector(
+    [ taxTypeList ],
+    (taxTypes) => {
+        const entities = getEntities({ taxTypes });
+        return formatTaxTypes(entities.taxTypes);
+    },
 );

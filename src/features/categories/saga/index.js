@@ -60,10 +60,11 @@ function* createExpenseCategory({ payload: { params, onResult } }) {
         };
 
         const response = yield call([Request, 'post'], options);
+        const { category } = response;
 
-        yield put(setCreateExpenseCategories({ categories: [response.category] }));
+        yield put(setCreateExpenseCategories({ category }));
 
-        onResult && onResult(response.category)
+        onResult && onResult(category);
 
     } catch (error) {
         // console.log(error);
@@ -83,8 +84,9 @@ function* getEditExpenseCategory({ payload: { id, onResult } }) {
         };
 
         const response = yield call([Request, 'get'], options);
-        onResult && onResult(response.category)
+        const { category } = response;
 
+        onResult && onResult(category);
     } catch (error) {
         // console.log(error);
     } finally {
@@ -108,9 +110,10 @@ function* editExpenseCategory(payloadData) {
         };
 
         const response = yield call([Request, 'put'], options);
-        navigation.navigate(ROUTES.CATEGORIES)
-        yield put(setEditExpenseCategories({ categories: [response.category], id }));
+        const { category } = response;
 
+        navigation.navigate(ROUTES.CATEGORIES)
+        yield put(setEditExpenseCategories({ category, id }));
     } catch (error) {
         // console.log(error);
     } finally {

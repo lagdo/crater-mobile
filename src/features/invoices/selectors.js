@@ -1,5 +1,5 @@
-import React from 'react';
 import { createSelector } from 'reselect';
+import { getEntities } from '~/selectors/schemas';
 import { formatInvoice } from '~/selectors/format';
 
 const templateList = (state) => state.global.templates.invoice;
@@ -14,10 +14,16 @@ export const getTemplates = createSelector(
 
 export const getInvoices = createSelector(
     [ invoiceList ],
-    (invoices) => invoices.map((invoice) => formatInvoice(invoice))
+    (invoices) => {
+        const entities = getEntities({ invoices });
+        return entities.invoices.map((invoice) => formatInvoice(invoice));
+    },
 );
 
 export const getFilterInvoices = createSelector(
     [ filterInvoiceList ],
-    (invoices) => invoices.map((invoice) => formatInvoice(invoice))
+    (invoices) => {
+        const entities = getEntities({ invoices });
+        return entities.invoices.map((invoice) => formatInvoice(invoice));
+    },
 );

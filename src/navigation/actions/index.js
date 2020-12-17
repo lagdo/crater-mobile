@@ -11,7 +11,7 @@ export const navigate = (name, params = {}) => {
   navigationRef.current?.navigate(name, params);
 };
 
-let backHandler = null;
+const handlers = { back: null };
 
 // Get Value with translated
 // -----------------------------------------
@@ -31,10 +31,10 @@ const exitApp = () => {
 
 // Go Back Navigation
 // -----------------------------------------
-export const removeBackHandler = () => backHandler && backHandler.remove();
+export const removeBackHandler = () => handlers.back && handlers.back.remove();
 
 export const setOnBackHandler = (onBack) => {
-    backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+    handlers.back = BackHandler.addEventListener('hardwareBackPress', () => {
         onBack();
         return true;
     })
