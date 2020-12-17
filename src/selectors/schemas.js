@@ -8,7 +8,6 @@ const payment_method = new schema.Entity('payment_methods');
 const taxType = new schema.Entity('taxTypes');
 const tax = new schema.Entity('taxes', { taxType });
 
-const company = new schema.Entity('company');
 const customer = new schema.Entity('customers', { currency });
 
 const unit = new schema.Entity('units');
